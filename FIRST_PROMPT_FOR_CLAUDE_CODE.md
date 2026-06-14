@@ -23,6 +23,7 @@
 - `FLOOR_BOARD_SPEC.md`
 - `CONTENT_AUDIT_AND_GAPS.md`
 - `PILOT_STATION_PLAN.md`
+קבצים gameContent.json ו-gameContent.types.ts נמצאים בשורש ולא ב-src/data/
 
 אל תבנה את כל המשחק בבת אחת.
 
