@@ -2080,7 +2080,7 @@ function renderStationModal() {
     const ueGroupColor = COLOR[currentGroup.colorToken].primary;
     const ueGroupBadge = `<div style="display:inline-block;background:${ueGroupColor}18;border:1.5px solid ${ueGroupColor}55;
             border-radius:8px;padding:6px 20px;margin-bottom:14px;font-size:13px;font-weight:700;color:${ueGroupColor}">
-            הקבוצה המושפעת: ${currentGroup.label} — ${currentGroup.divisionName}
+            ${currentGroup.label} — ${currentGroup.divisionName}
           </div>`;
     if (activeUEResult) {
       const noDelay = activeUEResult.waitRounds === 0;
