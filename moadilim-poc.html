@@ -265,7 +265,12 @@
   ::-webkit-scrollbar-track{background:transparent}
   ::-webkit-scrollbar-thumb{background:#C0C4E8;border-radius:3px}
   @keyframes wheelSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-  .wheel-icon{display:inline-block;animation:wheelSpin 2.4s linear infinite;font-size:72px;line-height:1}
+  .wheel-css{width:80px;height:80px;border-radius:50%;display:inline-block;
+    background:conic-gradient(#C8102E 0deg 60deg,#FFD700 60deg 120deg,#1E1F56 120deg 180deg,
+      #E07820 180deg 240deg,#2A6A3A 240deg 300deg,#8B2090 300deg 360deg);
+    animation:wheelSpin 2.4s linear infinite;position:relative;box-shadow:0 3px 14px rgba(0,0,0,.22)}
+  .wheel-css::after{content:'';position:absolute;inset:30%;border-radius:50%;background:#fff;
+    box-shadow:inset 0 1px 4px rgba(0,0,0,.2)}
 </style>
 </head>
 <body>
@@ -2154,7 +2159,7 @@ function renderStationModal() {
       content = `
         <div style="text-align:center;padding:24px 0 12px">
           ${ueGroupBadge}
-          <div class="wheel-icon">🎡</div>
+          <div class="wheel-css"></div>
           <p style="font-size:15px;color:#5A3000;font-weight:600;margin:14px 0 20px">
             גלגל מזלות — מה יהיה?
           </p>
