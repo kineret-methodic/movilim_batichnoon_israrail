@@ -2073,10 +2073,16 @@ function renderStationModal() {
         </button>`}
       </div>`;
   } else if (station.type === 'unexpected_event') {
+    const ueGroupColor = COLOR[currentGroup.colorToken].primary;
+    const ueGroupBadge = `<div style="display:inline-block;background:${ueGroupColor}18;border:1.5px solid ${ueGroupColor}55;
+            border-radius:8px;padding:6px 20px;margin-bottom:14px;font-size:13px;font-weight:700;color:${ueGroupColor}">
+            הקבוצה המושפעת: ${currentGroup.label} — ${currentGroup.divisionName}
+          </div>`;
     if (activeUEResult) {
       const noDelay = activeUEResult.waitRounds === 0;
       content = `
         <div style="text-align:center;padding:16px 0">
+          ${ueGroupBadge}
           <div style="background:#FFF3E0;border:2px solid #E07820;border-radius:12px;
             padding:22px 20px;margin-bottom:20px;max-width:440px;margin-left:auto;margin-right:auto">
             <div style="font-size:12px;color:#A05010;margin-bottom:8px;font-weight:600;letter-spacing:.04em">
@@ -2107,6 +2113,7 @@ function renderStationModal() {
     } else if (ueAlreadyUsed) {
       content = `
         <div style="text-align:center;padding:28px 0">
+          ${ueGroupBadge}
           <div style="font-size:40px;margin-bottom:12px">⚡</div>
           <p style="font-size:14px;color:#5A5A8A;line-height:1.6;margin-bottom:20px;
             max-width:320px;margin-left:auto;margin-right:auto">
@@ -2121,6 +2128,7 @@ function renderStationModal() {
     } else {
       content = `
         <div style="text-align:center;padding:36px 0">
+          ${ueGroupBadge}
           <div style="font-size:52px;margin-bottom:14px">🎲</div>
           <p style="font-size:15px;color:#5A3000;font-weight:600;margin-bottom:24px">
             תחנת בלת"מ — מה יהיה?
