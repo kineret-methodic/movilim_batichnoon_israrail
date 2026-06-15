@@ -1127,43 +1127,47 @@ const GC = {
   "compensationModels": {
     "group_1": {
       "modelName": "זמינות וכשירות צי נייד",
-      "rewardMetric": "זמינות הצי בפועל",
-      "formula": "זמינות בפועל / יעד זמינות שנתי × 100",
-      "weight": "יושלם בתיאום עם הלקוחה",
-      "performanceThresholds": "יושלם בתיאום עם הלקוחה",
-      "dataSource": "יושלם בתיאום עם הלקוחה",
+      "rewardMetric": "שיפור זמינות הצי",
+      "formula": "לפי עמידה ביעד",
+      "weight": "זמינות קרונועים: 40% | כשירות טכנית: 35% | עמידה בלוח זמנים: 20% | בטיחות ציוד: 10% (סה״כ: 105%)",
+      "performanceThresholds": "100% = עמידה מלאה ביעד הזמינות | 80% = חריגה של עד 10% | מתחת ל-70% = אי-עמידה",
+      "dataSource": "מערכת ניהול הצי, דוחות תפעוליים רבעוניים",
       "notes": "המשקולות מסתכמות ל-105 במקום 100 — יש לתקן",
-      "devHint": "טעות מוטמנת: המשקולות מסתכמות ל-105 במקום 100."
+      "devErrors": ["rewardMetric", "formula", "weight"],
+      "devHint": "טעויות מוטמנות: (1) מדד תגמול עמום — נכון: 'זמינות הצי בפועל'. (2) נוסחה עמומה — נכון: 'זמינות בפועל / יעד זמינות שנתי × 100'. (3) משקולות מסתכמות ל-105 במקום 100."
     },
     "group_2": {
       "modelName": "תהליכי גיוס והכשרות",
-      "rewardMetric": "קיצור משך תהליך הגיוס הממוצע",
-      "formula": "משך תהליך בפועל ביחס ליעד שנתי",
-      "weight": "יושלם בתיאום עם הלקוחה",
-      "performanceThresholds": "יושלם בתיאום עם הלקוחה",
-      "dataSource": "יושלם בתיאום עם הלקוחה",
+      "rewardMetric": "שיפור תהליכי גיוס",
+      "formula": "מספר מועמדים שטופלו",
+      "weight": "גיוס: 30% | הכשרות: 30% | שימור עובדים: 25% | ניהול ידע: 20% (סה״כ: 105%)",
+      "performanceThresholds": "100% = עמידה מלאה ביעד | 80% = חריגה של עד 15% | מתחת ל-65% = אי-עמידה",
+      "dataSource": "מערכת HR, מאגר גיוס ומעקב הכשרות",
       "notes": "משקלים 30+30+25+20 = 105 במקום 100 — יש לתקן",
-      "devHint": "טעות מוטמנת: משקלים 30+30+25+20 = 105 במקום 100."
+      "devErrors": ["rewardMetric", "formula", "weight"],
+      "devHint": "טעויות מוטמנות: (1) מדד תגמול עמום — נכון: 'קיצור משך תהליך הגיוס הממוצע'. (2) נוסחה שגויה — מונה כמות מועמדים ולא מודדת שיפור; נכון: 'משך תהליך בפועל / יעד שנתי × 100'. (3) משקלים 30+30+25+20 = 105 במקום 100."
     },
     "group_3": {
       "modelName": "בטיחות ועמידה ברגולציה",
-      "rewardMetric": "צמצום ימי היעדרות עקב תאונת עבודה",
-      "formula": "יושלם בתיאום עם הלקוחה",
-      "weight": "יושלם בתיאום עם הלקוחה",
-      "performanceThresholds": "יושלם בתיאום עם הלקוחה",
-      "dataSource": "יושלם בתיאום עם הלקוחה",
+      "rewardMetric": "שיפור בטיחות",
+      "formula": "מספר אירועי בטיחות לפי ביקורת פנימית",
+      "weight": "בטיחות תפעולית: 50% | עמידה ברגולציה: 30% | הדרכות בטיחות: 20% (סה״כ: 100%)",
+      "performanceThresholds": "100% = עד 200 אירועי בטיחות בשנה | 70% = עד 250 אירועים | 0% = מעל 250 אירועים",
+      "dataSource": "מערכת בטיחות, דוחות תאונות ואירועים",
       "notes": "ספי הביצוע לא מאתגרים — יש להגדיר ספים ריאליים ומבוססי יעד",
-      "devHint": "טעות מוטמנת: ספי הביצוע לא מאתגרים ולא ברורים."
+      "devErrors": ["rewardMetric", "formula", "performanceThresholds"],
+      "devHint": "טעויות מוטמנות: (1) מדד תגמול עמום — נכון: 'צמצום ימי היעדרות עקב תאונת עבודה'. (2) נוסחה אינה מגדירה כיוון מדידה — נכון: נוסחה ברורה עם יעד ומקור נתונים. (3) ספי ביצוע לא מאתגרים — 200 אירועים בשנה כספה מלאה הוא גבוה מדי."
     },
     "group_4": {
       "modelName": "הגדלת הכנסות מסחר",
       "rewardMetric": "הכנסות מסחר בפועל ביחס ליעד",
-      "formula": "הכנסות מסחר בפועל / יעד הכנסות שנתי × 100",
-      "weight": "יושלם בתיאום עם הלקוחה",
-      "performanceThresholds": "יושלם בתיאום עם הלקוחה",
-      "dataSource": "יושלם בתיאום עם הלקוחה",
+      "formula": "הכנסות בפועל",
+      "weight": "הכנסות מסחר: 60% | תפוסת שטחים: 30% | חוזים חדשים: 10% (סה״כ: 100%)",
+      "performanceThresholds": "100% = 5,000,000 ₪ | 70% = 4,900,000 ₪ | 0% = 4,800,000 ₪",
+      "dataSource": "מערכת הכנסות, דוחות פיננסיים רבעוניים",
       "notes": "הספים צפופים מדי — יש להגדיר מדרגות מובחנות וריאליות",
-      "devHint": "טעות מוטמנת: הספים צפופים מדי — אין הבחנה משמעותית בין המדרגות."
+      "devErrors": ["formula", "performanceThresholds"],
+      "devHint": "טעויות מוטמנות: (1) נוסחה חלקית — 'הכנסות בפועל' לא מגדירה ביחס למה; נכון: 'הכנסות מסחר בפועל / יעד הכנסות שנתי × 100'. (2) ספי ביצוע צפופים מדי — הפרש של 100,000 ₪ בלבד בין כל מדרגה, אין הבחנה משמעותית."
     }
   },
   "unexpectedEvents": {
@@ -2536,7 +2540,7 @@ function renderFolder(wrap, group, col) {
         onclick="switchTab('${gid}','compensation')">${copy.tabs.compensationModel}</button>
     </div>
     <div class="m-content">
-      ${tab === 'tasks' ? renderTasksList(tasks, col, gid) : renderCompCard(comp, col)}
+      ${tab === 'tasks' ? renderTasksList(tasks, col, gid) : renderCompCard(comp, col, gid)}
     </div>
     <div class="reminder-bar">
       <button class="reminder-btn" style="color:${col.primary};border-color:${col.primary}"
@@ -2641,16 +2645,47 @@ function renderTaskCard(task, col, gid) {
     </div>`;
 }
 
-function renderCompCard(comp, col) {
+function renderCompCard(comp, col, gid) {
   if (!comp) return '<p style="color:#888;padding:12px">' + GC.uiCopy.messages.mobileNoCompensation + '</p>';
+  const errs = (DEV_MODE && comp.devErrors) ? new Set(comp.devErrors) : new Set();
+  const dv = (v, field) => {
+    if (errs.has(field)) return `<span style="background:#FFF3CD;color:#7A5000;font-weight:700;padding:0 4px;border-radius:3px;border-bottom:2px solid #E07000">⚠️ ${v}</span>`;
+    return devStyleVal(v);
+  };
+  const devBox = DEV_MODE && comp.devHint ? (() => {
+    const FIELD_TO_QID = {
+      rewardMetric: 'q_reward_metric', formula: 'q_reward_metric',
+      weight: 'q_weight', performanceThresholds: 'q_weight'
+    };
+    const QID_LABELS = {
+      q_reward_metric: 'מדד תגמול ונוסחה',
+      q_weight: 'משקולות וספי ביצוע'
+    };
+    const uniqueQids = [...new Set((comp.devErrors || []).map(f => FIELD_TO_QID[f]).filter(Boolean))];
+    const stationsHtml = uniqueQids.map(qid => {
+      const q = GC.stationQuestions.find(sq => sq.id === qid);
+      if (!q) return '';
+      const ans = q.answersByGroup ? q.answersByGroup[gid] : null;
+      return `<div style="margin-top:6px;padding:6px 8px;background:#FFF8E1;border-radius:4px;border-right:2px solid #C8920A">
+        <div style="font-weight:700;color:#5D4000;margin-bottom:3px">📍 תחנה: ${QID_LABELS[qid] || qid}</div>
+        <div style="color:#6B4D00;margin-bottom:2px"><strong>שאלה:</strong> ${q.questionText}</div>
+        ${ans ? `<div style="color:#7A3000;margin-bottom:2px"><strong>מה שגוי:</strong> ${ans.whatIsWrong}</div>
+        <div style="color:#2D5A00"><strong>תיקון:</strong> ${ans.correctFix}</div>` : ''}
+      </div>`;
+    }).join('');
+    return `<div style="margin-top:8px;padding:8px 10px;background:#FFF3CD;border-radius:6px;border-right:3px solid #E0A020;font-size:11px;color:#7A5000;line-height:1.6;direction:rtl">
+      <strong>⚠️ DEV — טעות מוטמנת:</strong> ${comp.devHint}
+      ${stationsHtml}
+    </div>`;
+  })() : '';
   return `<div class="comp-card">
     <div class="comp-title" style="color:${col.primary}">${comp.modelName}</div>
-    <div class="f-row"><span class="f-lbl">${GC.uiCopy.compensationFields.rewardMetric}</span><span class="f-val">${devStyleVal(comp.rewardMetric)}</span></div>
-    <div class="f-row"><span class="f-lbl">${GC.uiCopy.compensationFields.formula}</span><span class="f-val">${devStyleVal(comp.formula)}</span></div>
-    <div class="f-row"><span class="f-lbl">${GC.uiCopy.compensationFields.weight}</span><span class="f-val">${devStyleVal(comp.weight)}</span></div>
-    <div class="f-row"><span class="f-lbl">${GC.uiCopy.compensationFields.performanceThresholds}</span><span class="f-val">${devStyleVal(comp.performanceThresholds)}</span></div>
-    ${comp.dataSource ? `<div class="f-row"><span class="f-lbl">${GC.uiCopy.compensationFields.dataSource}</span><span class="f-val">${devStyleVal(comp.dataSource)}</span></div>` : ''}
-    ${DEV_MODE && comp.devHint ? `<div style="margin-top:8px;padding:8px 10px;background:#FFF3CD;border-radius:6px;border-right:3px solid #E0A020;font-size:11px;color:#7A5000;line-height:1.5"><strong>⚠️ DEV:</strong> ${comp.devHint}</div>` : ""}
+    <div class="f-row"><span class="f-lbl">${GC.uiCopy.compensationFields.rewardMetric}</span><span class="f-val">${dv(comp.rewardMetric,'rewardMetric')}</span></div>
+    <div class="f-row"><span class="f-lbl">${GC.uiCopy.compensationFields.formula}</span><span class="f-val">${dv(comp.formula,'formula')}</span></div>
+    <div class="f-row"><span class="f-lbl">${GC.uiCopy.compensationFields.weight}</span><span class="f-val">${dv(comp.weight,'weight')}</span></div>
+    <div class="f-row"><span class="f-lbl">${GC.uiCopy.compensationFields.performanceThresholds}</span><span class="f-val">${dv(comp.performanceThresholds,'performanceThresholds')}</span></div>
+    ${comp.dataSource ? `<div class="f-row"><span class="f-lbl">${GC.uiCopy.compensationFields.dataSource}</span><span class="f-val">${dv(comp.dataSource,'dataSource')}</span></div>` : ''}
+    ${devBox}
   </div>`;
 }
 
