@@ -116,12 +116,6 @@
     transition:background .15s}
   .outcome-popup-btn:hover{background:#2E2F80}
 
-  /* ── Dev skip button ── */
-  .dev-skip-btn{background:none;border:1.5px dashed #E07820;border-radius:6px;
-    color:#E07820;font-size:12px;font-weight:700;padding:4px 10px;cursor:pointer;
-    font-family:inherit;white-space:nowrap;flex-shrink:0;
-    transition:background .15s}
-  .dev-skip-btn:hover{background:rgba(224,120,32,.15)}
 
   /* ── Status bar ── */
   #status-bar{background:#1E1F56;display:flex;flex-shrink:0;border-top:2px solid #F5C800}
@@ -1382,7 +1376,7 @@ const GC = {
       "startGame": "התחילו משחק",
       "startTimer": "הפעילו טיימר",
       "correct": "נכון - התקדמו",
-      "partial": "חלקי - טעות + המתנה",
+      "partial": "חלקי - פחות נקודות",
       "wrong": "שגוי - טעות + המתנה",
       "revealAnswer": "חשפו תשובה",
       "openMobileFolder": "פתח תיק קבוצה",
@@ -1415,7 +1409,7 @@ const GC = {
       "softWarning": "שימו לב: לפי מצב המשחק, קבוצה זו עדיין לא הגיעה לתחנה הזו. להמשיך בכל זאת?",
       "stationCompleted": "תחנה זו כבר הושלמה. בתור הבא הקבוצה מתקדמת חזרה קדימה.",
       "unexpectedAlreadyUsed": "קבוצה זו כבר הפעילה את הבלת\"ם הזה. ממשיכים הלאה.",
-      "partialOutcome": "תשובה חלקית — +5 נקודות. הקבוצה מתקדמת לתחנה הבאה אך ממתינה סבב.",
+      "partialOutcome": "תשובה חלקית — +5 נקודות. הקבוצה מתקדמת לתחנה הבאה.",
       "wrongOutcome": "תשובה שגויה — 0 נקודות. הקבוצה מתקדמת לתחנה הבאה וממתינה סבב.",
       "correctOutcome": "תשובה נכונה — +10 נקודות! הקבוצה מתקדמת לתחנה הבאה.",
       "autoAdvanceNotice": "בתור הבא הקבוצה מתקדמת אוטומטית.",
@@ -1613,10 +1607,10 @@ function applyOutcome(groupId, stationId, outcome) {
     g.waitingOneRound = false;
   } else if (outcome === 'partial') {
     g.points += 5;
-    g.currentStationOrder = st.order + 1; // advance station — but wait next round
-    g.waitingOneRound = true;
+    g.currentStationOrder = st.order + 1; // advance station, no waiting — penalty is points only
+    g.waitingOneRound = false;
   } else {
-    // wrong: 0 points, advance station (same as partial), wait one round
+    // wrong: 0 points, advance station, wait one round
     g.points += 0;
     g.currentStationOrder = st.order + 1;
     g.waitingOneRound = true;
@@ -1809,8 +1803,6 @@ function renderFacilitator(app) {
             ${turnText}
             ${currentGroupWaiting ? `<span style="background:#7A3500;color:#FFB060;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-right:10px;vertical-align:middle">⏳ ממתינה סבב</span>` : ''}
           </div>`}
-      ${DEV_MODE ? `<button class="dev-skip-btn" onclick="devSkipTurn()"
-        title="דלג על תור הקבוצה הנוכחית (DEV בלבד)">⏭ דלג</button>` : ''}
       <button class="preview-btn${facilitatorPreview ? ' active' : ''}"
         onclick="facilitatorPreview=!facilitatorPreview;renderApp()"
         title="${facilitatorPreview ? 'בטל תצוגת מנחה' : 'תצוגת מנחה — פתח הכל'}">🔍</button>
@@ -2203,9 +2195,8 @@ function renderStationModal() {
                   : 'תשובה שגויה';
       const pts   = o === 'correct' ? '+10' : o === 'partial' ? '+5' : '+0';
       const ptsColor = o === 'correct' ? '#1A7A40' : o === 'partial' ? '#8A6A00' : '#A0001A';
-      const next  = o === 'correct' ? 'מתקדמים לתחנה הבאה 🚀'
-                  : o === 'partial' ? 'מתקדמים לתחנה הבאה — ממתינים סבב אחד ⏳'
-                  : 'מתקדמים לתחנה הבאה — ממתינים סבב אחד ⏳';
+      const next  = o === 'wrong' ? 'מתקדמים לתחנה הבאה — ממתינים סבב אחד ⏳'
+                  : 'מתקדמים לתחנה הבאה 🚀';
       return `<div class="outcome-popup-overlay" onclick="if(event.target===this)dismissOutcomePopup()">
         <div class="outcome-popup" style="border-top:6px solid ${col.primary}">
           <div class="outcome-popup-icon">${icon}</div>
