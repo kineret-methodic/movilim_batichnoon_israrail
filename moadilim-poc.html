@@ -1408,7 +1408,7 @@ const GC = {
       "stationCompleted": "תחנה זו כבר הושלמה. בתור הבא הקבוצה מתקדמת חזרה קדימה.",
       "unexpectedAlreadyUsed": "קבוצה זו כבר הפעילה את הבלת\"ם הזה. ממשיכים הלאה.",
       "partialOutcome": "תשובה חלקית — +5 נקודות. הקבוצה מתקדמת לתחנה הבאה אך ממתינה סבב.",
-      "wrongOutcome": "תשובה שגויה — 0 נקודות. הקבוצה נשארת בתחנה וממתינה סבב.",
+      "wrongOutcome": "תשובה שגויה — 0 נקודות. הקבוצה מתקדמת לתחנה הבאה וממתינה סבב.",
       "correctOutcome": "תשובה נכונה — +10 נקודות! הקבוצה מתקדמת לתחנה הבאה.",
       "autoAdvanceNotice": "בתור הבא הקבוצה מתקדמת אוטומטית.",
       "mobileTasksFallback": "תיק המשימות לקבוצה זו יושלם בשלב הבא.",
@@ -1608,8 +1608,9 @@ function applyOutcome(groupId, stationId, outcome) {
     g.currentStationOrder = st.order + 1; // advance station — but wait next round
     g.waitingOneRound = true;
   } else {
-    // wrong: 0 points, stay in same station, wait one round (retry next time)
+    // wrong: 0 points, advance station (same as partial), wait one round
     g.points += 0;
+    g.currentStationOrder = st.order + 1;
     g.waitingOneRound = true;
   }
   // advanceTurn() called in goBackToMap — after facilitator returns to map
@@ -2127,16 +2128,21 @@ function renderStationModal() {
       onclick="if(event.target===this && ${canClose ? 'true' : 'false'})goBackToMap()">
       <div style="background:#F0F2F7;border-radius:14px;width:100%;max-width:700px;
         max-height:90vh;overflow-y:auto;padding:24px;box-shadow:0 8px 32px rgba(30,31,86,.3)">
-        <div style="display:flex;align-items:center;margin-bottom:16px">
-          <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <div style="flex:1">
             <div style="font-size:11px;color:#8A90C0">${station.month || ''}</div>
             <h2 style="font-size:20px;font-weight:800;color:#1E1F56;margin:0">${station.name}</h2>
           </div>
           ${canClose ? `<button onclick="goBackToMap()"
-            style="margin-right:auto;background:#1E1F56;color:#fff;border:none;border-radius:7px;
+            style="background:#1E1F56;color:#fff;border:none;border-radius:7px;
               padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">
             ${copy.buttons.backToMap}
-          </button>` : `<span style="margin-right:auto;font-size:11px;color:#8A90C0">${GC.uiCopy.groupCard.mustAnswerFirst}</span>`}
+          </button>` : `<span style="font-size:11px;color:#8A90C0">${GC.uiCopy.groupCard.mustAnswerFirst}</span>`}
+          <button onclick="closeStationModal()"
+            style="background:none;border:1.5px solid #C0C4E0;border-radius:6px;
+              width:32px;height:32px;font-size:16px;cursor:pointer;color:#6A70A0;
+              display:flex;align-items:center;justify-content:center;flex-shrink:0"
+            title="סגירה ללא מעבר תור">✕</button>
         </div>
         ${content}
       </div>
@@ -2153,7 +2159,7 @@ function renderStationModal() {
       const ptsColor = o === 'correct' ? '#1A7A40' : o === 'partial' ? '#8A6A00' : '#A0001A';
       const next  = o === 'correct' ? 'מתקדמים לתחנה הבאה 🚀'
                   : o === 'partial' ? 'מתקדמים לתחנה הבאה — ממתינים סבב אחד ⏳'
-                  : 'נשארים בתחנה — ממתינים סבב אחד ⏳';
+                  : 'מתקדמים לתחנה הבאה — ממתינים סבב אחד ⏳';
       return `<div class="outcome-popup-overlay" onclick="if(event.target===this)dismissOutcomePopup()">
         <div class="outcome-popup" style="border-top:6px solid ${col.primary}">
           <div class="outcome-popup-icon">${icon}</div>
@@ -2340,6 +2346,18 @@ function confirmWarning(gid) { softWarningGroup = null; revealedGroups.add(gid);
 function dismissOutcomePopup() {
   outcomePopupVisible = false;
   goBackToMap(); // return to map after acknowledging result
+}
+
+function closeStationModal() {
+  // X button — close without advancing turn.
+  // But if an outcome was already applied, we must still advance (state already changed).
+  if (lastOutcome) {
+    goBackToMap();
+  } else {
+    activeStationId = null;
+    outcomePopupVisible = false;
+    renderApp();
+  }
 }
 
 function doOutcome(groupId, outcome) {
