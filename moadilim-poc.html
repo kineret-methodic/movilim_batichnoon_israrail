@@ -1760,9 +1760,12 @@ let outcomePopupVisible = false;
 
 function renderApp() {
   const app = document.getElementById('app');
-  if (currentView === 'facilitator' && !gameStarted) {
+  if (currentView === 'facilitator' && !gameStarted && !DEV_MODE) {
     renderWelcome(app);
     return;
+  }
+  if (currentView === 'facilitator' && !gameStarted && DEV_MODE) {
+    gameStarted = true; // skip welcome in dev mode
   }
   if (currentView === 'facilitator') {
     renderFacilitator(app);
@@ -1792,7 +1795,7 @@ function renderFacilitator(app) {
 
   let html = `
     <div class="f-header">
-      <div class="f-title">${copy.appTitle}</div>
+      <div class="f-title">${copy.appTitle}${DEV_MODE ? '<span style="font-size:11px;font-weight:600;background:#C8102E;color:#fff;border-radius:4px;padding:2px 7px;margin-right:8px;vertical-align:middle;letter-spacing:.03em">תצוגת פיתוח</span>' : ''}</div>
       ${facilitatorPreview
         ? `<div class="f-turn-indicator"><span class="preview-badge">👁 תצוגת מנחה — הכל פתוח</span></div>`
         : `<div class="f-turn-indicator" style="color:${currentGroupColor}">
