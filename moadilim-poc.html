@@ -100,6 +100,13 @@
     animation:previewPulse 2.5s ease-in-out infinite}
   @keyframes previewPulse{0%,100%{opacity:1}50%{opacity:.7}}
 
+  /* ── Dev skip button ── */
+  .dev-skip-btn{background:none;border:1.5px dashed #E07820;border-radius:6px;
+    color:#E07820;font-size:12px;font-weight:700;padding:4px 10px;cursor:pointer;
+    font-family:inherit;white-space:nowrap;flex-shrink:0;
+    transition:background .15s}
+  .dev-skip-btn:hover{background:rgba(224,120,32,.15)}
+
   /* ── Status bar ── */
   #status-bar{background:#1E1F56;display:flex;flex-shrink:0;border-top:2px solid #F5C800}
   .status-item{flex:1;padding:7px 10px;border-left:1px solid #2E3080;display:flex;flex-direction:column;gap:2px}
@@ -1592,6 +1599,21 @@ function applyOutcome(groupId, stationId, outcome) {
   // advanceTurn() called in goBackToMap — after facilitator returns to map
 }
 
+// DEV only — skip current group's turn without answering
+function devSkipTurn() {
+  if (!DEV_MODE) return;
+  const g = gameState[GC.groups[currentTurnGroupIndex].id];
+  const st = stationByOrder(g.currentStationOrder);
+  // mark as played + advance one station (like a "partial" answer)
+  if (st) g.currentStationOrder = st.order + 1;
+  g.playedThisRound = true;
+  g.waitingOneRound = false;
+  if (!g.completedStationIds.includes(st && st.id)) g.completedStationIds.push(st && st.id);
+  activeStationId = null;
+  advanceTurn();
+  renderApp();
+}
+
 function advanceTurn() {
   // Find next group that hasn't played this round
   let checked = 0;
@@ -1755,6 +1777,8 @@ function renderFacilitator(app) {
         ? `<div class="f-turn-indicator"><span class="preview-badge">👁 תצוגת מנחה — הכל פתוח</span></div>`
         : `<div class="f-turn-indicator">${turnText}</div>`}
       ${activeStationId ? `<button class="back-btn" onclick="goBackToMap()">${copy.buttons.backToMap} ←</button>` : ''}
+      ${DEV_MODE ? `<button class="dev-skip-btn" onclick="devSkipTurn()"
+        title="דלג על תור הקבוצה הנוכחית (DEV בלבד)">⏭ דלג</button>` : ''}
       <button class="preview-btn${facilitatorPreview ? ' active' : ''}"
         onclick="facilitatorPreview=!facilitatorPreview;renderApp()"
         title="${facilitatorPreview ? 'בטל תצוגת מנחה' : 'תצוגת מנחה — פתח הכל'}">🔍</button>
