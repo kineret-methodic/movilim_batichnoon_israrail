@@ -1538,7 +1538,7 @@ const GC = {
     "turnIndicator": "תור {group} — {division} — תחנת {station}",
     "groupCard": {
       "waitingMessage": "קבוצה זו ממתינה סבב",
-      "skipButton": "דלגו כדי להמשיך",
+      "skipButton": "להמשיך עם הקבוצה הבאה",
       "stationLocked": "תחנה זו לא פעילה בתור הנוכחי",
       "clickToOpen": "▶ לחצו",
       "approveTransition": "אישור מעבר",
@@ -1781,6 +1781,7 @@ function renderFacilitator(app) {
   const currentGroup = GC.groups[currentTurnGroupIndex];
   const currentGS = gs(currentGroup.id);
   const currentSt = stationByOrder(currentGS.currentStationOrder);
+  const currentGroupColor = COLOR[currentGroup.colorToken].primary;
   const turnText = GC.uiCopy.turnIndicator
     .replace('{group}', currentGroup.label)
     .replace('{division}', currentGroup.divisionName)
@@ -1791,7 +1792,7 @@ function renderFacilitator(app) {
       <div class="f-title">${copy.appTitle}</div>
       ${facilitatorPreview
         ? `<div class="f-turn-indicator"><span class="preview-badge">👁 תצוגת מנחה — הכל פתוח</span></div>`
-        : `<div class="f-turn-indicator">${turnText}</div>`}
+        : `<div class="f-turn-indicator" style="color:${currentGroupColor}">${turnText}</div>`}
       ${activeStationId ? `<button class="back-btn" onclick="goBackToMap()">${copy.buttons.backToMap} ←</button>` : ''}
       ${DEV_MODE ? `<button class="dev-skip-btn" onclick="devSkipTurn()"
         title="דלג על תור הקבוצה הנוכחית (DEV בלבד)">⏭ דלג</button>` : ''}
@@ -2338,7 +2339,7 @@ function confirmWarning(gid) { softWarningGroup = null; revealedGroups.add(gid);
 
 function dismissOutcomePopup() {
   outcomePopupVisible = false;
-  renderApp();
+  goBackToMap(); // return to map after acknowledging result
 }
 
 function doOutcome(groupId, outcome) {
