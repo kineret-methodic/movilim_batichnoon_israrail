@@ -2637,7 +2637,7 @@ function renderTaskCard(task, col, gid) {
               </div>`;
             }).join('');
             return `<div style="margin-top:8px;padding:8px 10px;background:#FFF3CD;border-radius:6px;border-right:3px solid #E0A020;font-size:11px;color:#7A5000;line-height:1.6;direction:rtl">
-              <strong>⚠️ DEV — טעות מוטמנת:</strong> ${task.devHint}
+              <strong>⚠️ טעות מוטמנת</strong>
               ${stationsHtml}
             </div>`;
           })() : ''}
@@ -2674,7 +2674,7 @@ function renderCompCard(comp, col, gid) {
       </div>`;
     }).join('');
     return `<div style="margin-top:8px;padding:8px 10px;background:#FFF3CD;border-radius:6px;border-right:3px solid #E0A020;font-size:11px;color:#7A5000;line-height:1.6;direction:rtl">
-      <strong>⚠️ DEV — טעות מוטמנת:</strong> ${comp.devHint}
+      <strong>⚠️ טעות מוטמנת</strong>
       ${stationsHtml}
     </div>`;
   })() : '';
