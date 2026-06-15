@@ -1,0 +1,2660 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title id="page-title"></title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;direction:rtl}
+  body{font-family:'Heebo','Arial',sans-serif;background:#F0F2F7;color:#1A1C50;-webkit-font-smoothing:antialiased}
+
+  /* ── Nav bar ── */
+  #nav{position:fixed;top:0;right:0;left:0;background:#1E1F56;
+    padding:6px 14px;display:flex;gap:6px;z-index:999;align-items:center;flex-wrap:wrap;
+    border-bottom:3px solid #F5C800}
+  #nav span{color:#A0A8D8;font-size:11px;padding:4px 6px}
+  .nav-btn{color:#C8CEF0;font-size:12px;padding:4px 10px;border-radius:4px;
+    border:1px solid #3A3E88;cursor:pointer;background:none;font-family:inherit;white-space:nowrap}
+  .nav-btn:hover{background:#2A2E72}
+  .nav-btn.active{background:#F5C800;color:#000000;border-color:#F5C800;font-weight:700}
+
+  /* ── Main layout ── */
+  #app{padding-top:40px;height:100vh;display:flex;flex-direction:column}
+
+  /* ── Facilitator header ── */
+  .f-header{background:#1E1F56;padding:10px 20px;
+    display:flex;align-items:center;gap:14px;flex-shrink:0;
+    border-bottom:1px solid #2E3080}
+  .f-title{font-size:18px;font-weight:800;letter-spacing:.02em;color:#FFFFFF}
+  .f-sub{font-size:11px;color:#8A92CC;flex:1}
+  .f-turn-indicator{font-size:13px;font-weight:700;color:#F5C800;
+    flex:1;text-align:center;letter-spacing:.01em}
+  .back-btn{background:#2A2E72;border:1px solid #3A3E88;color:#C8CEF0;border-radius:6px;
+    padding:6px 14px;cursor:pointer;font-size:12px;font-family:inherit}
+  .back-btn:hover{background:#3A3E88}
+
+  /* ── Board map ── */
+  #board-wrap{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px 16px;
+    background:#F0F2F7;display:flex;flex-direction:column;gap:6px}
+
+  /* Section labels */
+  .bsl{display:flex;justify-content:space-between;align-items:center;
+    padding:0 2px;margin-top:4px}
+  .bsl span:first-child{font-size:11px;font-weight:600;color:#1E1F56}
+  .bsl-months{font-size:10px;color:#8A90C0}
+
+  /* Board rows */
+  .board-row{display:flex;align-items:center;gap:0;flex-wrap:nowrap;
+    justify-content:center;
+    background:#FFFFFF;border-radius:12px;padding:8px 10px;
+    border:1px solid #D0D4F0;box-shadow:0 1px 4px rgba(30,31,86,.06);
+    overflow-x:auto}
+  .row-ltr{flex-direction:row-reverse}
+
+  /* Arrow between stations */
+  .row-arr{font-size:14px;color:#B0B4D8;flex-shrink:0;padding:0 4px;line-height:1}
+
+  /* Connector between rows */
+  .board-conn{display:flex;flex-direction:column;align-items:flex-end;padding-right:24px;height:24px;position:relative}
+  .board-conn.left{align-items:flex-start;padding-left:24px;padding-right:0}
+  .board-conn.right{align-items:flex-end}
+  .conn-v{width:1.5px;background:#B0B4D8;flex:1}
+  .conn-a{font-size:14px;color:#B0B4D8;line-height:1}
+
+  /* Station node */
+  .sn{border-radius:8px;padding:7px 10px;cursor:pointer;text-align:center;
+    flex-shrink:0;min-width:88px;max-width:110px;
+    transition:box-shadow .15s,transform .1s;
+    box-shadow:0 1px 3px rgba(30,31,86,.1)}
+  .sn:hover{transform:scale(1.05);box-shadow:0 3px 10px rgba(30,31,86,.2)}
+  .sn-pro{background:#FFFFFF;border:1.5px solid #1E1F56}
+  .sn-comp{background:#F0FFF8;border:1.5px solid #1A6A3A}
+  .sn-tr{background:#EEF0FF;border:1.5px solid #5A5EAA}
+  .sn-tr-comp{background:#E8F5EE;border:2px solid #1A6A3A}
+  .sn-ue{background:#FFF3E0;border:1.5px dashed #E07820;min-width:60px}
+  .sn-refl{background:#F5F0FF;border:1.5px dashed #8A70C0}
+  .sn-month{font-size:8px;color:#8A90C0;margin-bottom:2px}
+  .sn-name{font-size:10px;font-weight:600;color:#1A1C50;line-height:1.35}
+  .sn-ue .sn-name{color:#7A3A00}
+  .sn-tr .sn-name,.sn-tr-comp .sn-name{color:#2A2E72}
+  .sn-comp .sn-name,.sn-tr-comp .sn-name{color:#0D3A22}
+  .sn-refl .sn-name{color:#4A2A80}
+  .sn-toks{display:flex;justify-content:center;gap:3px;margin-top:5px}
+  .sn-tok{width:9px;height:9px;border-radius:50%;border:1px solid rgba(255,255,255,.8);display:inline-block}
+
+  /* keep old .token for status bar */
+  .token{width:10px;height:10px;border-radius:50%;border:1px solid rgba(255,255,255,.7);display:inline-block}
+
+  /* ── Status bar ── */
+  #status-bar{background:#1E1F56;display:flex;flex-shrink:0;border-top:2px solid #F5C800}
+  .status-item{flex:1;padding:7px 10px;border-left:1px solid #2E3080;display:flex;flex-direction:column;gap:2px}
+  .s-grp{font-size:12px;font-weight:700;color:#FFFFFF}
+  .s-div{font-size:9px;color:#7A80C0}
+  .s-pos{font-size:10px;color:#C8CEF0}
+  .s-err{font-size:10px;color:#F5C800}
+  .auto-tag{font-size:9px;background:#2A3A18;color:#80D050;border-radius:3px;
+    padding:1px 4px;align-self:flex-start;margin-top:1px}
+
+  /* ── Station screen ── */
+  #station-screen{flex:1;overflow-y:auto;padding:18px 22px;background:#F0F2F7}
+  .st-month{font-size:11px;color:#6A70B0;margin-bottom:4px}
+  .st-name{font-size:24px;font-weight:800;color:#1E1F56;margin-bottom:8px}
+  .st-principle{font-size:13px;color:#5A60A0;font-style:italic;line-height:1.6;
+    padding-bottom:14px;border-bottom:2px solid #D8DAF0;margin-bottom:16px}
+
+  /* ── Question box ── */
+  .q-box{background:#FFFFFF;border:1px solid #D0D4F0;border-right:4px solid #1E1F56;
+    border-radius:10px;padding:16px 18px;margin-bottom:18px;
+    display:flex;gap:18px;align-items:flex-start;
+    box-shadow:0 1px 4px rgba(30,31,86,.08)}
+  .q-text{flex:1;font-size:15px;color:#1A1C50;line-height:1.7;font-weight:500}
+
+  /* ── Timer ── */
+  .timer-wrap{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0}
+  .timer-display{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;
+    min-width:52px;text-align:center;color:#1E1F56}
+  .timer-btn{border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;
+    font-family:inherit;font-weight:700;border:1px solid;white-space:nowrap}
+
+  /* ── Group cards ── */
+  .cards-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .g-card{background:#FFFFFF;border-radius:10px;padding:14px;
+    border:1px solid #D0D4F0;box-shadow:0 1px 4px rgba(30,31,86,.07)}
+  .g-card-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .g-label{font-weight:700;font-size:13px;color:#1E1F56}
+  .g-div{font-size:11px;color:#7A80C0;flex:1}
+  .completed-badge{font-size:9px;background:#E8F5EE;color:#1A6A3A;border-radius:4px;
+    padding:2px 5px;border:1px solid #A8D8B8}
+  .reveal-btn{width:100%;padding:9px;border:none;border-radius:7px;color:#fff;
+    font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+  .reveal-btn:hover{opacity:.88}
+
+  /* ── Answer block ── */
+  .ans-row{display:flex;gap:8px;margin-bottom:7px;font-size:12px;line-height:1.5}
+  .ans-lbl{color:#6A70B0;font-weight:700;min-width:86px;flex-shrink:0}
+  .ans-val{color:#1A1C50}
+  .ans-fix{color:#1A6A3A;font-weight:600}
+  .outcome-row{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+  .outcome-btn{flex:1;min-width:76px;padding:7px 4px;border:none;border-radius:7px;
+    color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1.3}
+  .outcome-btn:hover{opacity:.88}
+  .completed-note{font-size:11px;color:#7A80C0;font-style:italic;padding:8px 0}
+
+  /* ── Transition box ── */
+  .transition-box{background:#FFFFFF;border:2px solid #1E1F56;
+    border-radius:12px;padding:28px 24px;text-align:center;
+    max-width:520px;margin:0 auto;box-shadow:0 2px 12px rgba(30,31,86,.1)}
+  .transition-title{font-size:22px;font-weight:800;color:#1E1F56;margin-bottom:12px}
+  .transition-body{font-size:15px;color:#3A3E78;line-height:1.7}
+
+  /* ── Soft warning modal ── */
+  .overlay{position:fixed;inset:0;background:rgba(30,31,86,.5);display:flex;
+    align-items:center;justify-content:center;z-index:500}
+  .modal{background:#FFFFFF;border:2px solid #1E1F56;border-radius:12px;
+    padding:26px 28px;max-width:400px;text-align:center;
+    box-shadow:0 4px 24px rgba(30,31,86,.2)}
+  .modal p{font-size:14px;color:#2A2E72;line-height:1.6;margin-bottom:18px}
+  .modal-btns{display:flex;gap:10px;justify-content:center}
+  .btn-sec{background:#F0F2F7;border:1px solid #C0C4E8;color:#3A3E78;border-radius:7px;
+    padding:8px 18px;cursor:pointer;font-size:12px;font-family:inherit}
+  .btn-danger{background:#C8102E;border:1px solid #A00820;color:#FFFFFF;border-radius:7px;
+    padding:8px 18px;cursor:pointer;font-size:12px;font-family:inherit}
+
+  /* ── Mobile ── */
+  #mobile-wrap{height:calc(100vh - 40px);overflow-y:auto;background:#F5F7FA;
+    color:#1A2A3A;max-width:440px;margin:0 auto;font-family:'Heebo','Arial',sans-serif;
+    display:flex;flex-direction:column}
+  .splash{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:32px 24px;gap:22px}
+  .splash-bar{height:6px;flex-shrink:0;width:100%}
+  .splash-logo{display:flex;align-items:center;gap:10px;width:100%}
+  .splash-logo-line{flex:1;height:1px;background:#D0D8E0}
+  .splash-logo-text{font-size:19px;font-weight:800;letter-spacing:.04em;white-space:nowrap}
+  .splash-badge{color:#fff;border-radius:18px;padding:5px 18px;font-size:14px;font-weight:700}
+  .splash-div{font-size:15px;color:#444;font-weight:500}
+  .splash-intro-card{background:#fff;border-radius:11px;padding:16px 18px;
+    box-shadow:0 1px 8px rgba(0,0,0,.08);width:100%}
+  .splash-intro-card p{font-size:13px;color:#555;line-height:1.7;margin:0}
+  .splash-btn{width:100%;padding:13px;border:none;border-radius:10px;color:#fff;
+    font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+  .m-header{background:#fff;padding:13px 15px 11px;flex-shrink:0}
+  .m-header-top{display:flex;align-items:center;gap:9px;margin-bottom:3px}
+  .m-badge{color:#fff;border-radius:11px;padding:2px 10px;font-size:11px;font-weight:700}
+  .m-div-name{font-size:12px;color:#666;font-weight:500}
+  .m-title{font-size:17px;font-weight:800;color:#1A2A3A;letter-spacing:.02em}
+  .m-tabs{background:#fff;display:flex;border-bottom:1px solid #E0E8F0;flex-shrink:0}
+  .m-tab{flex:1;padding:11px 8px;border:none;background:none;font-size:12px;
+    cursor:pointer;font-family:inherit;transition:color .15s}
+  .m-content{flex:1;overflow-y:auto;padding:10px 11px 80px}
+  .task-list{display:flex;flex-direction:column;gap:9px}
+  .t-card{background:#fff;border-radius:9px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+  .t-card-header{width:100%;background:none;border:none;display:flex;align-items:center;
+    justify-content:space-between;padding:13px 13px;cursor:pointer;font-family:inherit;text-align:right}
+  .t-card-name{font-size:13px;font-weight:600;color:#1A2A3A;flex:1}
+  .chevron{font-size:13px;color:#AAB8C8;transition:transform .2s;flex-shrink:0}
+  .t-card-body{padding:0 13px 14px;border-top:1px solid #F0F4F8}
+  .t-section{padding-top:10px}
+  .t-section-title{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+  .t-divider{height:1px;background:#F0F4F8;margin:4px 0}
+  .f-row{display:flex;gap:7px;margin-bottom:7px;align-items:flex-start}
+  .f-lbl{font-size:11px;color:#7A8A9A;font-weight:600;flex-shrink:0;min-width:100px;padding-top:1px}
+  .f-val{font-size:12px;color:#2A3A4A;line-height:1.5;flex:1}
+  .milestones-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+  .m-cell{display:flex;flex-direction:column;gap:3px}
+  .m-q{color:#fff;border-radius:4px;padding:2px;font-size:10px;font-weight:700;text-align:center}
+  .m-v{font-size:10px;color:#4A5A6A;line-height:1.4}
+  .comp-card{background:#fff;border-radius:9px;padding:16px 14px;
+    box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:9px}
+  .comp-title{font-size:15px;font-weight:700;margin-bottom:3px}
+  .reminder-bar{position:sticky;bottom:0;background:#fff;border-top:1px solid #E0E8F0;
+    padding:9px 14px;display:flex;justify-content:center}
+  .reminder-btn{background:none;border:1px solid;border-radius:18px;padding:5px 18px;
+    font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+  .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:100}
+  .drawer{position:fixed;bottom:0;right:0;left:0;background:#fff;border-radius:14px 14px 0 0;
+    padding:14px 18px 28px;z-index:101;max-width:440px;margin:0 auto;
+    box-shadow:0 -4px 24px rgba(0,0,0,.15)}
+  .drawer-handle{width:38px;height:4px;border-radius:2px;margin:0 auto 14px}
+  .drawer-title{font-size:15px;font-weight:700;color:#1A2A3A;margin-bottom:14px}
+  .def-row{margin-bottom:12px}
+  .def-term{font-size:12px;font-weight:700;display:block;margin-bottom:2px}
+  .def-def{font-size:12px;color:#4A5A6A;line-height:1.5}
+  .drawer-close{margin-top:10px;width:100%;background:none;border:1px solid;
+    border-radius:7px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+
+  /* Scrollbar */
+  ::-webkit-scrollbar{width:5px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:#C0C4E8;border-radius:3px}
+</style>
+</head>
+<body>
+<div id="nav">
+  <span id="nav-label"></span>
+  <button class="nav-btn active" id="nav-fac" onclick="showView('facilitator')">🖥 <span id="nav-fac-lbl"></span></button>
+  <button class="nav-btn" id="nav-g1" onclick="showView('mobile','group_1')">📱 <span id="nav-g1-lbl"></span></button>
+  <button class="nav-btn" id="nav-g2" onclick="showView('mobile','group_2')">📱 <span id="nav-g2-lbl"></span></button>
+  <button class="nav-btn" id="nav-g3" onclick="showView('mobile','group_3')">📱 <span id="nav-g3-lbl"></span></button>
+  <button class="nav-btn" id="nav-g4" onclick="showView('mobile','group_4')">📱 <span id="nav-g4-lbl"></span></button>
+</div>
+<div id="app"></div>
+
+<script>
+const GC = {
+  "groups": [
+    {
+      "id": "group_1",
+      "label": "קבוצה 1",
+      "divisionName": "חטיבת נייד",
+      "colorToken": "blue"
+    },
+    {
+      "id": "group_2",
+      "label": "קבוצה 2",
+      "divisionName": "חטיבת משאבי אנוש",
+      "colorToken": "green"
+    },
+    {
+      "id": "group_3",
+      "label": "קבוצה 3",
+      "divisionName": "חטיבת בטיחות, ביטחון ואיכ\"ס",
+      "colorToken": "orange"
+    },
+    {
+      "id": "group_4",
+      "label": "קבוצה 4",
+      "divisionName": "חטיבת פיתוח עסקי",
+      "colorToken": "purple"
+    }
+  ],
+  "stations": [
+    {
+      "id": "station_start",
+      "name": "כולם לעלות",
+      "month": "יוני",
+      "type": "transition",
+      "segment": "workplan",
+      "order": 0,
+      "boardPosition": {
+        "x": 92,
+        "y": 80
+      },
+      "transitionMessageId": "transition_start"
+    },
+    {
+      "id": "station_company_goal",
+      "name": "מטרת חברה ויעד",
+      "month": "יולי",
+      "type": "professional",
+      "segment": "workplan",
+      "order": 1,
+      "boardPosition": {
+        "x": 78,
+        "y": 80
+      },
+      "questionId": "q_company_goal"
+    },
+    {
+      "id": "station_outcome_metric",
+      "name": "מדד תוצאה או משימה",
+      "month": "יולי",
+      "type": "professional",
+      "segment": "workplan",
+      "order": 2,
+      "boardPosition": {
+        "x": 64,
+        "y": 80
+      },
+      "questionId": "q_outcome_metric"
+    },
+    {
+      "id": "station_top10",
+      "name": "Top 10 / שוטפת",
+      "month": "אוגוסט",
+      "type": "professional",
+      "segment": "workplan",
+      "order": 3,
+      "boardPosition": {
+        "x": 50,
+        "y": 80
+      },
+      "questionId": "q_top10"
+    },
+    {
+      "id": "station_unexpected_aug",
+      "name": "בלת\"ם",
+      "month": "אוגוסט",
+      "type": "unexpected_event",
+      "segment": "workplan",
+      "order": 4,
+      "boardPosition": {
+        "x": 36,
+        "y": 80
+      },
+      "unexpectedEventSetId": "ue_set_aug"
+    },
+    {
+      "id": "station_measurable",
+      "name": "ניסוח מדיד",
+      "month": "ספטמבר",
+      "type": "professional",
+      "segment": "workplan",
+      "order": 5,
+      "boardPosition": {
+        "x": 22,
+        "y": 80
+      },
+      "questionId": "q_measurable"
+    },
+    {
+      "id": "station_output_metric",
+      "name": "מדד תפוקה",
+      "month": "ספטמבר",
+      "type": "professional",
+      "segment": "workplan",
+      "order": 6,
+      "boardPosition": {
+        "x": 8,
+        "y": 80
+      },
+      "questionId": "q_output_metric"
+    },
+    {
+      "id": "station_unexpected_sep",
+      "name": "בלת\"ם",
+      "month": "ספטמבר",
+      "type": "unexpected_event",
+      "segment": "workplan",
+      "order": 7,
+      "boardPosition": {
+        "x": 8,
+        "y": 48
+      },
+      "unexpectedEventSetId": "ue_set_sep"
+    },
+    {
+      "id": "station_milestones",
+      "name": "אבני דרך רבעוניות",
+      "month": "אוקטובר",
+      "type": "professional",
+      "segment": "workplan",
+      "order": 8,
+      "boardPosition": {
+        "x": 22,
+        "y": 48
+      },
+      "questionId": "q_milestones"
+    },
+    {
+      "id": "station_gate_divisional",
+      "name": "שער אישור חטיבתי",
+      "month": "אוקטובר",
+      "type": "transition",
+      "segment": "workplan",
+      "order": 9,
+      "boardPosition": {
+        "x": 36,
+        "y": 48
+      },
+      "transitionMessageId": "transition_gate_divisional"
+    },
+    {
+      "id": "station_unexpected_oct",
+      "name": "בלת\"ם",
+      "month": "אוקטובר",
+      "type": "unexpected_event",
+      "segment": "workplan",
+      "order": 10,
+      "boardPosition": {
+        "x": 50,
+        "y": 48
+      },
+      "unexpectedEventSetId": "ue_set_oct"
+    },
+    {
+      "id": "station_deputy_ceo",
+      "name": "משנה למנכ\"ל – נעילה לעריכה",
+      "month": "נובמבר",
+      "type": "transition",
+      "segment": "workplan",
+      "order": 11,
+      "boardPosition": {
+        "x": 64,
+        "y": 48
+      },
+      "transitionMessageId": "transition_deputy_ceo"
+    },
+    {
+      "id": "station_unexpected_nov",
+      "name": "בלת\"ם – רגע לפני אישור",
+      "month": "נובמבר",
+      "type": "unexpected_event",
+      "segment": "workplan",
+      "order": 12,
+      "boardPosition": {
+        "x": 78,
+        "y": 48
+      },
+      "unexpectedEventSetId": "ue_set_nov"
+    },
+    {
+      "id": "station_workplan_approved",
+      "name": "מנכ\"ל ודירקטוריון – אישור תכנית עבודה",
+      "month": "דצמבר",
+      "type": "transition",
+      "segment": "transition_to_compensation",
+      "order": 13,
+      "boardPosition": {
+        "x": 92,
+        "y": 48
+      },
+      "transitionMessageId": "transition_workplan_approved"
+    },
+    {
+      "id": "station_reward_metric",
+      "name": "מדד תגמול ונוסחה",
+      "month": "דצמבר",
+      "type": "professional",
+      "segment": "compensation",
+      "order": 14,
+      "boardPosition": {
+        "x": 92,
+        "y": 16
+      },
+      "questionId": "q_reward_metric"
+    },
+    {
+      "id": "station_unexpected_comp",
+      "name": "בלת\"ם – מודל תגמול",
+      "month": "דצמבר",
+      "type": "unexpected_event",
+      "segment": "compensation",
+      "order": 15,
+      "boardPosition": {
+        "x": 78,
+        "y": 16
+      },
+      "unexpectedEventSetId": "ue_set_comp"
+    },
+    {
+      "id": "station_weight",
+      "name": "משקל וספי ביצוע",
+      "month": "דצמבר",
+      "type": "professional",
+      "segment": "compensation",
+      "order": 16,
+      "boardPosition": {
+        "x": 64,
+        "y": 16
+      },
+      "questionId": "q_weight"
+    },
+    {
+      "id": "station_unexpected_comp2",
+      "name": "בלת\"ם – תיקון במודל תגמול",
+      "month": "דצמבר",
+      "type": "unexpected_event",
+      "segment": "compensation",
+      "order": 17,
+      "boardPosition": {
+        "x": 50,
+        "y": 16
+      },
+      "unexpectedEventSetId": "ue_set_comp2"
+    },
+    {
+      "id": "station_end",
+      "name": "מודל תגמול מאושר",
+      "month": "ינואר",
+      "type": "transition",
+      "segment": "compensation",
+      "order": 18,
+      "boardPosition": {
+        "x": 36,
+        "y": 16
+      },
+      "transitionMessageId": "transition_model_approved"
+    },
+    {
+      "id": "station_reflection",
+      "name": "התחנה הבאה שלי",
+      "month": "ינואר",
+      "type": "reflection",
+      "segment": "reflection",
+      "order": 19,
+      "boardPosition": {
+        "x": 20,
+        "y": 16
+      }
+    }
+  ],
+  "stationQuestions": [
+    {
+      "id": "q_company_goal",
+      "stationId": "station_company_goal",
+      "questionText": "עיינו במשימות לבדיקה. אחת מהן אינה משויכת בצורה מדויקת למטרת החברה או ליעד. אתרו אותה, תקנו את השיוך ונמקו.",
+      "professionalPrinciple": "תשובה נכונה מזהה את המשימה עם השיוך השגוי ומתקנת כך שהמשימה תיגזר ממטרת החברה ותשרת יעד מתאים.",
+      "timerSeconds": 60,
+      "answersByGroup": {
+        "group_1": {
+          "groupId": "group_1",
+          "taskName": "שדרוג סלון נוסעים",
+          "whatIsWrong": "המשימה שויכה בטעות למטרה \"פיתוח מנופי צמיחה\" וליעד עסקי.",
+          "correctFix": "לשייך למטרה: השירות כערך עליון, וליעד: הקניית רמת שירות מיטבית ללקוחות הרכבת.",
+          "facilitatorNotes": null
+        },
+        "group_2": {
+          "groupId": "group_2",
+          "taskName": "צמצום ימי הכשרות נהגי נוסעים בקורס ישיר",
+          "whatIsWrong": "המשימה שויכה בטעות למטרה \"שירות כערך עליון\".",
+          "correctFix": "לשייך למטרה \"פיתוח ושימור ההון האנושי\" וליעד של פיתוח מקצועיות, כשירות ותרבות למידה.",
+          "facilitatorNotes": null
+        },
+        "group_3": {
+          "groupId": "group_3",
+          "taskName": "היערכות הרכבת בחירום",
+          "whatIsWrong": "היעד שהוגדר הוא \"עמידה בציות וברגולציה\", אך זה לא היעד המדויק.",
+          "correctFix": "לשייך ליעד \"מימוש מיטבי של התוכנית להפחתת סיכונים\".",
+          "facilitatorNotes": null
+        },
+        "group_4": {
+          "groupId": "group_4",
+          "taskName": "הרחבת פעילות מסחרית בתחנות מרכזיות",
+          "whatIsWrong": "המשימה שויכה בטעות למטרה הקשורה לשירות נוסעים בלבד.",
+          "correctFix": "לשייך ל\"פיתוח מנופי צמיחה\" וליעד של פעילות כלכלית, רווחית ועסקית.",
+          "facilitatorNotes": null
+        }
+      }
+    },
+    {
+      "id": "q_outcome_metric",
+      "stationId": "station_outcome_metric",
+      "questionText": "במשימות לבדיקה מופיע בלבול: פעולה הוצגה כמדד תוצאה או מדד הוצג כמשימה. אתרו את הבלבול ותקנו.",
+      "professionalPrinciple": "משימה היא פעולה מרכזית שמבצעים בפועל. מדד תוצאה בוחן אם היעד הושג. תשובה נכונה מסווגת מחדש את הרכיבים ומנמקת לפי ההבחנה הזו.",
+      "timerSeconds": 60,
+      "answersByGroup": {
+        "group_1": {
+          "groupId": "group_1",
+          "taskName": "קליטת קרונועים חשמליים מסוג DDEMU",
+          "whatIsWrong": "\"קליטת 50 קרונועים\" הוגדרה כמדד תוצאה.",
+          "correctFix": "זו תפוקה/ביצוע משימה. מדד תוצאה מתאים יותר יהיה קשור לשיעור זמינות או כשירות הצי.",
+          "facilitatorNotes": null
+        },
+        "group_2": {
+          "groupId": "group_2",
+          "taskName": "הקמת מתחם גיוס חדש",
+          "whatIsWrong": "\"בניית מתחם גיוס\" הוגדרה כמדד תוצאה.",
+          "correctFix": "זו משימה/פעולה. מדד תוצאה צריך לבחון את השפעת המהלך, למשל שיפור חוויית מועמד או קיצור תהליך גיוס.",
+          "facilitatorNotes": null
+        },
+        "group_3": {
+          "groupId": "group_3",
+          "taskName": "הטמעת בטיחות בכלל החטיבות",
+          "whatIsWrong": "\"הטמעת בטיחות\" הוגדרה כמדד תוצאה.",
+          "correctFix": "זו פעולה רחבה. מדד תוצאה מתאים יכול להיות צמצום ימי היעדרות עקב תאונות עבודה או הפחתת אירועי בטיחות.",
+          "facilitatorNotes": null
+        },
+        "group_4": {
+          "groupId": "group_4",
+          "taskName": "שיווק והשכרה של שטחי מסחר",
+          "whatIsWrong": "המשימה עצמה הוגדרה כמדד תוצאה.",
+          "correctFix": "\"שיווק והשכרה\" היא פעולה; מדד תוצאה מתאים הוא סך הכנסות מסחר או שיעור תפוסת שטחי מסחר.",
+          "facilitatorNotes": null
+        }
+      }
+    },
+    {
+      "id": "q_top10",
+      "stationId": "station_top10",
+      "questionText": "עיינו במשימות לבדיקה. אחת מהן סווגה באופן לא מדויק כ־Top 10 או כשוטפת. אתרו אותה, תקנו את הסיווג ונמקו.",
+      "professionalPrinciple": "משימת Top 10 צריכה להיות בנתיב הקריטי להשגת יעדי החברה, בעלת חשיבות גבוהה, המשכיות, התאמה למשאבים/תקציב והשפעה משמעותית. משימה שוטפת או אדמיניסטרטיבית לא תסווג כ־Top 10.",
+      "timerSeconds": 60,
+      "answersByGroup": {
+        "group_1": {
+          "groupId": "group_1",
+          "taskName": "הגשת דוח רבעוני למנכ\"ל",
+          "whatIsWrong": "המשימה סווגה כ־Top 10.",
+          "correctFix": "זו משימה שוטפת / אדמיניסטרטיבית ולא משימה בנתיב הקריטי.",
+          "facilitatorNotes": null
+        },
+        "group_2": {
+          "groupId": "group_2",
+          "taskName": "הכנת חומרים לדיוני הנהלה בנושא הכשרות",
+          "whatIsWrong": "המשימה סווגה כ־Top 10.",
+          "correctFix": "זו משימה תומכת/שוטפת, אלא אם היא חלק ממהלך אסטרטגי מוגדר.",
+          "facilitatorNotes": null
+        },
+        "group_3": {
+          "groupId": "group_3",
+          "taskName": "ניטור אוויר בתחנות הרכבת לפי רגולציה",
+          "whatIsWrong": "המשימה סווגה כשוטפת בלבד.",
+          "correctFix": "מאחר שמדובר במשימה רגולטורית ובנתיב קריטי לציות ולבטיחות, ניתן לסווגה כ־Top 10.",
+          "facilitatorNotes": null
+        },
+        "group_4": {
+          "groupId": "group_4",
+          "taskName": "מעקב יומי אחרי מלאים/נכסים מסחריים",
+          "whatIsWrong": "המשימה סווגה כ־Top 10.",
+          "correctFix": "זו פעילות שוטפת, לא משימה אסטרטגית בנתיב הקריטי.",
+          "facilitatorNotes": null
+        }
+      }
+    },
+    {
+      "id": "q_measurable",
+      "stationId": "station_measurable",
+      "questionText": "במשימות לבדיקה יש משימה שנוסחה באופן עמום מדי. אתרו אותה ונסחו אותה מחדש כך שיהיה ברור מה מבוצע, למי, באיזה היקף ועד מתי.",
+      "professionalPrinciple": "ניסוח טוב כולל פעולה ברורה, תוצר מדיד, היקף או יעד, ומועד. ניסוחים כלליים כמו \"הנגשת מידע\", \"שיפור ממשקים\" או \"קידום תהליך\" אינם מספיקים ללא פירוט מדיד.",
+      "timerSeconds": 60,
+      "answersByGroup": {
+        "group_1": {
+          "groupId": "group_1",
+          "taskName": "שיפור זמינות הצי הנייד",
+          "whatIsWrong": "הניסוח כללי מדי ואינו מגדיר פעולה, היקף או מועד.",
+          "correctFix": "למשל: \"קליטת 50 קרונועים חשמליים מסוג DDEMU עד סוף השנה, לפי אבני דרך רבעוניות\".",
+          "facilitatorNotes": null
+        },
+        "group_2": {
+          "groupId": "group_2",
+          "taskName": "הנגשת מידע למועמדים חדשים",
+          "whatIsWrong": "\"הנגשת מידע\" הוא ניסוח עמום ולא מדיד.",
+          "correctFix": "למשל: \"הקמת אזור מידע דיגיטלי למועמדים הכולל 5 תכנים מרכזיים עד סוף רבעון 2\".",
+          "facilitatorNotes": null
+        },
+        "group_3": {
+          "groupId": "group_3",
+          "taskName": "הטמעת תרבות בטיחות בכלל החטיבות",
+          "whatIsWrong": "לא ברור מה ייחשב הטמעה, באילו חטיבות, באיזה היקף ומתי.",
+          "correctFix": "למשל: \"ביצוע 4 סדנאות בטיחות לחטיבות יעד והטמעת נוהל אחיד עד סוף רבעון 3\".",
+          "facilitatorNotes": null
+        },
+        "group_4": {
+          "groupId": "group_4",
+          "taskName": "קידום מסחר בתחנות",
+          "whatIsWrong": "ניסוח כללי מדי.",
+          "correctFix": "למשל: \"השכרת 10 שטחי מסחר חדשים בתחנות מרכזיות עד סוף רבעון 3\".",
+          "facilitatorNotes": null
+        }
+      }
+    },
+    {
+      "id": "q_output_metric",
+      "stationId": "station_output_metric",
+      "questionText": "באחת מהמשימות לבדיקה נבחר סוג מדד תפוקה שאינו מתאים. אתרו את המשימה, בחרו סוג מדד מתאים ונמקו.",
+      "professionalPrinciple": "בינארי מתאים לבוצע/לא בוצע; כמותי עולה לשאיפה למקסימום; כמותי יורד לשאיפה למינימום; אחוזים להתקדמות יחסית. התשובה צריכה לחבר בין אופי המשימה, ההישג השנתי וסוג המדד.",
+      "timerSeconds": 60,
+      "answersByGroup": {
+        "group_1": {
+          "groupId": "group_1",
+          "taskName": "קליטת קרונועים חשמליים מסוג DDEMU",
+          "whatIsWrong": "סוג מדד התפוקה הוגדר כבינארי.",
+          "correctFix": "כמותי עולה, כי מודדים כמות מצטברת של קרונועים שנקלטו.",
+          "facilitatorNotes": null
+        },
+        "group_2": {
+          "groupId": "group_2",
+          "taskName": "צמצום ימי הכשרות נהגי נוסעים",
+          "whatIsWrong": "סוג מדד התפוקה הוגדר ככמותי עולה.",
+          "correctFix": "כמותי יורד או אחוז הפחתה, כי שואפים לצמצם ימי הכשרה.",
+          "facilitatorNotes": null
+        },
+        "group_3": {
+          "groupId": "group_3",
+          "taskName": "צמצום ימי היעדרות עקב תאונת עבודה",
+          "whatIsWrong": "סוג מדד התפוקה הוגדר ככמותי עולה.",
+          "correctFix": "כמותי יורד, כי שואפים להפחית מספר ימים/מקרים.",
+          "facilitatorNotes": null
+        },
+        "group_4": {
+          "groupId": "group_4",
+          "taskName": "הרחבת פעילות מסחרית בתחנות",
+          "whatIsWrong": "סוג מדד התפוקה הוגדר כבינארי.",
+          "correctFix": "כמותי עולה, למשל מספר שטחי מסחר שהושכרו או היקף שטח מסחרי פעיל.",
+          "facilitatorNotes": null
+        }
+      }
+    },
+    {
+      "id": "q_milestones",
+      "stationId": "station_milestones",
+      "questionText": "עיינו במשימות לבדיקה. באחת מהן פריסת אבני הדרך אינה מאפשרת בקרה לאורך השנה. אתרו אותה והציעו פריסה מתוקנת.",
+      "professionalPrinciple": "פריסה תקינה מאפשרת ניהול ובקרה לאורך השנה. משימה שכל אבני הדרך שלה מרוכזות ברבעון 4 נחשבת לתכנון לא מאתגר.",
+      "timerSeconds": 60,
+      "answersByGroup": {
+        "group_1": {
+          "groupId": "group_1",
+          "taskName": "קליטת קרונועים DDEMU",
+          "whatIsWrong": "כל אבני הדרך מרוכזות ברבעון 4.",
+          "correctFix": "לפרוס לאורך השנה: Q1: 10 קרונועים, Q2: 10, Q3: 10, Q4: 20.",
+          "facilitatorNotes": null
+        },
+        "group_2": {
+          "groupId": "group_2",
+          "taskName": "הנגשת מידע למועמדים",
+          "whatIsWrong": "כל העבודה הוגדרה לרבעון 4.",
+          "correctFix": "Q1: אפיון תכנים, Q2: כתיבה והפקה, Q3: העלאה לאוויר, Q4: בדיקה ושיפור.",
+          "facilitatorNotes": null
+        },
+        "group_3": {
+          "groupId": "group_3",
+          "taskName": "ניטור אוויר בתחנות",
+          "whatIsWrong": "אבני הדרך מתחילות מאוחר מדי, רק Q3–Q4.",
+          "correctFix": "Q1: אפיון צרכים ותקציב, Q2: רכש/התקשרות, Q3: התקנה, Q4: בדיקה והטמעה.",
+          "facilitatorNotes": null
+        },
+        "group_4": {
+          "groupId": "group_4",
+          "taskName": "הרחבת פעילות מסחרית בתחנות",
+          "whatIsWrong": "כל ההשכרות מתוכננות ל־Q4.",
+          "correctFix": "Q1: איתור שטחים, Q2: מכרז/שיווק, Q3: חתימה, Q4: הפעלה.",
+          "facilitatorNotes": null
+        }
+      }
+    },
+    {
+      "id": "q_reward_metric",
+      "stationId": "station_reward_metric",
+      "questionText": "במודל התגמול לבדיקה יש מדד או נוסחה שאינם מספיק ברורים. אתרו את הבעיה ותקנו.",
+      "professionalPrinciple": "מדד תגמול צריך להגדיר כיצד מודדים הצלחה של יחידה לצורך תגמול. נוסחה צריכה להבהיר איך מחשבים את הביצוע בפועל – מה נספר, איך מחושב ומה מקור הנתונים.",
+      "timerSeconds": 60,
+      "answersByGroup": {
+        "group_1": {
+          "groupId": "group_1",
+          "taskName": "זמינות וכשירות צי נייד",
+          "whatIsWrong": "המדד הוגדר \"שיפור זמינות הצי\" והנוסחה \"לפי עמידה ביעד\" – שניהם עמומים.",
+          "correctFix": "להגדיר נוסחה ברורה: זמינות בפועל / יעד זמינות שנתי × 100, כולל מקור נתונים.",
+          "facilitatorNotes": null
+        },
+        "group_2": {
+          "groupId": "group_2",
+          "taskName": "תהליכי גיוס והכשרות",
+          "whatIsWrong": "המדד \"שיפור תהליכי גיוס\" עמום, והנוסחה \"מספר מועמדים שטופלו\" אינה מודדת שיפור.",
+          "correctFix": "למשל: \"קיצור משך תהליך הגיוס הממוצע\", עם נוסחה: משך תהליך בפועל / יעד שנתי × 100.",
+          "facilitatorNotes": null
+        },
+        "group_3": {
+          "groupId": "group_3",
+          "taskName": "בטיחות",
+          "whatIsWrong": "המדד \"שיפור בטיחות\" כללי מדי, והנוסחה אינה מבהירה כיוון מדידה.",
+          "correctFix": "למשל: \"צמצום ימי היעדרות עקב תאונת עבודה\", עם נוסחה ברורה ומקור נתונים.",
+          "facilitatorNotes": null
+        },
+        "group_4": {
+          "groupId": "group_4",
+          "taskName": "הכנסות מסחר",
+          "whatIsWrong": "הנוסחה \"הכנסות בפועל\" חלקית – לא ברור ביחס למה נמדדת הצלחה.",
+          "correctFix": "הכנסות מסחר בפועל / יעד הכנסות שנתי × 100.",
+          "facilitatorNotes": null
+        }
+      }
+    },
+    {
+      "id": "q_weight",
+      "stationId": "station_weight",
+      "questionText": "בדקו את מודל התגמול לבדיקה: האם המשקולות מסתכמות ל־100? האם ספי הביצוע ריאליים ומאתגרים?",
+      "professionalPrinciple": "כל המשקולות יחד צריכות להסתכם ל־100. ספי הביצוע צריכים להגדיר עמידה מלאה, חלקית או אי־עמידה, ולהיות ריאליים ומאתגרים.",
+      "timerSeconds": 60,
+      "answersByGroup": {
+        "group_1": {
+          "groupId": "group_1",
+          "taskName": "זמינות צי",
+          "whatIsWrong": "המשקולות במדדים מסתכמות ל־105 במקום 100.",
+          "correctFix": "לעדכן את המשקולות כך שסך כל המדדים יהיה 100.",
+          "facilitatorNotes": null
+        },
+        "group_2": {
+          "groupId": "group_2",
+          "taskName": "גיוס והכשרות",
+          "whatIsWrong": "המשקלים 30, 30, 25, 20 מסתכמים ל־105.",
+          "correctFix": "לתקן כך שסך המשקולות יהיה 100.",
+          "facilitatorNotes": null
+        },
+        "group_3": {
+          "groupId": "group_3",
+          "taskName": "בטיחות",
+          "whatIsWrong": "ספי הביצוע לא מאתגרים: 100 = עד 200 אירועים, 70 = עד 250 אירועים, ללא הצדקה.",
+          "correctFix": "להגדיר ספים ריאליים, מאתגרים וברורים, המבוססים על יעד ומקור נתונים.",
+          "facilitatorNotes": null
+        },
+        "group_4": {
+          "groupId": "group_4",
+          "taskName": "הכנסות מסחר",
+          "whatIsWrong": "הספים צפופים מדי: 100 = 5 מיליון, 70 = 4.9 מיליון, 0 = 4.8 מיליון.",
+          "correctFix": "להגדיר מדרגות ביצוע מובחנות, ריאליות ומאתגרות.",
+          "facilitatorNotes": null
+        }
+      }
+    }
+  ],
+  "_prototype_note": "Prototype uses 3 visible tasks for group_1. Full version may expand to 4 tasks if needed.",
+  "visibleTasks": {
+    "group_1": [
+      {
+        "taskId": "g1_t1",
+        "taskName": "קליטת קרונועים חשמליים מסוג DDEMU",
+        "companyGoal": "יושלם בתיאום עם הלקוחה",
+        "goal": "יושלם בתיאום עם הלקוחה",
+        "outcomeMetric": "שיעור זמינות או כשירות הצי",
+        "classification": "top10",
+        "taskDescription": "יושלם בתיאום עם הלקוחה",
+        "annualAchievement": "יושלם בתיאום עם הלקוחה",
+        "outputMetricType": "כמותי עולה",
+        "milestones": {
+          "Q1": "10 קרונועים",
+          "Q2": "10 קרונועים",
+          "Q3": "10 קרונועים",
+          "Q4": "20 קרונועים"
+        },
+        "devHint": "טעות מוטמנת: סוג מדד תפוקה הוגדר כבינארי. נכון: כמותי עולה."
+      },
+      {
+        "taskId": "g1_t2",
+        "taskName": "שדרוג סלון נוסעים",
+        "companyGoal": "השירות כערך עליון",
+        "goal": "הקניית רמת שירות מיטבית ללקוחות הרכבת",
+        "outcomeMetric": "יושלם בתיאום עם הלקוחה",
+        "classification": "top10",
+        "taskDescription": "יושלם בתיאום עם הלקוחה",
+        "annualAchievement": "יושלם בתיאום עם הלקוחה",
+        "outputMetricType": "יושלם בתיאום עם הלקוחה",
+        "milestones": {
+          "Q1": "יושלם בתיאום עם הלקוחה",
+          "Q2": "יושלם בתיאום עם הלקוחה",
+          "Q3": "יושלם בתיאום עם הלקוחה",
+          "Q4": "יושלם בתיאום עם הלקוחה"
+        },
+        "devHint": "טעות מוטמנת: שויכה למטרה 'פיתוח מנופי צמיחה'. נכון: השירות כערך עליון, יעד: הקניית רמת שירות מיטבית ללקוחות הרכבת."
+      },
+      {
+        "taskId": "g1_t3",
+        "taskName": "הגשת דוח רבעוני למנכ\"ל",
+        "companyGoal": "יושלם בתיאום עם הלקוחה",
+        "goal": "יושלם בתיאום עם הלקוחה",
+        "outcomeMetric": "יושלם בתיאום עם הלקוחה",
+        "classification": "routine",
+        "taskDescription": "יושלם בתיאום עם הלקוחה",
+        "annualAchievement": "4 דוחות רבעוניים במועד",
+        "outputMetricType": "יושלם בתיאום עם הלקוחה",
+        "milestones": {
+          "Q1": "דוח Q1 — אפריל",
+          "Q2": "דוח Q2 — יולי",
+          "Q3": "דוח Q3 — אוקטובר",
+          "Q4": "דוח Q4 — ינואר"
+        },
+        "devHint": "טעות מוטמנת: סווגה כ-Top 10. נכון: משימה שוטפת / אדמיניסטרטיבית."
+      }
+    ],
+    "group_2": [
+      {
+        "taskId": "g2_t1",
+        "taskName": "צמצום ימי הכשרות נהגי נוסעים בקורס ישיר",
+        "companyGoal": "פיתוח ושימור ההון האנושי",
+        "goal": "פיתוח מקצועיות, כשירות ותרבות למידה",
+        "outcomeMetric": "קיצור משך תהליך ההכשרה הממוצע",
+        "classification": "top10",
+        "taskDescription": "יושלם בתיאום עם הלקוחה",
+        "annualAchievement": "יושלם בתיאום עם הלקוחה",
+        "outputMetricType": "כמותי יורד",
+        "milestones": {
+          "Q1": "יושלם בתיאום עם הלקוחה",
+          "Q2": "יושלם בתיאום עם הלקוחה",
+          "Q3": "יושלם בתיאום עם הלקוחה",
+          "Q4": "יושלם בתיאום עם הלקוחה"
+        },
+        "devHint": "טעות מוטמנת: סוג מדד תפוקה הוגדר ככמותי עולה. נכון: כמותי יורד."
+      },
+      {
+        "taskId": "g2_t2",
+        "taskName": "הקמת מתחם גיוס חדש",
+        "companyGoal": "יושלם בתיאום עם הלקוחה",
+        "goal": "יושלם בתיאום עם הלקוחה",
+        "outcomeMetric": "שיפור חוויית מועמד או קיצור תהליך גיוס",
+        "classification": "top10",
+        "taskDescription": "יושלם בתיאום עם הלקוחה",
+        "annualAchievement": "יושלם בתיאום עם הלקוחה",
+        "outputMetricType": "יושלם בתיאום עם הלקוחה",
+        "milestones": {
+          "Q1": "יושלם בתיאום עם הלקוחה",
+          "Q2": "יושלם בתיאום עם הלקוחה",
+          "Q3": "יושלם בתיאום עם הלקוחה",
+          "Q4": "יושלם בתיאום עם הלקוחה"
+        },
+        "devHint": "טעות מוטמנת: 'בניית מתחם גיוס' הוגדרה כמדד תוצאה. נכון: זו משימה/פעולה. מדד תוצאה: שיפור חוויית מועמד או קיצור תהליך גיוס."
+      },
+      {
+        "taskId": "g2_t3",
+        "taskName": "הנגשת מידע למועמדים חדשים",
+        "companyGoal": "יושלם בתיאום עם הלקוחה",
+        "goal": "יושלם בתיאום עם הלקוחה",
+        "outcomeMetric": "יושלם בתיאום עם הלקוחה",
+        "classification": "top10",
+        "taskDescription": "הקמת אזור מידע דיגיטלי למועמדים הכולל תכנים מרכזיים",
+        "annualAchievement": "הקמת אזור מידע דיגיטלי הכולל 5 תכנים מרכזיים עד סוף רבעון 2",
+        "outputMetricType": "יושלם בתיאום עם הלקוחה",
+        "milestones": {
+          "Q1": "אפיון תכנים",
+          "Q2": "כתיבה והפקה",
+          "Q3": "העלאה לאוויר",
+          "Q4": "בדיקה ושיפור"
+        },
+        "devHint": "טעות מוטמנת: כל אבני הדרך הוגדרו לרבעון 4. נכון: לפרוס — Q1 אפיון, Q2 כתיבה, Q3 העלאה, Q4 בדיקה."
+      },
+      {
+        "taskId": "g2_t4",
+        "taskName": "הכנת חומרים לדיוני הנהלה בנושא הכשרות",
+        "companyGoal": "יושלם בתיאום עם הלקוחה",
+        "goal": "יושלם בתיאום עם הלקוחה",
+        "outcomeMetric": "יושלם בתיאום עם הלקוחה",
+        "classification": "routine",
+        "taskDescription": "יושלם בתיאום עם הלקוחה",
+        "annualAchievement": "יושלם בתיאום עם הלקוחה",
+        "outputMetricType": "יושלם בתיאום עם הלקוחה",
+        "milestones": {
+          "Q1": "יושלם בתיאום עם הלקוחה",
+          "Q2": "יושלם בתיאום עם הלקוחה",
+          "Q3": "יושלם בתיאום עם הלקוחה",
+          "Q4": "יושלם בתיאום עם הלקוחה"
+        },
+        "devHint": "טעות מוטמנת: סווגה כ-Top 10. נכון: משימה תומכת/שוטפת."
+      }
+    ],
+    "group_3": [
+      {
+        "taskId": "g3_t1",
+        "taskName": "היערכות הרכבת בחירום",
+        "companyGoal": "יושלם בתיאום עם הלקוחה",
+        "goal": "מימוש מיטבי של התוכנית להפחתת סיכונים",
+        "outcomeMetric": "יושלם בתיאום עם הלקוחה",
+        "classification": "top10",
+        "taskDescription": "יושלם בתיאום עם הלקוחה",
+        "annualAchievement": "יושלם בתיאום עם הלקוחה",
+        "outputMetricType": "יושלם בתיאום עם הלקוחה",
+        "milestones": {
+          "Q1": "יושלם בתיאום עם הלקוחה",
+          "Q2": "יושלם בתיאום עם הלקוחה",
+          "Q3": "יושלם בתיאום עם הלקוחה",
+          "Q4": "יושלם בתיאום עם הלקוחה"
+        },
+        "devHint": "טעות מוטמנת: היעד הוגדר כ'עמידה בציות וברגולציה'. נכון: מימוש מיטבי של התוכנית להפחתת סיכונים."
+      },
+      {
+        "taskId": "g3_t2",
+        "taskName": "הטמעת בטיחות בכלל החטיבות",
+        "companyGoal": "יושלם בתיאום עם הלקוחה",
+        "goal": "יושלם בתיאום עם הלקוחה",
+        "outcomeMetric": "צמצום ימי היעדרות עקב תאונות עבודה או הפחתת אירועי בטיחות",
+        "classification": "top10",
+        "taskDescription": "ביצוע סדנאות בטיחות לחטיבות יעד והטמעת נוהל אחיד",
+        "annualAchievement": "4 סדנאות בטיחות לחטיבות יעד והטמעת נוהל אחיד עד סוף רבעון 3",
+        "outputMetricType": "יושלם בתיאום עם הלקוחה",
+        "milestones": {
+          "Q1": "יושלם בתיאום עם הלקוחה",
+          "Q2": "יושלם בתיאום עם הלקוחה",
+          "Q3": "יושלם בתיאום עם הלקוחה",
+          "Q4": "יושלם בתיאום עם הלקוחה"
+        },
+        "devHint": "טעות מוטמנת: 'הטמעת בטיחות' הוגדרה כמדד תוצאה. נכון: זו פעולה. מדד תוצאה: צמצום ימי היעדרות או הפחתת אירועי בטיחות."
+      },
+      {
+        "taskId": "g3_t3",
+        "taskName": "ניטור אוויר בתחנות הרכבת לפי רגולציה",
+        "companyGoal": "יושלם בתיאום עם הלקוחה",
+        "goal": "יושלם בתיאום עם הלקוחה",
+        "outcomeMetric": "יושלם בתיאום עם הלקוחה",
+        "classification": "top10",
+        "taskDescription": "יושלם בתיאום עם הלקוחה",
+        "annualAchievement": "יושלם בתיאום עם הלקוחה",
+        "outputMetricType": "יושלם בתיאום עם הלקוחה",
+        "milestones": {
+          "Q1": "אפיון צרכים ותקציב",
+          "Q2": "רכש והתקשרות",
+          "Q3": "התקנה",
+          "Q4": "בדיקה והטמעה"
+        },
+        "devHint": "טעות מוטמנת: סווגה כשוטפת. נכון: Top 10 — משימה רגולטורית בנתיב קריטי."
+      },
+      {
+        "taskId": "g3_t4",
+        "taskName": "צמצום ימי היעדרות עקב תאונת עבודה",
+        "companyGoal": "יושלם בתיאום עם הלקוחה",
+        "goal": "יושלם בתיאום עם הלקוחה",
+        "outcomeMetric": "יושלם בתיאום עם הלקוחה",
+        "classification": "top10",
+        "taskDescription": "יושלם בתיאום עם הלקוחה",
+        "annualAchievement": "יושלם בתיאום עם הלקוחה",
+        "outputMetricType": "כמותי יורד",
+        "milestones": {
+          "Q1": "יושלם בתיאום עם הלקוחה",
+          "Q2": "יושלם בתיאום עם הלקוחה",
+          "Q3": "יושלם בתיאום עם הלקוחה",
+          "Q4": "יושלם בתיאום עם הלקוחה"
+        },
+        "devHint": "טעות מוטמנת: סוג מדד תפוקה הוגדר ככמותי עולה. נכון: כמותי יורד."
+      }
+    ],
+    "group_4": [
+      {
+        "taskId": "g4_t1",
+        "taskName": "שיווק והשכרה של שטחי מסחר",
+        "companyGoal": "פיתוח מנופי צמיחה",
+        "goal": "פעילות כלכלית, רווחית ועסקית",
+        "outcomeMetric": "סך הכנסות מסחר או שיעור תפוסת שטחי מסחר",
+        "classification": "top10",
+        "taskDescription": "יושלם בתיאום עם הלקוחה",
+        "annualAchievement": "יושלם בתיאום עם הלקוחה",
+        "outputMetricType": "יושלם בתיאום עם הלקוחה",
+        "milestones": {
+          "Q1": "יושלם בתיאום עם הלקוחה",
+          "Q2": "יושלם בתיאום עם הלקוחה",
+          "Q3": "יושלם בתיאום עם הלקוחה",
+          "Q4": "יושלם בתיאום עם הלקוחה"
+        },
+        "devHint": "טעות מוטמנת: המשימה עצמה הוגדרה כמדד תוצאה. נכון: שיווק והשכרה היא פעולה. מדד תוצאה: סך הכנסות מסחר או שיעור תפוסת שטחים."
+      },
+      {
+        "taskId": "g4_t2",
+        "taskName": "מעקב יומי אחרי מלאים/נכסים מסחריים",
+        "companyGoal": "יושלם בתיאום עם הלקוחה",
+        "goal": "יושלם בתיאום עם הלקוחה",
+        "outcomeMetric": "יושלם בתיאום עם הלקוחה",
+        "classification": "routine",
+        "taskDescription": "יושלם בתיאום עם הלקוחה",
+        "annualAchievement": "יושלם בתיאום עם הלקוחה",
+        "outputMetricType": "יושלם בתיאום עם הלקוחה",
+        "milestones": {
+          "Q1": "יושלם בתיאום עם הלקוחה",
+          "Q2": "יושלם בתיאום עם הלקוחה",
+          "Q3": "יושלם בתיאום עם הלקוחה",
+          "Q4": "יושלם בתיאום עם הלקוחה"
+        },
+        "devHint": "טעות מוטמנת: סווגה כ-Top 10. נכון: פעילות שוטפת."
+      },
+      {
+        "taskId": "g4_t3",
+        "taskName": "הרחבת פעילות מסחרית בתחנות מרכזיות",
+        "companyGoal": "פיתוח מנופי צמיחה",
+        "goal": "פעילות כלכלית, רווחית ועסקית",
+        "outcomeMetric": "יושלם בתיאום עם הלקוחה",
+        "classification": "top10",
+        "taskDescription": "השכרת שטחי מסחר חדשים בתחנות מרכזיות",
+        "annualAchievement": "השכרת 10 שטחי מסחר חדשים בתחנות מרכזיות עד סוף רבעון 3",
+        "outputMetricType": "כמותי עולה",
+        "milestones": {
+          "Q1": "איתור שטחים",
+          "Q2": "מכרז ושיווק",
+          "Q3": "חתימה",
+          "Q4": "הפעלה"
+        },
+        "devHint": "טעות מוטמנת: סוג מדד תפוקה הוגדר כבינארי. נכון: כמותי עולה."
+      },
+      {
+        "taskId": "g4_t4",
+        "taskName": "קידום מסחר בתחנות",
+        "companyGoal": "יושלם בתיאום עם הלקוחה",
+        "goal": "יושלם בתיאום עם הלקוחה",
+        "outcomeMetric": "יושלם בתיאום עם הלקוחה",
+        "classification": "top10",
+        "taskDescription": "השכרת שטחי מסחר חדשים בתחנות מרכזיות",
+        "annualAchievement": "השכרת 10 שטחי מסחר חדשים עד סוף רבעון 3",
+        "outputMetricType": "יושלם בתיאום עם הלקוחה",
+        "milestones": {
+          "Q1": "יושלם בתיאום עם הלקוחה",
+          "Q2": "יושלם בתיאום עם הלקוחה",
+          "Q3": "יושלם בתיאום עם הלקוחה",
+          "Q4": "יושלם בתיאום עם הלקוחה"
+        },
+        "devHint": "טעות מוטמנת: ניסוח עמום מדי. נכון: למשל 'השכרת 10 שטחי מסחר חדשים בתחנות מרכזיות עד סוף רבעון 3'."
+      }
+    ]
+  },
+  "compensationModels": {
+    "group_1": {
+      "modelName": "זמינות וכשירות צי נייד",
+      "rewardMetric": "זמינות הצי בפועל",
+      "formula": "זמינות בפועל / יעד זמינות שנתי × 100",
+      "weight": "יושלם בתיאום עם הלקוחה",
+      "performanceThresholds": "יושלם בתיאום עם הלקוחה",
+      "dataSource": "יושלם בתיאום עם הלקוחה",
+      "notes": "המשקולות מסתכמות ל-105 במקום 100 — יש לתקן",
+      "devHint": "טעות מוטמנת: המשקולות מסתכמות ל-105 במקום 100."
+    },
+    "group_2": {
+      "modelName": "תהליכי גיוס והכשרות",
+      "rewardMetric": "קיצור משך תהליך הגיוס הממוצע",
+      "formula": "משך תהליך בפועל ביחס ליעד שנתי",
+      "weight": "יושלם בתיאום עם הלקוחה",
+      "performanceThresholds": "יושלם בתיאום עם הלקוחה",
+      "dataSource": "יושלם בתיאום עם הלקוחה",
+      "notes": "משקלים 30+30+25+20 = 105 במקום 100 — יש לתקן",
+      "devHint": "טעות מוטמנת: משקלים 30+30+25+20 = 105 במקום 100."
+    },
+    "group_3": {
+      "modelName": "בטיחות ועמידה ברגולציה",
+      "rewardMetric": "צמצום ימי היעדרות עקב תאונת עבודה",
+      "formula": "יושלם בתיאום עם הלקוחה",
+      "weight": "יושלם בתיאום עם הלקוחה",
+      "performanceThresholds": "יושלם בתיאום עם הלקוחה",
+      "dataSource": "יושלם בתיאום עם הלקוחה",
+      "notes": "ספי הביצוע לא מאתגרים — יש להגדיר ספים ריאליים ומבוססי יעד",
+      "devHint": "טעות מוטמנת: ספי הביצוע לא מאתגרים ולא ברורים."
+    },
+    "group_4": {
+      "modelName": "הגדלת הכנסות מסחר",
+      "rewardMetric": "הכנסות מסחר בפועל ביחס ליעד",
+      "formula": "הכנסות מסחר בפועל / יעד הכנסות שנתי × 100",
+      "weight": "יושלם בתיאום עם הלקוחה",
+      "performanceThresholds": "יושלם בתיאום עם הלקוחה",
+      "dataSource": "יושלם בתיאום עם הלקוחה",
+      "notes": "הספים צפופים מדי — יש להגדיר מדרגות מובחנות וריאליות",
+      "devHint": "טעות מוטמנת: הספים צפופים מדי — אין הבחנה משמעותית בין המדרגות."
+    }
+  },
+  "unexpectedEvents": {
+    "ue_set_aug": [
+      {
+        "resultId": "ue_aug_1",
+        "label": "אין בלת\"מ — ממשיכים",
+        "description": "הפעם הכל שקט. ממשיכים קדימה.",
+        "waitRounds": 0
+      },
+      {
+        "resultId": "ue_aug_2",
+        "label": "הסמנכ\"ל לא זמין",
+        "description": "הסמנכ\"ל לא זמין לשבועיים.",
+        "waitRounds": 1
+      },
+      {
+        "resultId": "ue_aug_3",
+        "label": "שינוי מדיניות",
+        "description": "שינוי מדיניות: יש להציג את כלל התוכנית מחדש.",
+        "waitRounds": 1
+      }
+    ],
+    "ue_set_sep": [
+      {
+        "resultId": "ue_sep_1",
+        "label": "אין בלת\"מ — ממשיכים",
+        "description": "הפעם הכל שקט. ממשיכים קדימה.",
+        "waitRounds": 0
+      },
+      {
+        "resultId": "ue_sep_2",
+        "label": "גיוס מילואים",
+        "description": "גיוס מילואים לחודשיים פגע בזמינות בעלי תפקידים.",
+        "waitRounds": 1
+      },
+      {
+        "resultId": "ue_sep_3",
+        "label": "מחסור בכוח אדם",
+        "description": "מחסור בכוח אדם מעכב משימה מרכזית.",
+        "waitRounds": 1
+      }
+    ],
+    "ue_set_oct": [
+      {
+        "resultId": "ue_oct_1",
+        "label": "אין בלת\"מ — ממשיכים",
+        "description": "הפעם הכל שקט. ממשיכים קדימה.",
+        "waitRounds": 0
+      },
+      {
+        "resultId": "ue_oct_2",
+        "label": "תקציב טרם אושר",
+        "description": "התקציב למשימה מרכזית טרם אושר.",
+        "waitRounds": 1
+      },
+      {
+        "resultId": "ue_oct_3",
+        "label": "ועדת היגוי נדחתה",
+        "description": "ועדת ההיגוי נדחתה לחודש הבא.",
+        "waitRounds": 1
+      }
+    ],
+    "ue_set_nov": [
+      {
+        "resultId": "ue_nov_1",
+        "label": "אין בלת\"מ — ממשיכים",
+        "description": "הפעם הכל שקט. ממשיכים קדימה.",
+        "waitRounds": 0
+      },
+      {
+        "resultId": "ue_nov_2",
+        "label": "הערות לפני אישור",
+        "description": "התקבלו הערות שדורשות טיפול לפני העברה לאישור.",
+        "waitRounds": 1
+      },
+      {
+        "resultId": "ue_nov_3",
+        "label": "חופשת חגים",
+        "description": "חופשת חגים עיכבה את סיום הגשת המסמכים.",
+        "waitRounds": 1
+      }
+    ],
+    "ue_set_comp": [
+      {
+        "resultId": "ue_comp_1",
+        "label": "אין בלת\"מ — ממשיכים",
+        "description": "הפעם הכל שקט. ממשיכים קדימה.",
+        "waitRounds": 0
+      },
+      {
+        "resultId": "ue_comp_2",
+        "label": "נוסחה הוחזרה לתיקון",
+        "description": "גורם מאשר החזיר את נוסחת התגמול לתיקון.",
+        "waitRounds": 1
+      },
+      {
+        "resultId": "ue_comp_3",
+        "label": "ממתינים לנתוני HR",
+        "description": "נתוני HR הנדרשים לחישוב המדד טרם התקבלו.",
+        "waitRounds": 1
+      }
+    ],
+    "ue_set_comp2": [
+      {
+        "resultId": "ue_comp2_1",
+        "label": "אין בלת\"מ — ממשיכים",
+        "description": "הפעם הכל שקט. ממשיכים קדימה.",
+        "waitRounds": 0
+      },
+      {
+        "resultId": "ue_comp2_2",
+        "label": "שינוי במדיניות תגמול",
+        "description": "הנהלה החליטה על שינוי במדיניות התגמול — יש לעדכן את המודל.",
+        "waitRounds": 1
+      },
+      {
+        "resultId": "ue_comp2_3",
+        "label": "ביקורת פנימית",
+        "description": "ביקורת פנימית ביקשה לבחון מחדש את ספי הביצוע.",
+        "waitRounds": 1
+      }
+    ]
+  },
+  "transitionMessages": {
+    "transition_start": {
+      "title": "כולם לעלות!",
+      "body": "סרקו את הברקוד של הקבוצה ופתחו את תיק תכנית העבודה החטיבתי שלכם. עברו על מבנה התיק: המשימות ומודל התגמול."
+    },
+    "transition_gate_divisional": {
+      "title": "שער האישור החטיבתי",
+      "body": "הגעתם לשער האישור החטיבתי. אם השלמתם את תחנות הליבה הקודמות – ניתן להעביר את התוכנית למנהל אגף ולסמנכ\"ל."
+    },
+    "transition_deputy_ceo": {
+      "title": "משנה למנכ\"ל – נעילה לעריכה",
+      "body": "התוכנית הועברה למשנה למנכ\"ל. מכאן ואילך המשימה נעולה לעריכה וניתנת לצפייה בלבד."
+    },
+    "transition_workplan_approved": {
+      "title": "טו-טו! תכנית העבודה אושרה",
+      "body": "תכנית העבודה אושרה על ידי מנכ\"ל ודירקטוריון. פתחתם את מודל התגמול. מכאן ממשיכים: מדד תגמול, נוסחה, משקל וספי ביצוע."
+    },
+    "transition_model_approved": {
+      "title": "טו-טו! מודל התגמול אושר",
+      "body": "מודל התגמול אושר. הגעתם ליעד."
+    }
+  },
+  "reminderDefinitions": [
+    {
+      "term": "משימה",
+      "definition": "פעולה מרכזית שמבצעים בפועל להשגת יעד."
+    },
+    {
+      "term": "מדד תוצאה",
+      "definition": "מדד הבוחן אם היעד הושג – נמדד מול היעד."
+    },
+    {
+      "term": "מדד תפוקה",
+      "definition": "מדד הבוחן את ביצוע המשימה – נמדד מול המשימה. סוגים: בינארי, כמותי עולה, כמותי יורד, אחוזים."
+    },
+    {
+      "term": "מדד תגמול",
+      "definition": "מדד המגדיר כיצד מודדים הצלחה של יחידה לצורך תגמול, כולל נוסחה, משקל וספי ביצוע."
+    }
+  ],
+  "uiCopy": {
+    "appTitle": "מובילים בתכנון",
+    "gameSubtitle": "התוכנית לא מתקדמת כי הזמן עובר - היא מתקדמת כי הנאמן מוביל אותה נכון.",
+    "buttons": {
+      "startGame": "התחילו משחק",
+      "startTimer": "הפעילו טיימר",
+      "correct": "נכון - התקדמו",
+      "partial": "חלקי - טעות + המתנה",
+      "wrong": "שגוי - טעות + חזרה תחנה",
+      "revealAnswer": "חשפו תשובה",
+      "openMobileFolder": "פתח תיק קבוצה",
+      "needReminder": "צריכים תזכורת?",
+      "openFolder": "פתחו את תכנית העבודה השנתית",
+      "spinWheel": "סובבו גלגל",
+      "backToMap": "חזרה למסלול",
+      "confirmSoftWarning": "המשך בכל זאת",
+      "cancel": "ביטול"
+    },
+    "tabs": {
+      "reviewTasks": "משימות לבדיקה",
+      "compensationModel": "מודל תגמול לבדיקה"
+    },
+    "statusBar": {
+      "position": "מיקום",
+      "errors": "טעויות",
+      "nextTurn": "תור הבא",
+      "autoAdvance": "יתקדם אוטומטית",
+      "noStation": "-",
+      "played": "שיחקה",
+      "waiting": "ממתינה סבב",
+      "notYet": "מחכה לתורה",
+      "roundComplete": "סבב הושלם — אפשר להתחיל סבב חדש",
+      "activeTurn": "תור פעיל"
+    },
+    "messages": {
+      "mobileIntro": "לפניכם הצצה למשימות נבחרות מתוך תכנית העבודה החטיבתית. במהלך המשחק תעבדו עם המשימות המוצגות כאן, אך זכרו: במציאות תכנית העבודה רחבה יותר, ובלת\"מים יכולים להגיע גם ממשימות ומגורמים שאינם מוצגים בתיק.",
+      "softWarning": "שימו לב: לפי מצב המשחק, קבוצה זו עדיין לא הגיעה לתחנה הזו. להמשיך בכל זאת?",
+      "stationCompleted": "תחנה זו כבר הושלמה. בתור הבא הקבוצה מתקדמת חזרה קדימה.",
+      "unexpectedAlreadyUsed": "קבוצה זו כבר הפעילה את הבלת\"ם הזה. ממשיכים הלאה.",
+      "partialOutcome": "נספרת טעות. המנחה מדייקת בקצרה. הקבוצה ממתינה לתור הבא.",
+      "wrongOutcome": "נספרת טעות. הקבוצה חוזרת תחנה אחת אחורה.",
+      "correctOutcome": "מצוין! הקבוצה מתקדמת לתחנה הבאה.",
+      "autoAdvanceNotice": "בתור הבא הקבוצה מתקדמת אוטומטית.",
+      "mobileTasksFallback": "תיק המשימות לקבוצה זו יושלם בשלב הבא.",
+      "mobileNoCompensation": "אין נתוני מודל תגמול.",
+      "noGroupAnswer": "אין תשובה ייחודית לקבוצה זו.",
+      "noStationQuestion": "תחנת מעבר — אין שאלה.",
+      "wrongOutcomeStayed": "נספרת טעות. הקבוצה נשארת בתחנה הראשונה."
+    },
+    "endScreen": {
+      "title": "המשחק הסתיים",
+      "winnerLabel": "הקבוצה המנצחת",
+      "commitmentQuestion": "מה הפעולה הראשונה שתעשו ב־72 השעות הקרובות כדי לקדם את תכנית העבודה ואת מודל התגמול בחטיבה שלכם?",
+      "mentimeterUrl": "יושלם בתיאום עם הלקוחה",
+      "mentimeterQrLabel": "סרקו להתחייבות אישית"
+    },
+    "nav": {
+      "facilitator": "מפת המשחק",
+      "mobile_group": "קב׳ {n} - {division}",
+      "screenLabel": "מסך:"
+    },
+    "months": [
+      "יוני",
+      "יולי",
+      "אוגוסט",
+      "ספטמבר",
+      "אוקטובר",
+      "נובמבר",
+      "דצמבר",
+      "ינואר"
+    ],
+    "answerCard": {
+      "taskLabel": "משימה:",
+      "whatIsWrongLabel": "מה לא תקין:",
+      "correctFixLabel": "תיקון נכון:",
+      "facilitatorNoteLabel": "הערת מנחה:"
+    },
+    "taskSections": {
+      "strategic": "שיוך אסטרטגי",
+      "details": "פרטי המשימה",
+      "planning": "תכנון לאורך השנה"
+    },
+    "taskFields": {
+      "companyGoal": "מטרת חברה",
+      "goal": "יעד",
+      "outcomeMetric": "מדד תוצאה",
+      "classification": "סיווג",
+      "taskDescription": "תיאור משימה",
+      "annualAchievement": "הישג שנתי נדרש",
+      "outputMetricType": "סוג מדד תפוקה"
+    },
+    "classificationLabels": {
+      "top10": "Top 10",
+      "routine": "שוטפת"
+    },
+    "compensationFields": {
+      "rewardMetric": "מדד תגמול",
+      "formula": "נוסחה",
+      "weight": "משקל",
+      "performanceThresholds": "ספי ביצוע",
+      "dataSource": "מקור נתונים"
+    },
+    "reminderDrawer": {
+      "title": "הגדרות בסיסיות"
+    },
+    "timer": {
+      "stop": "עצרו",
+      "resume": "המשך"
+    },
+    "completedBadge": "הושלמה",
+    "pageTitle": "מובילים בתכנון - Proof of Concept",
+    "map": {
+      "instruction": "לחצו על תחנה להפעלתה"
+    },
+    "stationTypes": {
+      "unexpectedEventLabel": "בלת\"ם"
+    },
+    "outcomeBanner": {
+      "correct": "{group}: {msg}",
+      "partial": "{group}: {msg}",
+      "wrong": "{group}: {msg}"
+    },
+    "boardSections": {
+      "a": "מקטע א — הקמת תכנית עבודה",
+      "aMonths": "יוני — ספטמבר",
+      "b": "המשך תכנית עבודה ואישורים",
+      "bMonths": "ספטמבר — נובמבר",
+      "c": "הקמת מודל תגמול",
+      "cMonths": "דצמבר — ינואר"
+    },
+    "welcome": {
+      "title": "ברוכים הבאים למובילים בתכנון!",
+      "intro": "במשחק הזה תובילו תכנית עבודה חטיבתית לאורך השנה: מהגדרת המשימות, דרך דיוק המדדים ואבני הדרך, ועד לאישור תכנית העבודה ומודל התגמול.",
+      "sections": [
+        {
+          "title": "איך משחקים?",
+          "body": "כל קבוצה מתקדמת על גבי מסלול המשחק. בתחנות המקצועיות הקבוצה בודקת את תיק תכנית העבודה שלה במובייל, מאתרת אי-דיוקים ומשיבה בעל פה למנחה."
+        },
+        {
+          "title": "תפקיד המנחה",
+          "body": "המנחה מפעילה את התחנות דרך המסך המוקרן, מציגה שאלות, מפעילה טיימר, חושפת תשובות ומעדכנת את מצב המשחק לפי איכות המענה."
+        },
+        {
+          "title": "מה המשתתפים עושים?",
+          "body": "כל קבוצה פותחת את תיק תכנית העבודה החטיבתי שלה, מתייעצת בזמן מוגבל ומנסה לזהות מה דורש תיקון. שימו לב — התיק נעול בזמן שקבוצה אחרת עונה."
+        },
+        {
+          "title": "תשובות והתקדמות",
+          "body": "תשובה נכונה — 10 נקודות, הקבוצה מתקדמת. תשובה חלקית — 5 נקודות, הקבוצה מתקדמת. תשובה שגויה — 0 נקודות, הקבוצה נשארת במקום ומדלגת על הסבב הבא."
+        },
+        {
+          "title": "בלת\"מים",
+          "body": "בתחנות בלת\"ם מסובבים גלגל ופועלים לפי ההוראה. בלת\"ם יכול לגרום לעיכוב של סבב אחד או שניים — הקבוצה לא משחקת בסבבים אלה. קבוצה לא מסובבת שוב את אותו גלגל באותה תחנה."
+        },
+        {
+          "title": "איך מנצחים?",
+          "body": "המטרה היא להגיע הכי רחוק על המסלול. שוויון במיקום — נקודות שוברות שוויון. בסיום עוברים להתחייבות אישית: מה כל משתתף לוקח לעבודה שלו ב-72 השעות הקרובות."
+        },
+        {
+          "title": "סדר התורות",
+          "body": "המשחק מתנהל בסבבים — קבוצה 1, קבוצה 2, קבוצה 3, קבוצה 4, וחוזר חלילה. בראש המסך תמיד מוצג תור מי עכשיו ובאיזו תחנה. בסיום כל סבב מוצג חיווי 'סבב הושלם'."
+        }
+      ],
+      "startButton": "התחילו משחק",
+      "openInstructionsButton": "הנחיות המשחק",
+      "closeInstructionsButton": "חזרה למפה"
+    },
+    "turnIndicator": "תור {group} — {division} — תחנת {station}",
+    "groupCard": {
+      "waitingMessage": "קבוצה זו ממתינה סבב",
+      "skipButton": "דלגו כדי להמשיך",
+      "stationLocked": "תחנה זו לא פעילה בתור הנוכחי",
+      "clickToOpen": "▶ לחצו",
+      "approveTransition": "אישור מעבר",
+      "answerRecorded": "התשובה נרשמה.",
+      "mustAnswerFirst": "יש לסמן תשובה לפני חזרה"
+    },
+    "points": {
+      "correct": "10 נקודות",
+      "partial": "5 נקודות",
+      "wrong": "0 נקודות",
+      "label": "נקודות"
+    },
+    "mobileFolder": {
+      "lockedMessage": "תור {group} — המתינו לתורכם",
+      "lockedWait": "התיק שלכם ייפתח כשיגיע תורכם"
+    }
+  }
+}
+
+const DEV_MODE = new URLSearchParams(window.location.search).get('devmode') === 'true';
+
+const COLOR = {
+  blue:   {primary:'#1A6FB5', light:'#EAF2FA', text:'#0D3A66'},
+  green:  {primary:'#1A8C4E', light:'#EAF6EF', text:'#0D4A28'},
+  orange: {primary:'#C05C1A', light:'#FDF0E8', text:'#6A2A00'},
+  purple: {primary:'#6B3FA0', light:'#F3EDF9', text:'#3A1A60'},
+};
+
+// ── Game state ──────────────────────────────────────────
+let gameState = {};
+GC.groups.forEach(g => {
+  // Groups start at order=1 (past the opening transition station)
+  gameState[g.id] = {
+    groupId: g.id,
+    currentStationOrder: 1,
+    points: 0,
+    waitingOneRound: false,
+    playedThisRound: false,
+    usedUnexpectedEventIds: [],
+    completedStationIds: ['station_start'],
+  };
+});
+
+function gs(gid){ return gameState[gid]; }
+function stationByOrder(order){ return GC.stations.find(s => s.order === order); }
+function stationById(id){ return GC.stations.find(s => s.id === id); }
+function devStyleVal(v) {
+  if (!DEV_MODE || typeof v !== 'string' || !v.includes('יושלם')) return v;
+  return `<span style="color:#C8102E;font-weight:700">${v}</span>`;
+}
+
+function applyOutcome(groupId, stationId, outcome) {
+  const st = stationById(stationId);
+  const g = gameState[groupId];
+  if (!st) return;
+  if (!g.completedStationIds.includes(stationId))
+    g.completedStationIds.push(stationId);
+
+  g.playedThisRound = true;
+
+  if (outcome === 'correct') {
+    g.points += 10;
+    g.currentStationOrder = st.order + 1;
+    g.waitingOneRound = false;
+  } else if (outcome === 'partial') {
+    g.points += 5;
+    g.currentStationOrder = st.order + 1;
+    g.waitingOneRound = false;
+  } else {
+    // wrong: 0 points, stay in place, wait one round
+    g.points += 0;
+    g.waitingOneRound = true;
+  }
+  // advanceTurn() called in goBackToMap — after facilitator returns to map
+}
+
+function advanceTurn() {
+  // Find next group that hasn't played this round
+  let checked = 0;
+  do {
+    currentTurnGroupIndex = (currentTurnGroupIndex + 1) % GC.groups.length;
+    checked++;
+  } while (checked < GC.groups.length &&
+           gameState[GC.groups[currentTurnGroupIndex].id].playedThisRound);
+
+  // Check if round is complete (all groups played or waiting)
+  const allDone = GC.groups.every(g => {
+    const gs = gameState[g.id];
+    return gs.playedThisRound || gs.waitingOneRound;
+  });
+
+  if (allDone) {
+    // Round complete — reset for next round
+    roundNumber++;
+    GC.groups.forEach(g => {
+      const gs = gameState[g.id];
+      gs.playedThisRound = false;
+      // Groups that were waiting now advance
+      if (gs.waitingOneRound) {
+        // waitingOneRound cleared when facilitator clicks "skip"
+        // playedThisRound stays false so they play next round
+      }
+    });
+    // Find first group that hasn't played (respecting waiting)
+    currentTurnGroupIndex = 0;
+  }
+}
+
+function skipWaitingGroup(groupId) {
+  const g = gameState[groupId];
+  g.waitingOneRound = false;
+  g.playedThisRound = true;
+  g.currentStationOrder += 1;
+  advanceTurn();
+  activeStationId = null;
+  renderApp();
+}
+
+// ── View router ─────────────────────────────────────────
+let currentView = 'facilitator';
+let currentGroup = null;
+
+function showView(view, group) {
+  currentView = view;
+  currentGroup = group || null;
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderApp();
+}
+
+function renderInstructionsContent() {
+  const w = GC.uiCopy.welcome;
+  return `
+    <div style="max-width:600px;margin:0 auto;padding:8px 0">
+      <h2 style="font-size:20px;font-weight:700;color:#1E1F56;margin-bottom:12px;text-align:center">
+        ${w.title}
+      </h2>
+      <p style="font-size:14px;color:#3A3E78;line-height:1.7;margin-bottom:20px;
+        padding:14px 16px;background:#EEF0FF;border-radius:8px;border-right:4px solid #1E1F56">
+        ${w.intro}
+      </p>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        ${w.sections.map(s => `
+          <div style="background:#FFFFFF;border:1px solid #D0D4F0;border-radius:8px;padding:14px 16px">
+            <div style="font-size:13px;font-weight:700;color:#1E1F56;margin-bottom:5px">${s.title}</div>
+            <div style="font-size:13px;color:#3A3E78;line-height:1.6">${s.body}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function renderWelcome(app) {
+  const w = GC.uiCopy.welcome;
+  app.innerHTML = `
+    <div style="min-height:100vh;background:#F0F2F7;display:flex;flex-direction:column;
+      align-items:center;justify-content:flex-start;padding:32px 24px;direction:rtl">
+      <div style="width:100%;max-width:640px">
+        ${renderInstructionsContent()}
+        <div style="text-align:center;margin-top:28px">
+          <button onclick="startGame()"
+            style="background:#1E1F56;color:#FFFFFF;border:none;border-radius:10px;
+              padding:14px 48px;font-size:16px;font-weight:700;cursor:pointer;
+              font-family:inherit;letter-spacing:.02em;
+              box-shadow:0 2px 12px rgba(30,31,86,.25)">
+            ${w.startButton}
+          </button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function startGame() {
+  gameStarted = true;
+  instructionsOpen = false;
+  renderApp();
+}
+
+function openInstructions() {
+  instructionsOpen = true;
+  renderApp();
+}
+
+function closeInstructions() {
+  instructionsOpen = false;
+  renderApp();
+}
+
+// ── Facilitator state vars (declared before renderApp to avoid TDZ) ──────
+let activeStationId = null;
+let revealedGroups = new Set();
+let softWarningGroup = null;
+let lastOutcome = null;
+let gameStarted = false;
+let instructionsOpen = false;
+let roundNumber = 1;
+let currentTurnGroupIndex = 0; // index into GC.groups array
+let timerInterval = null;
+let timerRemaining = 60;
+let timerRunning = false;
+let activeUEResult = null;
+
+function renderApp() {
+  const app = document.getElementById('app');
+  if (currentView === 'facilitator' && !gameStarted) {
+    renderWelcome(app);
+    return;
+  }
+  if (currentView === 'facilitator') {
+    renderFacilitator(app);
+  } else if (currentView === 'dev') {
+    renderDevView(app);
+  } else {
+    renderMobile(app, currentGroup);
+  }
+}
+
+// ── Facilitator ─────────────────────────────────────────
+
+function renderFacilitator(app) {
+  const copy = GC.uiCopy;
+  const sorted = [...GC.stations].sort((a,b) => a.order - b.order);
+
+  // Build turn indicator
+  const currentGroup = GC.groups[currentTurnGroupIndex];
+  const currentGS = gs(currentGroup.id);
+  const currentSt = stationByOrder(currentGS.currentStationOrder);
+  const turnText = GC.uiCopy.turnIndicator
+    .replace('{group}', currentGroup.label)
+    .replace('{division}', currentGroup.divisionName)
+    .replace('{station}', currentSt ? currentSt.name : '—');
+
+  let html = `
+    <div class="f-header">
+      <div class="f-title">${copy.appTitle}</div>
+      <div class="f-turn-indicator">${turnText}</div>
+      ${activeStationId ? `<button class="back-btn" onclick="goBackToMap()">${copy.buttons.backToMap} ←</button>` : ''}
+    </div>`;
+
+  if (!activeStationId) {
+    // Board map — 3-row grid layout
+  const row1 = sorted.filter(s => s.order <= 6);
+  const row2 = sorted.filter(s => s.order >= 7 && s.order <= 13);
+  const row3 = sorted.filter(s => s.order >= 14);
+
+  // Current group's station — only this one is clickable
+  const currentTurnGroup = GC.groups[currentTurnGroupIndex];
+  const currentTurnStation = gs(currentTurnGroup.id).currentStationOrder;
+
+  function snGrid(s) {
+    const here = GC.groups.filter(g => gs(g.id).currentStationOrder === s.order);
+    const isUE = s.type === 'unexpected_event';
+    const isTr = s.type === 'transition' || s.type === 'reflection';
+    const isComp = s.segment === 'compensation' || s.segment === 'transition_to_compensation';
+    const isRefl = s.type === 'reflection';
+    const isActive = DEV_MODE || s.order === currentTurnStation;
+    let cls = 'sn';
+    if (isUE) cls += ' sn-ue';
+    else if (isRefl) cls += ' sn-refl';
+    else if (isTr && isComp) cls += ' sn-tr-comp';
+    else if (isTr) cls += ' sn-tr';
+    else if (isComp) cls += ' sn-comp';
+    else cls += ' sn-pro';
+    if (!isActive) cls += ' sn-locked';
+    const label = isUE ? ('⚡ ' + GC.uiCopy.stationTypes.unexpectedEventLabel) : s.name;
+    return `<div class="${cls}" onclick="${isActive ? `openStation('${s.id}')` : ''}"
+      style="${isActive ? 'cursor:pointer' : 'cursor:default;opacity:0.45'}">
+      <div class="sn-month">${s.month||''}</div>
+      <div class="sn-name">${label}</div>
+      ${here.length ? `<div class="sn-toks">${here.map(g=>`<span class="sn-tok" style="background:${COLOR[g.colorToken].primary}"></span>`).join('')}</div>` : ''}
+      ${isActive ? '<div style="font-size:8px;color:#1E1F56;font-weight:700;margin-top:3px">&#9654; &#1500;&#1495;&#1510;&#1493;</div>' : ''}
+    </div>`;
+  }
+
+  function arrowDiv(ch) { return `<div class="row-arr">${ch}</div>`; }
+
+  html += `<div id="board-wrap">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:0 4px 6px">
+      <span style="font-size:12px;color:#6A70B0;font-style:italic">${GC.uiCopy.map.instruction}</span>
+      <button onclick="openInstructions()" style="background:none;border:1px solid #C0C4E8;color:#1E1F56;border-radius:6px;padding:4px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">${GC.uiCopy.welcome.openInstructionsButton}</button>
+    </div>
+    <div class="bsl"><span>${GC.uiCopy.boardSections.a}</span><span class="bsl-months">${GC.uiCopy.boardSections.aMonths}</span></div>
+    <div class="board-row">
+      ${row1.map(s => snGrid(s)).join(arrowDiv('←'))}
+    </div>
+    <div class="board-conn left">
+      <div class="conn-v"></div><span class="conn-a">↓</span>
+    </div>
+    <div class="bsl"><span>${GC.uiCopy.boardSections.b}</span><span class="bsl-months">${GC.uiCopy.boardSections.bMonths}</span></div>
+    <div class="board-row row-ltr">
+      ${row2.map(s => snGrid(s)).join(arrowDiv('→'))}
+    </div>
+    <div class="board-conn right">
+      <div class="conn-v"></div><span class="conn-a">↓</span>
+    </div>
+    <div class="bsl"><span>${GC.uiCopy.boardSections.c}</span><span class="bsl-months">${GC.uiCopy.boardSections.cMonths}</span></div>
+    <div class="board-row">
+      ${row3.map(s => snGrid(s)).join(arrowDiv('←'))}
+    </div>
+  </div>`;
+  } // end if (!activeStationId)
+
+  // Station modal overlay — shown over map when a station is active
+  if (activeStationId) {
+    html += renderStationModal();
+  }
+
+  // Check round complete
+  const allPlayedOrWaiting = GC.groups.every(g => {
+    const gst = gs(g.id);
+    return gst.playedThisRound || gst.waitingOneRound;
+  });
+
+  // Status bar
+  html += `<div id="status-bar">`;
+  GC.groups.forEach(g => {
+    const gst = gs(g.id);
+    const cur = stationByOrder(gst.currentStationOrder);
+    const col = COLOR[g.colorToken];
+    const isCurrentTurn = GC.groups[currentTurnGroupIndex].id === g.id;
+
+    let roundStatus = '';
+    if (isCurrentTurn) {
+      roundStatus = `<span class="auto-tag" style="background:#1E1F56;color:#F5C800">${copy.statusBar.activeTurn}</span>`;
+    } else if (gst.waitingOneRound) {
+      roundStatus = `<span class="auto-tag" style="background:#2A1A00;color:#F0A040">${copy.statusBar.waiting}</span>`;
+    } else if (gst.playedThisRound) {
+      roundStatus = `<span class="auto-tag" style="background:#0A2014;color:#60D080">${copy.statusBar.played} ✓</span>`;
+    } else {
+      roundStatus = `<span class="auto-tag" style="background:#1A1A2A;color:#A0A8D8">${copy.statusBar.notYet}</span>`;
+    }
+
+    html += `
+      <div class="status-item" style="border-top:3px solid ${col.primary};
+        ${isCurrentTurn ? 'background:#F8F8FF;' : ''}">
+        <span class="s-grp" style="color:${col.primary}">${g.label}</span>
+        <span class="s-div">${g.divisionName}</span>
+        <span class="s-pos">${cur ? cur.name : GC.uiCopy.statusBar.noStation}</span>
+        <span class="s-err">${gst.points} ${copy.points.label}</span>
+        ${roundStatus}
+      </div>`;
+  });
+  html += `</div>`;
+
+  // Round complete banner
+  if (allPlayedOrWaiting) {
+    html += `<div style="background:#F5C800;color:#1E1F56;text-align:center;
+      font-size:12px;font-weight:700;padding:6px;letter-spacing:.02em">
+      ${copy.statusBar.roundComplete}
+    </div>`;
+  }
+
+  // Soft warning modal
+  if (softWarningGroup) {
+    html += `
+      <div class="overlay">
+        <div class="modal">
+          <p>${GC.uiCopy.messages.softWarning}</p>
+          <div class="modal-btns">
+            <button class="btn-sec" onclick="dismissWarning()">${copy.buttons.cancel}</button>
+            <button class="btn-danger" onclick="confirmWarning('${softWarningGroup}')">${copy.buttons.confirmSoftWarning}</button>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  // Instructions modal overlay
+  if (instructionsOpen) {
+    html += `<div onclick="if(event.target===this)closeInstructions()"
+      style="position:fixed;inset:0;background:rgba(30,31,86,.55);z-index:800;
+        display:flex;align-items:flex-start;justify-content:center;
+        padding:32px 16px;overflow-y:auto;direction:rtl">
+      <div style="background:#F0F2F7;border-radius:14px;width:100%;max-width:640px;
+        padding:28px 24px;box-shadow:0 8px 32px rgba(30,31,86,.25);
+        position:relative;margin:auto">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <span style="font-size:15px;font-weight:700;color:#1E1F56">${GC.uiCopy.welcome.title}</span>
+          <button onclick="closeInstructions()"
+            style="background:#1E1F56;color:#FFFFFF;border:none;border-radius:7px;
+              padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">
+            ${GC.uiCopy.welcome.closeInstructionsButton}
+          </button>
+        </div>
+        <p style="font-size:13px;color:#3A3E78;line-height:1.7;margin-bottom:16px;
+          padding:12px 14px;background:#EEF0FF;border-radius:8px;border-right:4px solid #1E1F56">
+          ${GC.uiCopy.welcome.intro}
+        </p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          ${GC.uiCopy.welcome.sections.map(s => `
+            <div style="background:#FFFFFF;border:1px solid #D0D4F0;border-radius:8px;padding:12px 14px">
+              <div style="font-size:12px;font-weight:700;color:#1E1F56;margin-bottom:4px">${s.title}</div>
+              <div style="font-size:12px;color:#3A3E78;line-height:1.6">${s.body}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  app.innerHTML = html;
+}
+
+function renderStationNode(s) {
+  const groupsHere = GC.groups.filter(g => gs(g.id).currentStationOrder === s.order);
+  const segCls = s.segment === 'compensation' ? 'compensation' :
+                 s.segment === 'transition_to_compensation' ? 'transition_to_compensation' : '';
+  const typeCls = s.type;
+  return `
+    <div class="s-node ${typeCls} ${segCls}"
+      style="left:${s.boardPosition.x}%;top:${s.boardPosition.y}%"
+      onclick="openStation('${s.id}')"
+      title="${s.name}">
+      <div class="s-month">${s.month || ''}</div>
+      <div class="s-name">${s.type === 'unexpected_event' ? '⚡ ' + GC.uiCopy.stationTypes.unexpectedEventLabel : s.name}</div>
+      ${groupsHere.length ? `<div class="token-row">${groupsHere.map(g =>
+        `<span class="token" style="background:${COLOR[g.colorToken].primary}" title="${g.label}"></span>`
+      ).join('')}</div>` : ''}
+    </div>`;
+}
+
+function renderStationModal() {
+  const station = stationById(activeStationId);
+  if (!station) return '';
+  const question = station.questionId
+    ? GC.stationQuestions.find(q => q.id === station.questionId)
+    : null;
+  const copy = GC.uiCopy;
+  const currentGroup = GC.groups[currentTurnGroupIndex];
+  const gst = gs(currentGroup.id);
+  const isWaiting = gst.waitingOneRound;
+  const answered = revealedGroups.has(currentGroup.id + '_outcome');
+  const ueSet = station.type === 'unexpected_event'
+    ? (GC.unexpectedEvents[station.unexpectedEventSetId] || [])
+    : null;
+  const ueAlreadyUsed = ueSet
+    ? ueSet.some(e => gst.usedUnexpectedEventIds.includes(e.resultId))
+    : false;
+  const canClose = DEV_MODE || answered
+    || (station.type === 'unexpected_event' && (activeUEResult !== null || ueAlreadyUsed));
+
+  let content = '';
+
+  if (isWaiting) {
+    // Group is waiting — show skip prompt
+    content = `
+      <div style="text-align:center;padding:24px 0">
+        <p style="font-size:15px;color:#3A3E78;margin-bottom:20px">
+          ${copy.groupCard.waitingMessage}
+        </p>
+        <button onclick="skipWaitingGroup('${currentGroup.id}')"
+          style="background:#1E1F56;color:#fff;border:none;border-radius:8px;
+            padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">
+          ${copy.groupCard.skipButton}
+        </button>
+      </div>`;
+  } else if (question) {
+    content = `
+      <div style="margin-bottom:16px">
+        <p style="font-size:12px;color:#6A70B0;font-style:italic;margin-bottom:8px">
+          ${question.professionalPrinciple}
+        </p>
+        <div style="background:#EEF0FF;border-right:4px solid #1E1F56;border-radius:8px;
+          padding:14px 16px;display:flex;gap:16px;align-items:flex-start">
+          <p style="flex:1;font-size:15px;color:#1A1C50;line-height:1.7;font-weight:500;margin:0">
+            ${question.questionText}
+          </p>
+          <div class="timer-wrap">
+            <div class="timer-display" id="timer-display" style="color:#1E1F56">${question.timerSeconds}</div>
+            <button class="timer-btn" id="timer-btn"
+              style="background:#1A3A2A;border-color:#2A5A3A;color:#A0E0B0"
+              onclick="toggleTimer(${question.timerSeconds})">
+              ${copy.buttons.startTimer}
+            </button>
+          </div>
+        </div>
+      </div>
+      ${DEV_MODE
+        ? `<div class="cards-grid">${GC.groups.map(g => renderGroupCardModal(g, question, answered, true)).join('')}</div>`
+        : renderGroupCardModal(currentGroup, question, answered)}`;
+  } else if (station.transitionMessageId && GC.transitionMessages[station.transitionMessageId]) {
+    const tm = GC.transitionMessages[station.transitionMessageId];
+    content = `
+      <div style="text-align:center;padding:16px 0">
+        <div style="font-size:20px;font-weight:800;color:#1E1F56;margin-bottom:10px">${tm.title}</div>
+        <p style="font-size:14px;color:#3A3E78;line-height:1.7">${tm.body}</p>
+        ${answered ? `<button onclick="goBackToMap()"
+          style="margin-top:16px;background:#1E1F56;color:#fff;border:none;border-radius:8px;
+            padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
+          ${copy.buttons.backToMap}
+        </button>` : `<button onclick="revealedGroups.add('${currentGroup.id}_outcome');renderApp()"
+          style="margin-top:16px;background:#1E1F56;color:#fff;border:none;border-radius:8px;
+            padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
+          ${GC.uiCopy.groupCard.approveTransition}
+        </button>`}
+      </div>`;
+  } else if (station.type === 'unexpected_event') {
+    if (activeUEResult) {
+      const noDelay = activeUEResult.waitRounds === 0;
+      content = `
+        <div style="text-align:center;padding:16px 0">
+          <div style="background:#FFF3E0;border:2px solid #E07820;border-radius:12px;
+            padding:22px 20px;margin-bottom:20px;max-width:440px;margin-left:auto;margin-right:auto">
+            <div style="font-size:12px;color:#A05010;margin-bottom:8px;font-weight:600;letter-spacing:.04em">
+              ⚡ תוצאת הגלגל
+            </div>
+            <div style="font-size:19px;font-weight:800;color:#7A3A00;margin-bottom:10px">
+              ${activeUEResult.label}
+            </div>
+            <p style="font-size:14px;color:#5A3000;line-height:1.65;margin:0 0 14px">
+              ${activeUEResult.description}
+            </p>
+            ${noDelay
+              ? `<div style="display:inline-block;background:#E8F5EE;border:1px solid #A8D8B8;
+                   border-radius:6px;padding:6px 16px;font-size:13px;font-weight:700;color:#1A6A3A">
+                   ✓ ממשיכים קדימה — אין עיכוב
+                 </div>`
+              : `<div style="display:inline-block;background:#FEE8EC;border:1px solid #F0A0B0;
+                   border-radius:6px;padding:6px 16px;font-size:13px;font-weight:700;color:#A0001A">
+                   ⏸ הקבוצה ממתינה סבב אחד
+                 </div>`}
+          </div>
+          <button onclick="doUEOutcome('${currentGroup.id}',${noDelay ? 0 : 1})"
+            style="background:#1E1F56;color:#fff;border:none;border-radius:8px;
+              padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">
+            ${copy.buttons.backToMap} ←
+          </button>
+        </div>`;
+    } else if (ueAlreadyUsed) {
+      content = `
+        <div style="text-align:center;padding:28px 0">
+          <div style="font-size:40px;margin-bottom:12px">⚡</div>
+          <p style="font-size:14px;color:#5A5A8A;line-height:1.6;margin-bottom:20px;
+            max-width:320px;margin-left:auto;margin-right:auto">
+            ${GC.uiCopy.messages.unexpectedAlreadyUsed}
+          </p>
+          <button onclick="doUEOutcome('${currentGroup.id}',0)"
+            style="background:#1E1F56;color:#fff;border:none;border-radius:8px;
+              padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">
+            ממשיכים קדימה ←
+          </button>
+        </div>`;
+    } else {
+      content = `
+        <div style="text-align:center;padding:36px 0">
+          <div style="font-size:52px;margin-bottom:14px">🎲</div>
+          <p style="font-size:15px;color:#5A3000;font-weight:600;margin-bottom:24px">
+            תחנת בלת"מ — מה יהיה?
+          </p>
+          <button onclick="spinWheel('${currentGroup.id}','${station.unexpectedEventSetId}')"
+            style="background:#E07820;color:#fff;border:none;border-radius:10px;
+              padding:16px 40px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;
+              box-shadow:0 4px 16px rgba(224,120,32,.35)">
+            ⚡ ${copy.buttons.spinWheel}
+          </button>
+        </div>`;
+    }
+  } else {
+    content = `<p style="color:#667;text-align:center">${GC.uiCopy.messages.noStationQuestion}</p>`;
+  }
+
+  return `
+    <div style="position:fixed;inset:0;background:rgba(30,31,86,.55);z-index:600;
+      display:flex;align-items:center;justify-content:center;padding:20px;direction:rtl"
+      onclick="if(event.target===this && ${canClose ? 'true' : 'false'})goBackToMap()">
+      <div style="background:#F0F2F7;border-radius:14px;width:100%;max-width:700px;
+        max-height:90vh;overflow-y:auto;padding:24px;box-shadow:0 8px 32px rgba(30,31,86,.3)">
+        <div style="display:flex;align-items:center;margin-bottom:16px">
+          <div>
+            <div style="font-size:11px;color:#8A90C0">${station.month || ''}</div>
+            <h2 style="font-size:20px;font-weight:800;color:#1E1F56;margin:0">${station.name}</h2>
+          </div>
+          ${canClose ? `<button onclick="goBackToMap()"
+            style="margin-right:auto;background:#1E1F56;color:#fff;border:none;border-radius:7px;
+              padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">
+            ${copy.buttons.backToMap}
+          </button>` : `<span style="margin-right:auto;font-size:11px;color:#8A90C0">${GC.uiCopy.groupCard.mustAnswerFirst}</span>`}
+        </div>
+        ${content}
+      </div>
+    </div>`;
+}
+
+function renderGroupCardModal(group, question, answered, devMode) {
+  const ans = question.answersByGroup[group.id];
+  const revealed = devMode || revealedGroups.has(group.id);
+  const col = COLOR[group.colorToken];
+  const copy = GC.uiCopy;
+  const gst = gs(group.id);
+  const completed = gst.completedStationIds.includes(activeStationId);
+
+  let inner = '';
+  if (!revealed) {
+    inner = `<button class="reveal-btn" style="background:${col.primary}"
+      onclick="revealGroup('${group.id}')">${copy.buttons.revealAnswer}</button>`;
+  } else if (!devMode && answered) {
+    inner = `<p style="font-size:12px;color:#5A7A9A;font-style:italic">${GC.uiCopy.groupCard.answerRecorded}</p>`;
+  } else if (ans) {
+    inner = `
+      <div class="ans-row"><span class="ans-lbl">${copy.answerCard.taskLabel}</span><span class="ans-val">${ans.taskName}</span></div>
+      <div class="ans-row"><span class="ans-lbl">${copy.answerCard.whatIsWrongLabel}</span><span class="ans-val">${ans.whatIsWrong}</span></div>
+      <div class="ans-row"><span class="ans-lbl">${copy.answerCard.correctFixLabel}</span><span class="ans-fix">${ans.correctFix}</span></div>
+      ${ans.facilitatorNotes ? `<div class="ans-row"><span class="ans-lbl">${copy.answerCard.facilitatorNoteLabel}</span><span class="ans-val">${ans.facilitatorNotes}</span></div>` : ''}
+      ${!devMode ? `<div class="outcome-row">
+        <button class="outcome-btn" style="background:#1A7A40" onclick="doOutcome('${group.id}','correct')">
+          ${copy.buttons.correct}<br><span style="font-size:10px;opacity:.8">${copy.points.correct}</span>
+        </button>
+        <button class="outcome-btn" style="background:#7A6A00" onclick="doOutcome('${group.id}','partial')">
+          ${copy.buttons.partial}<br><span style="font-size:10px;opacity:.8">${copy.points.partial}</span>
+        </button>
+        <button class="outcome-btn" style="background:#7A1A1A" onclick="doOutcome('${group.id}','wrong')">
+          ${copy.buttons.wrong}<br><span style="font-size:10px;opacity:.8">${copy.points.wrong}</span>
+        </button>
+      </div>` : ''}`;
+  } else {
+    inner = `<p style="color:#888">${copy.messages.noGroupAnswer}</p>`;
+  }
+
+  return `
+    <div class="g-card" style="border-top:4px solid ${col.primary}">
+      <div class="g-card-header">
+        <span class="g-label">${group.label}</span>
+        <span class="g-div">${group.divisionName}</span>
+        ${completed ? `<span class="completed-badge">${GC.uiCopy.completedBadge}</span>` : ''}
+      </div>
+      ${inner}
+    </div>`;
+}
+
+function renderStationScreen() {
+  const station = stationById(activeStationId);
+  const copy = GC.uiCopy;
+  if (!station) return '';
+
+  const question = station.questionId
+    ? GC.stationQuestions.find(q => q.id === station.questionId)
+    : null;
+
+  let html = `<div id="station-screen">
+    <div class="st-month">${station.month || ''}</div>
+    <h2 class="st-name">${station.name}</h2>`;
+
+  if (question) {
+    html += `<p class="st-principle">${question.professionalPrinciple}</p>`;
+    html += `
+      <div class="q-box">
+        <p class="q-text">${question.questionText}</p>
+        <div class="timer-wrap">
+          <div class="timer-display" id="timer-display" style="color:#1E1F56">${timerRemaining}</div>
+          <button class="timer-btn" id="timer-btn"
+            style="background:${timerRunning ? '#3A1A1A' : '#1A3A2A'};border-color:${timerRunning ? '#6A2A2A' : '#2A5A3A'};color:${timerRunning ? '#F0A0A0' : '#A0E0B0'}"
+            onclick="toggleTimer(${question.timerSeconds})">
+            ${timerRunning ? GC.uiCopy.timer.stop : timerRemaining < question.timerSeconds && timerRemaining > 0 ? GC.uiCopy.timer.resume : copy.buttons.startTimer}
+          </button>
+        </div>
+      </div>
+      ${lastOutcome ? renderOutcomeBanner(lastOutcome) : ''}
+      <div class="cards-grid">`;
+
+    GC.groups.forEach(g => {
+      const ans = question.answersByGroup[g.id];
+      const revealed = revealedGroups.has(g.id);
+      const gst = gs(g.id);
+      const completed = gst.completedStationIds.includes(activeStationId);
+      const col = COLOR[g.colorToken];
+
+      html += `
+        <div class="g-card" style="border-top:4px solid ${col.primary}">
+          <div class="g-card-header">
+            <span class="g-label">${g.label}</span>
+            <span class="g-div">${g.divisionName}</span>
+            ${completed ? `<span class="completed-badge">${GC.uiCopy.completedBadge}</span>` : ''}
+          </div>`;
+
+      if (!revealed) {
+        html += `<button class="reveal-btn" style="background:${col.primary}" onclick="revealGroup('${g.id}')">${copy.buttons.revealAnswer}</button>`;
+      } else if (completed && !revealedGroups.has(g.id + '_outcome')) {
+        html += `<p class="completed-note">${copy.messages.stationCompleted}</p>`;
+      } else if (ans) {
+        html += `
+          <div class="ans-row"><span class="ans-lbl">${GC.uiCopy.answerCard.taskLabel}</span><span class="ans-val">${ans.taskName}</span></div>
+          <div class="ans-row"><span class="ans-lbl">${GC.uiCopy.answerCard.whatIsWrongLabel}</span><span class="ans-val">${ans.whatIsWrong}</span></div>
+          <div class="ans-row"><span class="ans-lbl">${GC.uiCopy.answerCard.correctFixLabel}</span><span class="ans-fix">${ans.correctFix}</span></div>
+          ${ans.facilitatorNotes ? `<div class="ans-row"><span class="ans-lbl">${GC.uiCopy.answerCard.facilitatorNoteLabel}</span><span class="ans-val">${ans.facilitatorNotes}</span></div>` : ''}
+          <div class="outcome-row">
+            <button class="outcome-btn" style="background:#1A7A40" onclick="doOutcome('${g.id}','correct')">${copy.buttons.correct}</button>
+            <button class="outcome-btn" style="background:#7A6A00" onclick="doOutcome('${g.id}','partial')">${copy.buttons.partial}</button>
+            <button class="outcome-btn" style="background:#7A1A1A" onclick="doOutcome('${g.id}','wrong')">${copy.buttons.wrong}</button>
+          </div>`;
+      } else {
+        html += `<p class="completed-note">${GC.uiCopy.messages.noGroupAnswer}</p>`;
+      }
+
+      html += `</div>`;
+    });
+
+    html += `</div>`;
+  } else if (station.transitionMessageId && GC.transitionMessages[station.transitionMessageId]) {
+    const tm = GC.transitionMessages[station.transitionMessageId];
+    html += `
+      <div class="transition-box">
+        <div class="transition-title">${tm.title}</div>
+        <p class="transition-body">${tm.body}</p>
+      </div>`;
+  } else {
+    html += `<div class="transition-box"><p style="color:#667">${GC.uiCopy.messages.noStationQuestion}</p></div>`;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+function openStation(stationId) {
+  activeStationId = stationId;
+  revealedGroups = new Set();
+  softWarningGroup = null;
+  lastOutcome = null;
+  activeUEResult = null;
+  stopTimer();
+  const st = stationById(stationId);
+  const q = st?.questionId ? GC.stationQuestions.find(q=>q.id===st.questionId) : null;
+  timerRemaining = q ? q.timerSeconds : 60;
+  renderApp();
+}
+
+function goBackToMap() {
+  // Advance turn only when facilitator explicitly returns to map
+  advanceTurn();
+  activeStationId = null;
+  lastOutcome = null;
+  revealedGroups = new Set();
+  stopTimer();
+  renderApp();
+}
+
+function revealGroup(groupId) {
+  const gst = gs(groupId);
+  const st = stationById(activeStationId);
+  const atStation = gst.currentStationOrder >= st.order;
+  const completed = gst.completedStationIds.includes(activeStationId);
+  if (!atStation && !completed) {
+    softWarningGroup = groupId;
+    renderApp();
+    return;
+  }
+  revealedGroups.add(groupId);
+  renderApp();
+}
+
+function dismissWarning() { softWarningGroup = null; renderApp(); }
+function confirmWarning(gid) { softWarningGroup = null; revealedGroups.add(gid); renderApp(); }
+
+function doOutcome(groupId, outcome) {
+  applyOutcome(groupId, activeStationId, outcome);
+  revealedGroups.add(groupId + '_outcome');
+  lastOutcome = { groupId, outcome, stayed: false };
+  // Keep modal open only to show result — do NOT advance to next group automatically.
+  // Facilitator sees the result, then clicks "חזרה למסלול" manually.
+  // advanceTurn() already called inside applyOutcome — currentTurnGroupIndex updated,
+  // but activeStationId stays set so modal remains visible with result.
+  renderApp();
+}
+
+// Timer
+function renderOutcomeBanner({ groupId, outcome }) {
+  const group = GC.groups.find(g => g.id === groupId);
+  const col = COLOR[group.colorToken];
+  const msgKey = outcome === 'correct' ? 'correctOutcome'
+               : outcome === 'partial' ? 'partialOutcome'
+               : 'wrongOutcome';
+  const rawMsg = GC.uiCopy.messages[msgKey];
+  const msg = (outcome === 'wrong' && lastOutcome && lastOutcome.stayed)
+    ? GC.uiCopy.messages.wrongOutcomeStayed
+    : rawMsg;
+  const template = GC.uiCopy.outcomeBanner[outcome];
+  const text = template.replace('{group}', group.label).replace('{msg}', msg);
+  const bg = outcome === 'correct' ? '#E8F5EE' : outcome === 'partial' ? '#FFF8DC' : '#FEE8EC';
+  const border = outcome === 'correct' ? '#1A8A40' : outcome === 'partial' ? '#C09000' : '#C8102E';
+  const textColor = outcome === 'correct' ? '#0D5A28' : outcome === 'partial' ? '#7A5800' : '#A0001A';
+  return `<div style="
+    background:${bg};
+    border:1px solid ${border};
+    border-right:4px solid ${col.primary};
+    border-radius:8px;
+    padding:12px 16px;
+    margin-bottom:14px;
+    font-size:14px;
+    font-weight:600;
+    color:${textColor};
+    line-height:1.5;
+  ">${text}</div>`;
+}
+
+function toggleTimer(totalSecs) {
+  if (timerRunning) {
+    stopTimer();
+  } else {
+    if (timerRemaining === 0) timerRemaining = totalSecs;
+    timerRunning = true;
+    timerInterval = setInterval(() => {
+      timerRemaining--;
+      if (timerRemaining <= 0) { timerRemaining = 0; stopTimer(); }
+      const d = document.getElementById('timer-display');
+      const b = document.getElementById('timer-btn');
+      if (d) {
+        d.textContent = timerRemaining;
+        d.style.color = timerRemaining > 30 ? '#1E6A3A' : timerRemaining > 15 ? '#B07800' : '#C8102E';
+      }
+      if (b && timerRemaining === 0) {
+        b.textContent = GC.uiCopy.buttons.startTimer;
+        b.style.background = '#1A3A2A';
+      }
+    }, 1000);
+    renderApp();
+  }
+}
+function stopTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  timerRunning = false;
+}
+
+// ── Dev content review ──────────────────────────────────
+function renderDevView(app) {
+  function isMissing(v) {
+    if (v === null || v === undefined) return true;
+    const s = String(v);
+    return s.includes('יושלם') || s.startsWith('TODO') || s === '';
+  }
+  function fv(v) {
+    return isMissing(v)
+      ? `<span style="background:#FEE8EC;color:#C8102E;font-weight:700;border-radius:3px;padding:1px 5px;font-size:11px">⚠ להשלמה</span>`
+      : `<span>${v}</span>`;
+  }
+  let missing = 0;
+  function fm(v) { if (isMissing(v)) missing++; return fv(v); }
+
+  let body = '';
+
+  // ── 1. Professional stations ─────────────────────────
+  body += `<h3 style="font-size:12px;font-weight:700;color:#fff;background:#1E1F56;padding:6px 12px;border-radius:6px;margin:0 0 10px;letter-spacing:.04em">תחנות מקצועיות</h3>`;
+  GC.stationQuestions.forEach(q => {
+    const st = GC.stations.find(s => s.id === q.stationId);
+    body += `<div style="border:1px solid #D0D4F0;border-radius:8px;overflow:hidden;margin-bottom:12px">
+      <div style="background:#2A2E72;color:#fff;padding:6px 12px;font-size:12px;font-weight:700">${st?.month||''} — ${st?.name||q.stationId}</div>`;
+    GC.groups.forEach(g => {
+      const ans = q.answersByGroup[g.id];
+      const c = COLOR[g.colorToken];
+      body += `<div style="padding:7px 12px;border-bottom:1px solid #F0F2F8">
+        <div style="font-size:10px;font-weight:700;color:${c.primary};margin-bottom:3px">${g.label} — ${g.divisionName}</div>
+        <div style="font-size:11px;display:flex;flex-direction:column;gap:2px">
+          <div><span style="color:#8A90C0">משימה: </span>${fm(ans?.taskName)}</div>
+          <div><span style="color:#8A90C0">מה לא תקין: </span>${fm(ans?.whatIsWrong)}</div>
+          <div><span style="color:#8A90C0">תיקון: </span>${fm(ans?.correctFix)}</div>
+        </div>
+      </div>`;
+    });
+    body += `</div>`;
+  });
+
+  // ── 2. Unexpected events ─────────────────────────────
+  body += `<h3 style="font-size:12px;font-weight:700;color:#fff;background:#C05C1A;padding:6px 12px;border-radius:6px;margin:16px 0 10px;letter-spacing:.04em">⚡ תחנות בלת"מ</h3>`;
+  GC.stations.filter(s => s.type === 'unexpected_event').forEach(s => {
+    const ueSet = GC.unexpectedEvents[s.unexpectedEventSetId] || [];
+    body += `<div style="border:1px solid #E0C8A0;border-radius:8px;overflow:hidden;margin-bottom:10px">
+      <div style="background:#FFF3E0;padding:6px 12px;font-size:11px;font-weight:700;color:#7A3A00">${s.month} — ${s.name}</div>`;
+    ueSet.forEach(e => {
+      body += `<div style="padding:6px 12px;border-bottom:1px solid #F0E8D8;font-size:11px">
+        <strong>${e.label}:</strong> ${e.description}
+        &nbsp;·&nbsp;<span style="color:#7A5A20">המתנה: ${fm(e.waitRounds)} סבבים</span>
+      </div>`;
+    });
+    body += `</div>`;
+  });
+
+  // ── 3. Compensation models ───────────────────────────
+  body += `<h3 style="font-size:12px;font-weight:700;color:#fff;background:#1A6A3A;padding:6px 12px;border-radius:6px;margin:16px 0 10px;letter-spacing:.04em">מודל תגמול</h3>`;
+  GC.groups.forEach(g => {
+    const comp = GC.compensationModels[g.id];
+    const c = COLOR[g.colorToken];
+    body += `<div style="border:1px solid ${c.primary}55;border-radius:8px;overflow:hidden;margin-bottom:10px">
+      <div style="background:${c.primary};color:#fff;padding:6px 12px;font-size:12px;font-weight:700">${g.label} — ${comp?.modelName||''}</div>
+      <div style="padding:8px 12px;font-size:11px;display:flex;flex-direction:column;gap:2px">
+        <div><span style="color:#8A90C0">מדד תגמול: </span>${fm(comp?.rewardMetric)}</div>
+        <div><span style="color:#8A90C0">נוסחה: </span>${fm(comp?.formula)}</div>
+        <div><span style="color:#8A90C0">משקל: </span>${fm(comp?.weight)}</div>
+        <div><span style="color:#8A90C0">ספי ביצוע: </span>${fm(comp?.performanceThresholds)}</div>
+        <div><span style="color:#8A90C0">מקור נתונים: </span>${fm(comp?.dataSource)}</div>
+      </div>
+    </div>`;
+  });
+
+  // ── 4. Visible tasks ─────────────────────────────────
+  body += `<h3 style="font-size:12px;font-weight:700;color:#fff;background:#2A2E72;padding:6px 12px;border-radius:6px;margin:16px 0 10px;letter-spacing:.04em">משימות גלויות</h3>`;
+  GC.groups.forEach(g => {
+    const tasks = GC.visibleTasks[g.id] || [];
+    const c = COLOR[g.colorToken];
+    body += `<div style="border:1px solid ${c.primary}55;border-radius:8px;overflow:hidden;margin-bottom:12px">
+      <div style="background:${c.primary};color:#fff;padding:6px 12px;font-size:12px;font-weight:700">${g.label} — ${g.divisionName}</div>`;
+    tasks.forEach(t => {
+      body += `<div style="padding:8px 12px;border-bottom:1px solid #F0F2F8">
+        <div style="font-size:12px;font-weight:700;color:#1A1C50;margin-bottom:4px">${t.taskName}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 16px;font-size:11px">
+          <div><span style="color:#8A90C0">מטרת חברה: </span>${fm(t.companyGoal)}</div>
+          <div><span style="color:#8A90C0">יעד: </span>${fm(t.goal)}</div>
+          <div><span style="color:#8A90C0">מדד תוצאה: </span>${fm(t.outcomeMetric)}</div>
+          <div><span style="color:#8A90C0">תיאור משימה: </span>${fm(t.taskDescription)}</div>
+          <div><span style="color:#8A90C0">הישג שנתי: </span>${fm(t.annualAchievement)}</div>
+          <div><span style="color:#8A90C0">סוג מדד תפוקה: </span>${fm(t.outputMetricType)}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:5px;font-size:11px">
+          ${['Q1','Q2','Q3','Q4'].map(q=>`<div><strong style="color:#4A50A0">${q}:</strong> ${fm(t.milestones[q])}</div>`).join('')}
+        </div>
+      </div>`;
+    });
+    body += `</div>`;
+  });
+
+  // ── 5. End screen ────────────────────────────────────
+  const es = GC.uiCopy.endScreen;
+  body += `<h3 style="font-size:12px;font-weight:700;color:#fff;background:#6B3FA0;padding:6px 12px;border-radius:6px;margin:16px 0 10px;letter-spacing:.04em">מסך סיום</h3>
+    <div style="border:1px solid #D0C0F0;border-radius:8px;padding:10px 12px;font-size:11px;margin-bottom:32px;display:flex;flex-direction:column;gap:3px">
+      <div><span style="color:#8A90C0">שאלת התחייבות: </span>${es.commitmentQuestion}</div>
+      <div><span style="color:#8A90C0">Mentimeter URL: </span>${fm(es.mentimeterUrl)}</div>
+    </div>`;
+
+  const badge = missing > 0
+    ? `<span style="background:#C8102E;color:#fff;border-radius:10px;padding:4px 14px;font-size:13px;font-weight:700">${missing} שדות לא מלאים</span>`
+    : `<span style="background:#1A6A3A;color:#fff;border-radius:10px;padding:4px 14px;font-size:13px;font-weight:700">✓ הכל מלא</span>`;
+
+  app.innerHTML = `<div id="board-wrap" style="padding:16px 20px;direction:rtl;max-width:860px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-size:18px;font-weight:800;color:#1E1F56">📋 סקירת תוכן — מצב פיתוח</div>
+        <div style="font-size:12px;color:#8A90C0;margin-top:2px">שדות <span style="background:#FEE8EC;color:#C8102E;font-weight:700;border-radius:3px;padding:1px 4px;font-size:11px">⚠ להשלמה</span> דורשים תיאום עם הלקוחה</div>
+      </div>
+      ${badge}
+    </div>
+    ${body}
+  </div>`;
+}
+
+// ── Mobile ──────────────────────────────────────────────
+let mobileSplashDone = {};
+
+function renderMobile(app, groupId) {
+  const group = GC.groups.find(g => g.id === groupId) || GC.groups[0];
+  const col = COLOR[group.colorToken];
+
+  app.innerHTML = `<div id="mobile-wrap" dir="rtl"></div>`;
+  const wrap = document.getElementById('mobile-wrap');
+
+  // Lock folder if another group is currently playing
+  const currentGroup = GC.groups[currentTurnGroupIndex];
+  const isLocked = !DEV_MODE && gameStarted && group.id !== currentGroup.id;
+
+  if (isLocked) {
+    renderFolderLocked(wrap, group, col, currentGroup);
+    return;
+  }
+
+  if (!mobileSplashDone[groupId]) {
+    renderSplash(wrap, group, col);
+  } else {
+    renderFolder(wrap, group, col);
+  }
+}
+
+function renderFolderLocked(wrap, group, col, currentGroup) {
+  const msg = GC.uiCopy.mobileFolder.lockedMessage
+    .replace('{group}', currentGroup.label);
+  wrap.innerHTML = `
+    <div class="splash-bar" style="background:${col.primary}"></div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;
+      justify-content:center;padding:32px 24px;gap:20px;background:#F5F7FA;min-height:100vh">
+      <div style="font-size:48px">🔒</div>
+      <div style="font-size:16px;font-weight:700;color:#1A2A3A;text-align:center">${msg}</div>
+      <p style="font-size:13px;color:#666;text-align:center;line-height:1.6;max-width:260px">
+        ${GC.uiCopy.mobileFolder.lockedWait}
+      </p>
+    </div>`;
+}
+
+function renderSplash(wrap, group, col) {
+  const copy = GC.uiCopy;
+  wrap.innerHTML = `
+    <div class="splash-bar" style="background:${col.primary}"></div>
+    <div class="splash">
+      <div class="splash-logo">
+        <div class="splash-logo-line"></div>
+        <span class="splash-logo-text" style="color:${col.primary}">${copy.appTitle}</span>
+        <div class="splash-logo-line"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+        <span class="splash-badge" style="background:${col.primary}">${group.label}</span>
+        <span class="splash-div">${group.divisionName}</span>
+      </div>
+      <div class="splash-intro-card">
+        <p>${copy.messages.mobileIntro}</p>
+      </div>
+      <button class="splash-btn" style="background:${col.primary}"
+        onclick="startFolder('${group.id}')">
+        ${copy.buttons.openFolder}
+      </button>
+    </div>`;
+}
+
+function startFolder(groupId) {
+  mobileSplashDone[groupId] = true;
+  renderApp();
+}
+
+let activeTab = {};
+let openTasks = {};
+let reminderOpen = {};
+
+function renderFolder(wrap, group, col) {
+  const copy = GC.uiCopy;
+  const gid = group.id;
+  const tab = activeTab[gid] || 'tasks';
+  const tasks = GC.visibleTasks[gid] || [];
+  const comp = GC.compensationModels[gid];
+  const reminders = GC.reminderDefinitions;
+
+  wrap.innerHTML = `
+    <div class="m-header" style="border-bottom:3px solid ${col.primary}">
+      <div class="m-header-top">
+        <span class="m-badge" style="background:${col.primary}">${group.label}</span>
+        <span class="m-div-name">${group.divisionName}</span>
+      </div>
+      <div class="m-title">${copy.appTitle}</div>
+    </div>
+    <div class="m-tabs">
+      <button class="m-tab" style="border-bottom:3px solid ${tab==='tasks' ? col.primary : 'transparent'};
+        color:${tab==='tasks' ? col.text : '#666'};font-weight:${tab==='tasks' ? 700:400}"
+        onclick="switchTab('${gid}','tasks')">${copy.tabs.reviewTasks}</button>
+      <button class="m-tab" style="border-bottom:3px solid ${tab==='compensation' ? col.primary : 'transparent'};
+        color:${tab==='compensation' ? col.text : '#666'};font-weight:${tab==='compensation' ? 700:400}"
+        onclick="switchTab('${gid}','compensation')">${copy.tabs.compensationModel}</button>
+    </div>
+    <div class="m-content">
+      ${tab === 'tasks' ? renderTasksList(tasks, col, gid) : renderCompCard(comp, col)}
+    </div>
+    <div class="reminder-bar">
+      <button class="reminder-btn" style="color:${col.primary};border-color:${col.primary}"
+        onclick="toggleReminder('${gid}')">${copy.buttons.needReminder}</button>
+    </div>
+    ${reminderOpen[gid] ? renderReminderDrawer(reminders, col, gid) : ''}`;
+}
+
+function renderTasksList(tasks, col, gid) {
+  if (!tasks || tasks.length === 0) {
+    return `<div style="padding:20px 4px;color:#8A9AAA;font-size:13px;line-height:1.6">
+      ${GC.uiCopy.messages.mobileTasksFallback}
+    </div>`;
+  }
+  return `<div class="task-list">
+    ${tasks.map(t => renderTaskCard(t, col, gid)).join('')}
+  </div>`;
+}
+
+function renderTaskCard(task, col, gid) {
+  const open = !!(openTasks[gid] && openTasks[gid][task.taskId]);
+  return `
+    <div class="t-card" style="border-right:3px solid ${col.primary}">
+      <button class="t-card-header" onclick="toggleTask('${gid}','${task.taskId}')">
+        <span class="t-card-name">${task.taskName}</span>
+        <span class="chevron" style="transform:rotate(${open?180:0}deg)">▾</span>
+      </button>
+      ${open ? `
+        <div class="t-card-body">
+          <div class="t-section">
+            <div class="t-section-title" style="color:${col.primary}">${GC.uiCopy.taskSections.strategic}</div>
+            <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.companyGoal}</span><span class="f-val">${devStyleVal(task.companyGoal)}</span></div>
+            <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.goal}</span><span class="f-val">${devStyleVal(task.goal)}</span></div>
+            <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.outcomeMetric}</span><span class="f-val">${devStyleVal(task.outcomeMetric)}</span></div>
+            <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.classification}</span><span class="f-val">${task.classification === 'top10' ? GC.uiCopy.classificationLabels.top10 : GC.uiCopy.classificationLabels.routine}</span></div>
+          </div>
+          <div class="t-divider"></div>
+          <div class="t-section">
+            <div class="t-section-title" style="color:${col.primary}">${GC.uiCopy.taskSections.details}</div>
+            <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.taskDescription}</span><span class="f-val">${devStyleVal(task.taskDescription)}</span></div>
+            <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.annualAchievement}</span><span class="f-val">${devStyleVal(task.annualAchievement)}</span></div>
+            <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.outputMetricType}</span><span class="f-val">${devStyleVal(task.outputMetricType)}</span></div>
+          </div>
+          <div class="t-divider"></div>
+          <div class="t-section">
+            <div class="t-section-title" style="color:${col.primary}">${GC.uiCopy.taskSections.planning}</div>
+            <div class="milestones-grid">
+              ${['Q1','Q2','Q3','Q4'].map(q => `
+                <div class="m-cell">
+                  <div class="m-q" style="background:${col.primary}">${q}</div>
+                  <div class="m-v">${devStyleVal(task.milestones[q])}</div>
+                </div>`).join('')}
+            </div>
+          </div>
+        </div>` : ''}
+    </div>`;
+}
+
+function renderCompCard(comp, col) {
+  if (!comp) return '<p style="color:#888;padding:12px">' + GC.uiCopy.messages.mobileNoCompensation + '</p>';
+  return `<div class="comp-card">
+    <div class="comp-title" style="color:${col.primary}">${comp.modelName}</div>
+    <div class="f-row"><span class="f-lbl">${GC.uiCopy.compensationFields.rewardMetric}</span><span class="f-val">${devStyleVal(comp.rewardMetric)}</span></div>
+    <div class="f-row"><span class="f-lbl">${GC.uiCopy.compensationFields.formula}</span><span class="f-val">${devStyleVal(comp.formula)}</span></div>
+    <div class="f-row"><span class="f-lbl">${GC.uiCopy.compensationFields.weight}</span><span class="f-val">${devStyleVal(comp.weight)}</span></div>
+    <div class="f-row"><span class="f-lbl">${GC.uiCopy.compensationFields.performanceThresholds}</span><span class="f-val">${devStyleVal(comp.performanceThresholds)}</span></div>
+    ${comp.dataSource ? `<div class="f-row"><span class="f-lbl">${GC.uiCopy.compensationFields.dataSource}</span><span class="f-val">${devStyleVal(comp.dataSource)}</span></div>` : ''}
+    ${DEV_MODE && comp.devHint ? `<div style="margin-top:8px;padding:8px 10px;background:#FFF3CD;border-radius:6px;border-right:3px solid #E0A020;font-size:11px;color:#7A5000;line-height:1.5"><strong>⚠️ DEV:</strong> ${comp.devHint}</div>` : ""}
+  </div>`;
+}
+
+function renderReminderDrawer(defs, col, gid) {
+  const copy = GC.uiCopy;
+  return `
+    <div class="drawer-overlay" onclick="toggleReminder('${gid}')"></div>
+    <div class="drawer">
+      <div class="drawer-handle" style="background:${col.primary}"></div>
+      <div class="drawer-title">${GC.uiCopy.reminderDrawer.title}</div>
+      ${defs.map(d => `
+        <div class="def-row">
+          <span class="def-term" style="color:${col.primary}">${d.term}</span>
+          <span class="def-def">${d.definition}</span>
+        </div>`).join('')}
+      <button class="drawer-close" style="color:${col.primary};border-color:${col.primary}"
+        onclick="toggleReminder('${gid}')">${copy.buttons.cancel}</button>
+    </div>`;
+}
+
+function spinWheel(groupId, ueSetId) {
+  const ueSet = GC.unexpectedEvents[ueSetId] || [];
+  const idx = Math.floor(Math.random() * ueSet.length);
+  activeUEResult = ueSet[idx];
+  gs(groupId).usedUnexpectedEventIds.push(activeUEResult.resultId);
+  renderApp();
+}
+
+function doUEOutcome(groupId, waitRounds) {
+  const g = gs(groupId);
+  const st = stationById(activeStationId);
+  if (!g.completedStationIds.includes(activeStationId))
+    g.completedStationIds.push(activeStationId);
+  g.playedThisRound = true;
+  if (waitRounds > 0) {
+    g.waitingOneRound = true;
+  } else {
+    g.currentStationOrder = st.order + 1;
+  }
+  activeUEResult = null;
+  goBackToMap();
+}
+
+function switchTab(gid, tab) { activeTab[gid] = tab; renderApp(); }
+function toggleTask(gid, taskId) {
+  if (!openTasks[gid]) openTasks[gid] = {};
+  openTasks[gid][taskId] = !openTasks[gid][taskId];
+  renderApp();
+}
+function toggleReminder(gid) { reminderOpen[gid] = !reminderOpen[gid]; renderApp(); }
+
+// ── Init ────────────────────────────────────────────────
+// DEV_MODE active — free navigation enabled via ?devmode=true
+
+// Populate nav labels from GC
+document.getElementById('nav-label').textContent = GC.uiCopy.nav.screenLabel;
+document.getElementById('page-title').textContent = GC.uiCopy.pageTitle;
+document.getElementById('nav-fac-lbl').textContent = GC.uiCopy.nav.facilitator;
+GC.groups.forEach((g, i) => {
+  const el = document.getElementById('nav-g' + (i+1) + '-lbl');
+  if (el) el.textContent = GC.uiCopy.nav.mobile_group
+    .replace('{n}', i+1)
+    .replace('{division}', g.divisionName);
+});
+renderApp();
+</script>
+</body>
+</html>
