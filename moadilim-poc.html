@@ -87,6 +87,19 @@
   /* keep old .token for status bar */
   .token{width:10px;height:10px;border-radius:50%;border:1px solid rgba(255,255,255,.7);display:inline-block}
 
+  /* ── Facilitator preview mode ── */
+  .preview-btn{background:none;border:1.5px solid #3A3E88;border-radius:6px;
+    color:#A0A8D8;font-size:18px;width:34px;height:34px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    transition:background .15s,border-color .15s;line-height:1}
+  .preview-btn:hover{background:#2A2E72;border-color:#6A70C0}
+  .preview-btn.active{background:#1A6A3A;border-color:#2AA060;color:#FFFFFF;
+    box-shadow:0 0 8px rgba(26,160,80,.5)}
+  .preview-badge{background:#1A6A3A;color:#FFFFFF;font-size:11px;font-weight:700;
+    padding:4px 10px;border-radius:12px;letter-spacing:.03em;
+    animation:previewPulse 2.5s ease-in-out infinite}
+  @keyframes previewPulse{0%,100%{opacity:1}50%{opacity:.7}}
+
   /* ── Status bar ── */
   #status-bar{background:#1E1F56;display:flex;flex-shrink:0;border-top:2px solid #F5C800}
   .status-item{flex:1;padding:7px 10px;border-left:1px solid #2E3080;display:flex;flex-direction:column;gap:2px}
@@ -1703,6 +1716,7 @@ let timerInterval = null;
 let timerRemaining = 60;
 let timerRunning = false;
 let activeUEResult = null;
+let facilitatorPreview = false;
 
 function renderApp() {
   const app = document.getElementById('app');
@@ -1737,8 +1751,13 @@ function renderFacilitator(app) {
   let html = `
     <div class="f-header">
       <div class="f-title">${copy.appTitle}</div>
-      <div class="f-turn-indicator">${turnText}</div>
+      ${facilitatorPreview
+        ? `<div class="f-turn-indicator"><span class="preview-badge">👁 תצוגת מנחה — הכל פתוח</span></div>`
+        : `<div class="f-turn-indicator">${turnText}</div>`}
       ${activeStationId ? `<button class="back-btn" onclick="goBackToMap()">${copy.buttons.backToMap} ←</button>` : ''}
+      <button class="preview-btn${facilitatorPreview ? ' active' : ''}"
+        onclick="facilitatorPreview=!facilitatorPreview;renderApp()"
+        title="${facilitatorPreview ? 'בטל תצוגת מנחה' : 'תצוגת מנחה — פתח הכל'}">🔍</button>
     </div>`;
 
   if (!activeStationId) {
@@ -1757,7 +1776,7 @@ function renderFacilitator(app) {
     const isTr = s.type === 'transition' || s.type === 'reflection';
     const isComp = s.segment === 'compensation' || s.segment === 'transition_to_compensation';
     const isRefl = s.type === 'reflection';
-    const isActive = DEV_MODE || s.order === currentTurnStation;
+    const isActive = DEV_MODE || facilitatorPreview || s.order === currentTurnStation;
     let cls = 'sn';
     if (isUE) cls += ' sn-ue';
     else if (isRefl) cls += ' sn-refl';
@@ -1938,7 +1957,7 @@ function renderStationModal() {
   const ueAlreadyUsed = ueSet
     ? ueSet.some(e => gst.usedUnexpectedEventIds.includes(e.resultId))
     : false;
-  const canClose = DEV_MODE || answered
+  const canClose = DEV_MODE || facilitatorPreview || answered
     || (station.type === 'unexpected_event' && (activeUEResult !== null || ueAlreadyUsed));
 
   let content = '';
@@ -1977,7 +1996,7 @@ function renderStationModal() {
           </div>
         </div>
       </div>
-      ${DEV_MODE
+      ${(DEV_MODE || facilitatorPreview)
         ? `<div class="cards-grid">${GC.groups.map(g => renderGroupCardModal(g, question, answered, true)).join('')}</div>`
         : renderGroupCardModal(currentGroup, question, answered)}`;
   } else if (station.transitionMessageId && GC.transitionMessages[station.transitionMessageId]) {
@@ -2453,7 +2472,7 @@ function renderMobile(app, groupId) {
 
   // Lock folder if another group is currently playing
   const currentGroup = GC.groups[currentTurnGroupIndex];
-  const isLocked = !DEV_MODE && gameStarted && group.id !== currentGroup.id;
+  const isLocked = !DEV_MODE && !facilitatorPreview && gameStarted && group.id !== currentGroup.id;
 
   if (isLocked) {
     renderFolderLocked(wrap, group, col, currentGroup);
