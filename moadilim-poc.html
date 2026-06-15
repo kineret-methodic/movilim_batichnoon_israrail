@@ -314,36 +314,37 @@ const GC = {
       "type": "transition",
       "segment": "workplan",
       "order": 0,
-      "boardPosition": {
-        "x": 92,
-        "y": 80
-      },
+      "boardPosition": {"x": 92, "y": 80},
       "transitionMessageId": "transition_start"
     },
     {
       "id": "station_company_goal",
       "name": "מטרת חברה ויעד",
-      "month": "יולי",
+      "month": "יוני",
       "type": "professional",
       "segment": "workplan",
       "order": 1,
-      "boardPosition": {
-        "x": 78,
-        "y": 80
-      },
+      "boardPosition": {"x": 78, "y": 80},
       "questionId": "q_company_goal"
     },
     {
+      "id": "station_unexpected_aug",
+      "name": "בלת\"ם",
+      "month": "יוני",
+      "type": "unexpected_event",
+      "segment": "workplan",
+      "order": 2,
+      "boardPosition": {"x": 64, "y": 80},
+      "unexpectedEventSetId": "ue_set_aug"
+    },
+    {
       "id": "station_outcome_metric",
-      "name": "מדד תוצאה או משימה",
+      "name": "מדד תוצאה",
       "month": "יולי",
       "type": "professional",
       "segment": "workplan",
-      "order": 2,
-      "boardPosition": {
-        "x": 64,
-        "y": 80
-      },
+      "order": 3,
+      "boardPosition": {"x": 50, "y": 80},
       "questionId": "q_outcome_metric"
     },
     {
@@ -352,25 +353,9 @@ const GC = {
       "month": "אוגוסט",
       "type": "professional",
       "segment": "workplan",
-      "order": 3,
-      "boardPosition": {
-        "x": 50,
-        "y": 80
-      },
-      "questionId": "q_top10"
-    },
-    {
-      "id": "station_unexpected_aug",
-      "name": "בלת\"ם",
-      "month": "אוגוסט",
-      "type": "unexpected_event",
-      "segment": "workplan",
       "order": 4,
-      "boardPosition": {
-        "x": 36,
-        "y": 80
-      },
-      "unexpectedEventSetId": "ue_set_aug"
+      "boardPosition": {"x": 36, "y": 80},
+      "questionId": "q_top10"
     },
     {
       "id": "station_measurable",
@@ -379,24 +364,8 @@ const GC = {
       "type": "professional",
       "segment": "workplan",
       "order": 5,
-      "boardPosition": {
-        "x": 22,
-        "y": 80
-      },
+      "boardPosition": {"x": 22, "y": 80},
       "questionId": "q_measurable"
-    },
-    {
-      "id": "station_output_metric",
-      "name": "מדד תפוקה",
-      "month": "ספטמבר",
-      "type": "professional",
-      "segment": "workplan",
-      "order": 6,
-      "boardPosition": {
-        "x": 8,
-        "y": 80
-      },
-      "questionId": "q_output_metric"
     },
     {
       "id": "station_unexpected_sep",
@@ -404,38 +373,19 @@ const GC = {
       "month": "ספטמבר",
       "type": "unexpected_event",
       "segment": "workplan",
-      "order": 7,
-      "boardPosition": {
-        "x": 8,
-        "y": 48
-      },
+      "order": 6,
+      "boardPosition": {"x": 8, "y": 80},
       "unexpectedEventSetId": "ue_set_sep"
     },
     {
-      "id": "station_milestones",
-      "name": "אבני דרך רבעוניות",
+      "id": "station_output_metric",
+      "name": "מדד תפוקה",
       "month": "אוקטובר",
       "type": "professional",
       "segment": "workplan",
-      "order": 8,
-      "boardPosition": {
-        "x": 22,
-        "y": 48
-      },
-      "questionId": "q_milestones"
-    },
-    {
-      "id": "station_gate_divisional",
-      "name": "שער אישור חטיבתי",
-      "month": "אוקטובר",
-      "type": "transition",
-      "segment": "workplan",
-      "order": 9,
-      "boardPosition": {
-        "x": 36,
-        "y": 48
-      },
-      "transitionMessageId": "transition_gate_divisional"
+      "order": 7,
+      "boardPosition": {"x": 8, "y": 48},
+      "questionId": "q_output_metric"
     },
     {
       "id": "station_unexpected_oct",
@@ -443,103 +393,59 @@ const GC = {
       "month": "אוקטובר",
       "type": "unexpected_event",
       "segment": "workplan",
-      "order": 10,
-      "boardPosition": {
-        "x": 50,
-        "y": 48
-      },
+      "order": 8,
+      "boardPosition": {"x": 22, "y": 48},
       "unexpectedEventSetId": "ue_set_oct"
     },
     {
-      "id": "station_deputy_ceo",
-      "name": "משנה למנכ\"ל – נעילה לעריכה",
+      "id": "station_milestones",
+      "name": "אבני דרך רבעוניות",
       "month": "נובמבר",
-      "type": "transition",
+      "type": "professional",
       "segment": "workplan",
-      "order": 11,
-      "boardPosition": {
-        "x": 64,
-        "y": 48
-      },
-      "transitionMessageId": "transition_deputy_ceo"
+      "order": 9,
+      "boardPosition": {"x": 36, "y": 48},
+      "questionId": "q_milestones"
     },
     {
       "id": "station_unexpected_nov",
-      "name": "בלת\"ם – רגע לפני אישור",
+      "name": "בלת\"ם",
       "month": "נובמבר",
       "type": "unexpected_event",
       "segment": "workplan",
-      "order": 12,
-      "boardPosition": {
-        "x": 78,
-        "y": 48
-      },
+      "order": 10,
+      "boardPosition": {"x": 50, "y": 48},
       "unexpectedEventSetId": "ue_set_nov"
     },
     {
-      "id": "station_workplan_approved",
-      "name": "מנכ\"ל ודירקטוריון – אישור תכנית עבודה",
-      "month": "דצמבר",
-      "type": "transition",
-      "segment": "transition_to_compensation",
-      "order": 13,
-      "boardPosition": {
-        "x": 92,
-        "y": 48
-      },
-      "transitionMessageId": "transition_workplan_approved"
-    },
-    {
       "id": "station_reward_metric",
-      "name": "מדד תגמול ונוסחה",
+      "name": "מדד תגמול",
       "month": "דצמבר",
       "type": "professional",
       "segment": "compensation",
-      "order": 14,
-      "boardPosition": {
-        "x": 92,
-        "y": 16
-      },
+      "order": 11,
+      "boardPosition": {"x": 64, "y": 48},
       "questionId": "q_reward_metric"
     },
     {
       "id": "station_unexpected_comp",
-      "name": "בלת\"ם – מודל תגמול",
+      "name": "בלת\"ם",
       "month": "דצמבר",
       "type": "unexpected_event",
       "segment": "compensation",
-      "order": 15,
-      "boardPosition": {
-        "x": 78,
-        "y": 16
-      },
+      "order": 12,
+      "boardPosition": {"x": 78, "y": 48},
       "unexpectedEventSetId": "ue_set_comp"
     },
     {
       "id": "station_weight",
       "name": "משקל וספי ביצוע",
-      "month": "דצמבר",
+      "month": "ינואר",
       "type": "professional",
       "segment": "compensation",
-      "order": 16,
-      "boardPosition": {
-        "x": 64,
-        "y": 16
-      },
+      "order": 13,
+      "boardPosition": {"x": 92, "y": 48},
       "questionId": "q_weight"
-    },
-    {
-      "id": "station_unexpected_comp2",
-      "name": "בלת\"ם – תיקון במודל תגמול",
-      "month": "דצמבר",
-      "type": "unexpected_event",
-      "segment": "compensation",
-      "order": 17,
-      "boardPosition": {
-        "x": 50,
-        "y": 16
-      },
-      "unexpectedEventSetId": "ue_set_comp2"
     },
     {
       "id": "station_end",
@@ -547,11 +453,8 @@ const GC = {
       "month": "ינואר",
       "type": "transition",
       "segment": "compensation",
-      "order": 18,
-      "boardPosition": {
-        "x": 36,
-        "y": 16
-      },
+      "order": 14,
+      "boardPosition": {"x": 92, "y": 16},
       "transitionMessageId": "transition_model_approved"
     },
     {
@@ -560,12 +463,12 @@ const GC = {
       "month": "ינואר",
       "type": "reflection",
       "segment": "reflection",
-      "order": 19,
-      "boardPosition": {
-        "x": 20,
-        "y": 16
-      }
+      "order": 15,
+      "boardPosition": {"x": 78, "y": 16}
     }
+  ],
+  "mapGates": [
+    {"id": "gate_workplan_approved", "name": "אישור תכנית העבודה", "afterOrder": 10}
   ],
   "stationQuestions": [
     {
