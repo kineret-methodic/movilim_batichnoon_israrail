@@ -1661,6 +1661,7 @@ let timerRunning = false;
 let activeUEResult = null;
 let facilitatorPreview = false;
 let outcomePopupVisible = false;
+let devContentView = false;
 
 function renderApp() {
   const app = document.getElementById('app');
@@ -1709,9 +1710,17 @@ function renderFacilitator(app) {
       <button class="preview-btn${facilitatorPreview ? ' active' : ''}"
         onclick="facilitatorPreview=!facilitatorPreview;renderApp()"
         title="${facilitatorPreview ? 'בטל תצוגת מנחה' : 'תצוגת מנחה — פתח הכל'}">🔍</button>
+      ${DEV_MODE ? `<button onclick="devContentView=!devContentView;activeStationId=null;renderApp()"
+        style="background:${devContentView?'#1E1F56':'none'};color:${devContentView?'#fff':'#C8102E'};
+          border:1.5px solid #C8102E;border-radius:6px;padding:4px 10px;font-size:12px;
+          font-weight:700;cursor:pointer;font-family:inherit">
+        📋 תוכן
+      </button>` : ''}
     </div>`;
 
-  if (!activeStationId) {
+  if (devContentView && DEV_MODE) {
+    html += renderDevContentView();
+  } else if (!activeStationId) {
     // Board map — 3-row grid layout
   const row1 = sorted.filter(s => s.order <= 4);
   const row2 = sorted.filter(s => s.order >= 5 && s.order <= 10);
@@ -1891,6 +1900,123 @@ function renderFacilitator(app) {
   }
 
   app.innerHTML = html;
+}
+
+function renderDevContentView() {
+  const sorted = [...GC.stations].sort((a, b) => a.order - b.order);
+  const typeBadge = {
+    professional: {label: 'מקצועית', bg: '#1E1F56', color: '#fff'},
+    unexpected_event: {label: 'בלת"מ', bg: '#E07820', color: '#fff'},
+    transition: {label: 'מעבר', bg: '#5A5EAA', color: '#fff'},
+    reflection: {label: 'רפלקציה', bg: '#8A70C0', color: '#fff'},
+  };
+
+  const cards = sorted.map(station => {
+    const badge = typeBadge[station.type] || {label: station.type, bg: '#999', color: '#fff'};
+    const badgeHtml = `<span style="background:${badge.bg};color:${badge.color};font-size:10px;font-weight:700;
+      border-radius:4px;padding:2px 8px;white-space:nowrap">${badge.label}</span>`;
+
+    const headerHtml = `
+      <div style="background:#1E1F56;color:#fff;padding:10px 16px;border-radius:10px 10px 0 0;
+        display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-size:11px;color:#A0A8D8;min-width:20px">${station.order}</span>
+        <span style="font-weight:700;font-size:14px;flex:1">${station.name}</span>
+        <span style="font-size:11px;color:#C8CEF0">${station.month || ''}</span>
+        ${badgeHtml}
+      </div>`;
+
+    let bodyHtml = '';
+
+    if (station.type === 'transition' || station.type === 'reflection') {
+      const tm = station.transitionMessageId ? GC.transitionMessages[station.transitionMessageId] : null;
+      bodyHtml = `<div style="padding:12px 16px;font-size:13px;color:#5A5E88;font-style:italic">
+        ${tm ? `<strong style="color:#1E1F56">${tm.title}</strong><br>${tm.body}` : 'תחנת מעבר'}
+      </div>`;
+
+    } else if (station.type === 'unexpected_event') {
+      const ueSet = GC.unexpectedEvents[station.unexpectedEventSetId] || [];
+      const items = ueSet.map(r => {
+        const noDelay = r.waitRounds === 0;
+        return `<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 12px;
+          border-bottom:1px solid #F5E8D0">
+          <span style="font-size:11px;font-weight:700;color:#7A3A00;min-width:18px;margin-top:2px">⚡</span>
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:700;color:#7A3A00;margin-bottom:3px">${r.label}</div>
+            <div style="font-size:12px;color:#5A3000;line-height:1.5">${r.description}</div>
+          </div>
+          <span style="font-size:10px;font-weight:700;white-space:nowrap;padding:2px 8px;border-radius:4px;
+            ${noDelay
+              ? 'background:#E8F5EE;color:#1A6A3A;border:1px solid #A8D8B8'
+              : 'background:#FEE8EC;color:#A0001A;border:1px solid #F0A0B0'}">
+            ${noDelay ? '✓ אין עיכוב' : '⏸ המתנה סבב'}
+          </span>
+        </div>`;
+      }).join('');
+      bodyHtml = `<div style="background:#FFF3E0;border-radius:0 0 10px 10px;overflow:hidden">
+        ${items || '<div style="padding:12px 16px;color:#999;font-size:12px">אין פריטים</div>'}
+      </div>`;
+
+    } else if (station.type === 'professional') {
+      const q = station.questionId
+        ? GC.stationQuestions.find(x => x.id === station.questionId)
+        : null;
+      if (!q) {
+        bodyHtml = `<div style="padding:12px 16px;font-size:12px;color:#999">אין שאלה</div>`;
+      } else {
+        const groupCards = GC.groups.map(group => {
+          const ans = q.answersByGroup[group.id];
+          const col = COLOR[group.colorToken];
+          if (!ans) return '';
+          return `<div style="background:#FAFBFF;border:1px solid ${col.primary}44;border-radius:8px;
+            padding:12px;overflow:hidden">
+            <div style="font-weight:700;font-size:12px;color:${col.primary};margin-bottom:8px;
+              padding-bottom:6px;border-bottom:1px solid ${col.primary}22">
+              ${group.label} — ${group.divisionName}
+            </div>
+            <div style="font-size:11px;line-height:1.6;display:flex;flex-direction:column;gap:5px">
+              <div><span style="color:#6A70B0;font-weight:600">משימה: </span><span style="color:#1A1C50">${ans.taskName}</span></div>
+              <div><span style="color:#C8102E;font-weight:600">מה לא תקין: </span><span style="color:#3A1A1A">${ans.whatIsWrong}</span></div>
+              <div><span style="color:#1A6A3A;font-weight:600">תיקון נכון: </span><span style="color:#0D3A22">${ans.correctFix}</span></div>
+              ${ans.facilitatorNotes ? `<div><span style="color:#8A70C0;font-weight:600">הערת מנחה: </span><span style="color:#3A2060">${ans.facilitatorNotes}</span></div>` : ''}
+            </div>
+          </div>`;
+        }).filter(Boolean).join('');
+
+        const gridCols = GC.groups.length > 2 ? 'repeat(2,1fr)' : `repeat(${GC.groups.length},1fr)`;
+
+        bodyHtml = `<div style="padding:12px 16px 4px;background:#fff;border-bottom:1px solid #E8EAF4">
+          <div style="font-size:12px;color:#3A3E78;line-height:1.6;margin-bottom:6px;
+            padding:10px 12px;background:#EEF0FF;border-right:3px solid #1E1F56;border-radius:6px">
+            <strong style="color:#1E1F56">שאלה: </strong>${q.questionText}
+          </div>
+          <div style="font-size:11px;color:#5A60A0;font-style:italic;margin-bottom:8px">
+            ${q.professionalPrinciple}
+          </div>
+        </div>
+        <div style="padding:10px 16px 14px;background:#F8F9FF">
+          <div style="display:grid;grid-template-columns:${gridCols};gap:10px">
+            ${groupCards}
+          </div>
+        </div>`;
+      }
+    }
+
+    return `<div style="background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(30,31,86,.10);
+      overflow:hidden;margin-bottom:0">
+      ${headerHtml}
+      ${bodyHtml}
+    </div>`;
+  }).join('');
+
+  return `<div id="board-wrap" style="direction:rtl">
+    <div style="padding:4px 2px 10px;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:13px;font-weight:700;color:#1E1F56">סקירת תוכן — כל התחנות</span>
+      <span style="font-size:11px;color:#8A90C0">${GC.stations.length} תחנות</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      ${cards}
+    </div>
+  </div>`;
 }
 
 function renderStationNode(s) {
