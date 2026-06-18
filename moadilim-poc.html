@@ -270,10 +270,10 @@
 <div id="nav">
   <span id="nav-label"></span>
   <button class="nav-btn active" id="nav-fac" onclick="showView('facilitator')">🖥 <span id="nav-fac-lbl"></span></button>
-  <button class="nav-btn" id="nav-g1" onclick="showView('mobile','group_1')">📱 <span id="nav-g1-lbl"></span></button>
-  <button class="nav-btn" id="nav-g2" onclick="showView('mobile','group_2')">📱 <span id="nav-g2-lbl"></span></button>
-  <button class="nav-btn" id="nav-g3" onclick="showView('mobile','group_3')">📱 <span id="nav-g3-lbl"></span></button>
-  <button class="nav-btn" id="nav-g4" onclick="showView('mobile','group_4')">📱 <span id="nav-g4-lbl"></span></button>
+  <button class="nav-btn" id="nav-g1" onclick="showView('mobile','group_1')" style="display:none">📱 <span id="nav-g1-lbl"></span></button>
+  <button class="nav-btn" id="nav-g2" onclick="showView('mobile','group_2')" style="display:none">📱 <span id="nav-g2-lbl"></span></button>
+  <button class="nav-btn" id="nav-g3" onclick="showView('mobile','group_3')" style="display:none">📱 <span id="nav-g3-lbl"></span></button>
+  <button class="nav-btn" id="nav-g4" onclick="showView('mobile','group_4')" style="display:none">📱 <span id="nav-g4-lbl"></span></button>
   <button class="nav-btn" id="nav-content" onclick="showView('devContent')" style="display:none">📋 תוכן</button>
 </div>
 <div id="app"></div>
@@ -1680,6 +1680,13 @@ function renderApp() {
   } else {
     renderMobile(app, currentGroup);
   }
+
+  // הטאבים של הטלפונים גלויים רק כשהזכוכית המגדלת פעילה
+  const showMobileTabs = facilitatorPreview || DEV_MODE || currentView === 'mobile';
+  [1,2,3,4].forEach(n => {
+    const btn = document.getElementById('nav-g' + n);
+    if (btn) btn.style.display = showMobileTabs ? '' : 'none';
+  });
 }
 
 // ── Station Circle Helpers ───────────────────────────────
