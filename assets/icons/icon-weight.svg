@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<svg fill="none" stroke="#221f64" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 183.5 79.3">
+  
+  <defs>
+    
+  </defs>
+  <polyline class="st0" points="29.3 25.2 29.3 39.7 74.3 39.7"></polyline>
+  <polyline class="st0" points="154.3 25.2 154.3 39.7 109.3 39.7"></polyline>
+  <path class="st0" d="M91.8,20.2h0c9.7,0,17.5,7.8,17.5,17.5v27.9h-35v-27.9c0-9.7,7.8-17.5,17.5-17.5Z"></path>
+  <rect class="st0" x="55.5" y="65.7" width="72.5" height="10.6"></rect>
+  <path class="st0" d="M128,3h52.5c0,12.3-9.9,22.2-22.2,22.2h-8.1c-12.3,0-22.2-9.9-22.2-22.2h0Z"></path>
+  <path class="st0" d="M25.2,3h8.1c12.3,0,22.2,9.9,22.2,22.2H3C3,12.9,12.9,3,25.2,3Z" transform="translate(58.5 28.2) rotate(-180)"></path>
+</svg>

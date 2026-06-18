@@ -9,6 +9,7 @@
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%;direction:rtl}
   body{font-family:'Heebo','Arial',sans-serif;background:#D6D6D6;color:#1A1C50;-webkit-font-smoothing:antialiased}
+  @keyframes pulseRing{0%{box-shadow:0 0 0 0 rgba(0,174,255,.5)}70%{box-shadow:0 0 0 18px rgba(0,174,255,0)}100%{box-shadow:0 0 0 0 rgba(0,174,255,0)}}
 
   /* ── Nav bar ── */
   #nav{position:fixed;top:0;right:0;left:0;background:#1E1F56;
@@ -1791,45 +1792,182 @@ function renderFacilitator(app) {
     </div>
   </div>`;
 
-  html += `<div id="board-wrap">
+  // ── New projected board (1920×1080, auto-scaled) ──────────────────────────
 
-    <!-- ROW 1: 5 stations, RTL (order 0 far-right → order 4 far-left) -->
-    <div class="board-row">
-      ${row1.map(s => snGrid(s)).join(arrowDiv('←'))}
-    </div>
+  // HOOK 1 — group tokens + active station
+  const tokensByOrder = {};
+  GC.groups.forEach((g, gi) => {
+    const order = gs(g.id).currentStationOrder;
+    if (!tokensByOrder[order]) tokensByOrder[order] = [];
+    tokensByOrder[order].push(gi);
+  });
+  const activeOrder = currentTurnStation;
 
-    <!-- MIDDLE ROW: [standalone LEFT] ─── [row2 going left→right] -->
-    <div style="display:flex;flex-direction:row;align-items:center;direction:ltr;gap:0">
+  // Group colors (index 0-3)
+  const GP_BG = ['#00aeff','#1abe9b','#f4c40f','#e84d3d'];
+  const GP_FG = ['#fff','#fff','#221f64','#fff'];
 
-      <!-- Left: standalone (order 5) with up/down connectors -->
-      <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:134px">
-        <div style="width:2px;height:14px;background:#B0B4D8"></div>
-        <span style="font-size:14px;color:#B0B4D8;line-height:1">↓</span>
-        ${snGrid(standSt)}
-        <span style="font-size:14px;color:#B0B4D8;line-height:1">↓</span>
-        <div style="width:2px;height:14px;background:#B0B4D8"></div>
+  // Station color by type/id (hi-fi palette from design)
+  function boardColorOf(s) {
+    if (s.type === 'unexpected_event') return '#e84d3d';
+    if (s.id === 'station_start')      return '#1abe9b';
+    if (s.id === 'station_reflection') return '#e0a200';
+    if (s.id === 'station_end')        return '#00aeff';
+    if (s.type === 'transition' || s.type === 'reflection') return '#5a6d77';
+    return '#221f64';
+  }
+
+  // Icon filename lookup
+  const ICON_MAP = {
+    station_start:'flag', station_company_goal:'target', station_outcome_metric:'gauge',
+    station_top10:'top10', station_measurable:'doc', station_output_metric:'clipboard',
+    station_milestones:'milestone', station_deputy_ceo:'lock',
+    station_workplan_approved:'gate', station_reward_metric:'wallet', station_weight:'weight',
+    station_end:'trophy', station_reflection:'pin',
+  };
+  const iconUrl = (s) => 'assets/icons/icon-' +
+    (s.type === 'unexpected_event' ? 'wheel' : (ICON_MAP[s.id] || 'gauge')) + '.svg';
+
+  const ordered = [...GC.stations].sort((a,b) => a.order - b.order);
+  const BW = 1760, BH = 760;
+  const bpx = (x, y) => ({ cx: Math.round((x/100)*BW), cy: Math.round(((100-y)/100)*BH) });
+
+  const pathPoints = ordered.map(s => {
+    const p = bpx(s.boardPosition.x, s.boardPosition.y);
+    return p.cx + ',' + p.cy;
+  }).join(' ');
+
+  const stationsHtml = ordered.map(s => {
+    const p   = bpx(s.boardPosition.x, s.boardPosition.y);
+    const col = boardColorOf(s);
+    const name = s.type === 'unexpected_event' ? GC.uiCopy.stationTypes.unexpectedEventLabel : s.name;
+    const isActive = DEV_MODE || facilitatorPreview || s.order === activeOrder;
+    const anim = s.order === activeOrder ? 'pulseRing 2s infinite' : 'none';
+    const toks = (tokensByOrder[s.order] || []).map(gi =>
+      `<div style="width:30px;height:30px;border-radius:50%;background:${GP_BG[gi]};border:3px solid #fff;
+        box-shadow:0 2px 5px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;
+        color:${GP_FG[gi]};font-size:14px;font-weight:800">${gi+1}</div>`
+    ).join('');
+    return `<div style="position:absolute;left:${p.cx}px;top:${p.cy}px;
+        transform:translate(-50%,-62px);z-index:2;
+        display:flex;flex-direction:column;align-items:center;gap:8px;width:184px;
+        opacity:${isActive ? 1 : 0.32};cursor:${isActive ? 'pointer' : 'default'}"
+        onclick="${isActive ? `openStation('${s.id}')` : ''}">
+      <div style="position:relative;width:124px;height:124px">
+        <div style="position:absolute;inset:0;background:#fff;border-radius:50%;
+          border:5px solid ${col};display:flex;align-items:center;justify-content:center;
+          box-shadow:0 5px 16px rgba(34,31,100,.12);animation:${anim}">
+          <img src="${iconUrl(s)}" alt="" style="width:46px;height:46px">
+        </div>
+        <div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+          display:flex;gap:4px;z-index:3">${toks}</div>
       </div>
-
-      <!-- Thin horizontal bridge standalone → row2 -->
-      <div style="width:18px;height:2px;background:#B0B4D8;flex-shrink:0"></div>
-
-      <!-- Right: row2 (orders 6-10) left→right -->
-      <div style="flex:1;display:flex;flex-direction:row;align-items:center;overflow-x:auto;padding:10px 4px;gap:0">
-        ${row2.map(s => snGrid(s)).join(arrowDiv('→'))}
+      <div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:1px">
+        <span style="font-size:11px;font-weight:600;color:#9aa0b8">${s.month||''}</span>
+        <span style="font-size:13.5px;font-weight:700;line-height:1.2;color:${col};
+          max-width:178px">${name}</span>
       </div>
+    </div>`;
+  }).join('');
 
+  const gatesHtml = (GC.mapGates || []).map(g => {
+    const a = ordered.find(s => s.order === g.afterOrder);
+    const b = ordered.find(s => s.order === g.afterOrder + 1);
+    if (!a || !b) return '';
+    const pa = bpx(a.boardPosition.x, a.boardPosition.y);
+    const pb = bpx(b.boardPosition.x, b.boardPosition.y);
+    const cx = Math.round((pa.cx+pb.cx)/2), cy = Math.round((pa.cy+pb.cy)/2);
+    return `<div style="position:absolute;left:${cx}px;top:${cy}px;
+        transform:translate(-50%,-50%);z-index:1;
+        display:flex;flex-direction:column;align-items:center;gap:5px;width:120px">
+      <div style="width:64px;height:64px;border-radius:50%;background:#fff;
+        border:4px dashed #5a6d77;display:flex;align-items:center;justify-content:center">
+        <img src="assets/icons/icon-gate.svg" alt="" style="width:30px;height:30px">
+      </div>
+      <span style="font-size:12px;font-weight:700;color:#5a6d77;text-align:center;
+        line-height:1.2;background:rgba(255,255,255,.75);border-radius:5px;padding:1px 5px">
+        ${g.name}</span>
+    </div>`;
+  }).join('');
+
+  // Legend
+  const bs = GC.uiCopy.boardSections;
+  const segHtml = [
+    {dot:'#221f64', label:bs.a.replace(/^מקטע [^—]*— ?/,''), months:bs.aMonths},
+    {dot:'#1abe9b', label:bs.b, months:bs.bMonths},
+    {dot:'#00aeff', label:bs.c, months:bs.cMonths},
+  ].map(sg => `<div style="display:flex;align-items:center;gap:7px">
+    <span style="width:11px;height:11px;border-radius:50%;background:${sg.dot}"></span>
+    <span style="font-size:13px;font-weight:700;color:#3a3f5c">${sg.label}</span>
+    <span style="font-size:12px;font-weight:500;color:#9aa0b8">${sg.months}</span>
+  </div>`).join('');
+
+  const legendHtml = [
+    ['#221f64','תחנה מקצועית'],['#e84d3d','בלת״ם'],['#5a6d77','שער / אישור'],
+    ['#1abe9b','התחלה'],['#00aeff','סיום'],['#e0a200','רפלקציה'],
+  ].map(([col,lbl]) => `<div style="display:flex;align-items:center;gap:8px">
+    <span style="width:18px;height:18px;border-radius:50%;background:#fff;border:4px solid ${col}"></span>
+    <span style="font-size:13.5px;font-weight:600;color:#3a3f5c">${lbl}</span>
+  </div>`).join('');
+
+  // HOOK 2 — turn indicator (already built as turnText above)
+  const boardTurnHtml = `<div style="background:#221f64;border-radius:40px;padding:9px 22px 9px 16px;
+      display:flex;align-items:center;gap:12px;box-shadow:0 6px 18px rgba(34,31,100,.22)">
+    <span style="background:#f4c40f;color:#221f64;font-weight:800;font-size:14px;
+      border-radius:20px;padding:4px 13px">תור עכשיו</span>
+    <span style="color:#fff;font-size:17px;font-weight:700">${currentGroup.label} · ${currentGroup.divisionName}</span>
+  </div>`;
+
+  html += `<div id="board-fitwrap" style="flex:1;overflow:hidden;background:#dfe2e8;
+      display:flex;align-items:center;justify-content:center">
+    <div id="gameboard" style="width:1920px;height:1080px;flex:none;transform-origin:center center;
+        position:relative;overflow:hidden;font-family:Heebo,Arial,sans-serif;
+        background:#eef0f4 url('assets/board-bg.png') center/cover no-repeat;color:#221f64">
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:34px 60px 30px">
+
+        <!-- Header: logos + turn indicator -->
+        <div style="display:flex;align-items:center;gap:24px;flex-shrink:0">
+          <img src="assets/logo-rail.png" alt="רכבת ישראל"
+            style="height:30px;width:auto;opacity:.9">
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:14px">
+            <img src="assets/logo-mesilot.png" alt="מסילות" style="height:78px;width:auto">
+            <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:58px;width:auto;margin-top:6px">
+          </div>
+          <div style="min-width:360px;display:flex;justify-content:flex-end">
+            ${boardTurnHtml}
+          </div>
+        </div>
+
+        <!-- Segment labels -->
+        <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:22px;margin-top:10px">
+          ${segHtml}
+        </div>
+
+        <!-- Track canvas -->
+        <div style="flex:1;position:relative;margin-top:6px">
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+              width:${BW}px;height:${BH}px">
+            <svg width="${BW}" height="${BH}" viewBox="0 0 ${BW} ${BH}"
+                style="position:absolute;inset:0;z-index:0" fill="none">
+              <polyline points="${pathPoints}" stroke="#cdd2de" stroke-width="12"
+                stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="${pathPoints}" stroke="#ffffff" stroke-width="4"
+                stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 11"/>
+            </svg>
+            ${gatesHtml}
+            ${stationsHtml}
+          </div>
+        </div>
+
+        <!-- Station type legend -->
+        <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;
+            gap:26px;flex-wrap:wrap;padding-top:4px">
+          <span style="font-size:13px;font-weight:700;color:#7c84a0">סוגי תחנות:</span>
+          ${legendHtml}
+        </div>
+
+      </div>
     </div>
-
-    <!-- RIGHT-SIDE connector ↓ (physically at right edge, where row2 ends / row3 starts) -->
-    ${RCONN}
-    ${GATE}
-    ${RCONN}
-
-    <!-- ROW 3: 5 stations, RTL (order 11 far-right → order 15 far-left) -->
-    <div class="board-row">
-      ${row3.map(s => snGrid(s)).join(arrowDiv('←'))}
-    </div>
-
   </div>`;
   } // end if (!activeStationId)
 
@@ -1937,7 +2075,19 @@ function renderFacilitator(app) {
   }
 
   app.innerHTML = html;
+  // Scale the projected gameboard to fill available space
+  fitBoard();
 }
+
+// ── Projected board auto-fit ─────────────────────────────
+function fitBoard() {
+  const wrap = document.getElementById('board-fitwrap');
+  const board = document.getElementById('gameboard');
+  if (!wrap || !board) return;
+  const s = Math.min(wrap.clientWidth / 1920, wrap.clientHeight / 1080);
+  board.style.transform = 'scale(' + s + ')';
+}
+window.addEventListener('resize', fitBoard);
 
 function renderDevContentView() {
   const sorted = [...GC.stations].sort((a, b) => a.order - b.order);
