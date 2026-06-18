@@ -8,7 +8,7 @@
 <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%;direction:rtl}
-  body{font-family:'Heebo','Arial',sans-serif;background:#F0F2F7;color:#1A1C50;-webkit-font-smoothing:antialiased}
+  body{font-family:'Heebo','Arial',sans-serif;background:#D6D6D6;color:#1A1C50;-webkit-font-smoothing:antialiased}
 
   /* ── Nav bar ── */
   #nav{position:fixed;top:0;right:0;left:0;background:#1E1F56;
@@ -37,7 +37,8 @@
 
   /* ── Board map ── */
   #board-wrap{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px 16px;
-    background:#F0F2F7;display:flex;flex-direction:column;gap:6px}
+    background:radial-gradient(ellipse at 50% 30%,#ffffff 10%,#e0e0e0 100%);
+    display:flex;flex-direction:column;gap:6px}
 
   /* Section labels */
   .bsl{display:flex;justify-content:space-between;align-items:center;
@@ -63,25 +64,20 @@
   .conn-a{font-size:14px;color:#B0B4D8;line-height:1}
 
   /* Station node */
-  .sn{border-radius:8px;padding:7px 10px;cursor:pointer;text-align:center;
-    flex-shrink:0;min-width:88px;max-width:110px;
-    transition:box-shadow .15s,transform .1s;
-    box-shadow:0 1px 3px rgba(30,31,86,.1)}
-  .sn:hover{transform:scale(1.05);box-shadow:0 3px 10px rgba(30,31,86,.2)}
-  .sn-pro{background:#FFFFFF;border:1.5px solid #1E1F56}
-  .sn-comp{background:#F0FFF8;border:1.5px solid #1A6A3A}
-  .sn-tr{background:#EEF0FF;border:1.5px solid #5A5EAA}
-  .sn-tr-comp{background:#E8F5EE;border:2px solid #1A6A3A}
-  .sn-ue{background:#FFF3E0;border:1.5px dashed #E07820;min-width:60px}
-  .sn-refl{background:#F5F0FF;border:1.5px dashed #8A70C0}
-  .sn-month{font-size:8px;color:#8A90C0;margin-bottom:2px}
-  .sn-name{font-size:10px;font-weight:600;color:#1A1C50;line-height:1.35}
-  .sn-ue .sn-name{color:#7A3A00}
-  .sn-tr .sn-name,.sn-tr-comp .sn-name{color:#2A2E72}
-  .sn-comp .sn-name,.sn-tr-comp .sn-name{color:#0D3A22}
-  .sn-refl .sn-name{color:#4A2A80}
-  .sn-toks{display:flex;justify-content:center;gap:3px;margin-top:5px}
-  .sn-tok{width:9px;height:9px;border-radius:50%;border:1px solid rgba(255,255,255,.8);display:inline-block}
+  /* ── Station circles (new design) ── */
+  .sn{width:108px;height:108px;border-radius:50%;background:#FFFFFF;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    flex-shrink:0;text-align:center;padding:6px 8px;
+    box-shadow:0 3px 10px rgba(0,0,0,.18);
+    transition:transform .15s,box-shadow .15s;
+    position:relative;overflow:visible}
+  .sn.sn-active{cursor:pointer}
+  .sn.sn-active:hover{transform:scale(1.07);box-shadow:0 6px 18px rgba(0,0,0,.26)}
+  .sn-locked{opacity:0.28;pointer-events:none}
+  .sn-month{font-size:8px;font-weight:700;letter-spacing:.02em;line-height:1;margin-bottom:3px}
+  .sn-name{font-size:9.5px;font-weight:800;line-height:1.25;padding:0 6px;margin-top:3px}
+  .sn-toks{display:flex;justify-content:center;gap:4px;position:absolute;bottom:-13px;left:50%;transform:translateX(-50%);white-space:nowrap}
+  .sn-tok{width:10px;height:10px;border-radius:50%;border:2px solid #FFFFFF;display:inline-block;box-shadow:0 1px 4px rgba(0,0,0,.3)}
 
   /* keep old .token for status bar */
   .token{width:10px;height:10px;border-radius:50%;border:1px solid rgba(255,255,255,.7);display:inline-block}
@@ -1685,6 +1681,38 @@ function renderApp() {
   }
 }
 
+// ── Station Circle Helpers ───────────────────────────────
+
+function stationCircleStyle(s) {
+  // All stations: white fill, type-color for border + icon + text
+  let c;
+  if (s.type === 'unexpected_event') c = '#e84d3d';
+  else if (s.type === 'reflection')  c = '#f4c40f';
+  else if (s.order === 0)            c = '#1abe9b';
+  else if (s.type === 'transition')  c = '#00aeff';
+  else                               c = '#221f64'; // professional
+  return {bg:'#FFFFFF', tc:c};
+}
+
+function stationIcon(s, c) {
+  const DICE = `<svg viewBox="0 0 24 24" width="26" height="26"><rect x="3" y="3" width="18" height="18" rx="3.5" stroke="${c}" stroke-width="1.5" fill="none"/><circle cx="8" cy="8" r="1.5" fill="${c}"/><circle cx="16" cy="8" r="1.5" fill="${c}"/><circle cx="12" cy="12" r="1.5" fill="${c}"/><circle cx="8" cy="16" r="1.5" fill="${c}"/><circle cx="16" cy="16" r="1.5" fill="${c}"/></svg>`;
+  if (s.type === 'unexpected_event') return DICE;
+  const m = {
+    0:`<svg viewBox="0 0 24 24" width="26" height="26"><line x1="7" y1="4" x2="7" y2="21" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/><path d="M7 4L21 9L7 14Z" fill="${c}"/></svg>`,
+    1:`<svg viewBox="0 0 24 24" width="26" height="26"><rect x="2" y="10" width="14" height="10" rx="1.5" stroke="${c}" stroke-width="1.5" fill="none"/><path d="M4 10V8C4 5.8 7 4.5 9 4.5H12" stroke="${c}" stroke-width="1.5" fill="none" stroke-linecap="round"/><circle cx="18" cy="7" r="4" stroke="${c}" stroke-width="1.5" fill="none"/><circle cx="18" cy="7" r="1.5" fill="${c}"/></svg>`,
+    3:`<svg viewBox="0 0 24 24" width="26" height="26"><polyline points="2,18 7,13 11,15 16,9 22,12" stroke="${c}" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="2" y1="21" x2="22" y2="21" stroke="${c}" stroke-width="1.5"/></svg>`,
+    4:`<svg viewBox="0 0 24 24" width="26" height="26"><path d="M12 2L14.5 9.5H22L16 13.5L18.5 21L12 17L5.5 21L8 13.5L2 9.5H9.5Z" stroke="${c}" stroke-width="1.5" fill="none" stroke-linejoin="round"/></svg>`,
+    5:`<svg viewBox="0 0 24 24" width="26" height="26"><rect x="4" y="2" width="16" height="20" rx="2" stroke="${c}" stroke-width="1.5" fill="none"/><line x1="8" y1="8" x2="16" y2="8" stroke="${c}" stroke-width="1.5"/><line x1="8" y1="12" x2="16" y2="12" stroke="${c}" stroke-width="1.5"/><line x1="8" y1="16" x2="13" y2="16" stroke="${c}" stroke-width="1.5"/></svg>`,
+    7:`<svg viewBox="0 0 24 24" width="26" height="26"><rect x="2" y="13" width="5" height="8" rx="1" fill="${c}"/><rect x="9" y="9" width="5" height="12" rx="1" fill="${c}"/><rect x="16" y="5" width="5" height="16" rx="1" fill="${c}"/></svg>`,
+    9:`<svg viewBox="0 0 24 24" width="26" height="26"><path d="M12 3L20 12L12 21L4 12Z" stroke="${c}" stroke-width="1.5" fill="none" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.5" fill="${c}"/></svg>`,
+    11:`<svg viewBox="0 0 24 24" width="26" height="26"><line x1="12" y1="4" x2="12" y2="22" stroke="${c}" stroke-width="1.5"/><line x1="3" y1="8" x2="21" y2="8" stroke="${c}" stroke-width="1.5"/><path d="M5 12C5 12 3 14 3 16C3 18 4 19 5 19H9" stroke="${c}" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M19 12C19 12 21 14 21 16C21 18 20 19 19 19H15" stroke="${c}" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`,
+    13:`<svg viewBox="0 0 24 24" width="26" height="26"><line x1="12" y1="3" x2="12" y2="21" stroke="${c}" stroke-width="1.5"/><line x1="4" y1="7" x2="20" y2="7" stroke="${c}" stroke-width="1.5"/><path d="M4 7L2 12C2 14.2 3.8 16 6 16H9" stroke="${c}" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M20 7L22 12C22 14.2 20.2 16 18 16H15" stroke="${c}" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`,
+    14:`<svg viewBox="0 0 24 24" width="26" height="26"><circle cx="12" cy="12" r="9" stroke="${c}" stroke-width="1.5" fill="none"/><path d="M7 12L10.5 15.5L17 8" stroke="${c}" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    15:`<svg viewBox="0 0 24 24" width="26" height="26"><circle cx="12" cy="7" r="4" stroke="${c}" stroke-width="1.5" fill="none"/><path d="M4 21C4 17 7.5 14 12 14C16.5 14 20 17 20 21" stroke="${c}" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`,
+  };
+  return m[s.order] || m[1];
+}
+
 // ── Facilitator ─────────────────────────────────────────
 
 function renderFacilitator(app) {
@@ -1714,13 +1742,16 @@ function renderFacilitator(app) {
       <button class="preview-btn${facilitatorPreview ? ' active' : ''}"
         onclick="facilitatorPreview=!facilitatorPreview;renderApp()"
         title="${facilitatorPreview ? 'בטל תצוגת מנחה' : 'תצוגת מנחה — פתח הכל'}">🔍</button>
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAATgAAAAsCAYAAADxT6RTAAAACXBIWXMAABcSAAAXEgFnn9JSAAARqklEQVR4nO2dC5Rd0xnHv6SpVlJEx3gl6rnVVpGYeiVVpF7xSFWiKkqCjSBB601RpR4hlEak1CYerYom0kREEUKLEESV7uhWlFTTitFQ4p2u//hu1pkze+97XnPvrTm/tWatZM45+54595y9v+//PU43qhFSqG5EhJ+kLDdWL+/EUyopKfmM072Gn3UeEX2c4ueuGp5bSUnJZ5BaTnCTiOjDFPsPkULt0onnU1JS8hknjcuYGynUZCIaleIQQ0RbGavfpzojhepFRNOJ6POOzbcbqyfW4bRKSkoaxIIDP2X3MymSiC6hBsBY/Q4RvUFEOzl+zpFCrVTvcywpKanjBGesfoGIdMrDjpdCHUGNgc9KW5OIvlvjcykpKWkwCw6cTURvpTzmGinUkVRnjNV/IKKnPZuPq/HplJSUVOFzVGOWtC54p7mpZRmCCCm1wqHNTS1rNze1PLCkdUGaYEWhNDe1fERE33Zs6tvc1DJrSeuC1+pwWiUlJQ1iwYEJRPTHDMcdTUTPS6EOr6Pm9WsietOzrbTiSkq6ahQ1ihRqIyJ6koh6ZxzidUQvOV/uSWP1YqoRUigEPk5xbPoAlpyxGudWUlJSZ7pJodYnop/U8DNvMVbfh39IoeDq/a6gcWFVLSSiViL6LxG9l3Gc04zV/wrtIIXagIhe9CwQ84mojZuKcU42Vn8SGf9aDly4+AcmV2P1u4Hzu5iINnNsQmXIYcbq/0T23YOIjkl4roiALyGip/C9VVtUeCHY1LEJYxwZrVSRQh1IRPiJg+j1IbHrsy0Rnen52GuM1bMd53IIEQ137I9xRxmr36acSKHWJaKrMx4evbYzjdXBe0gK9Q3PIuvjE342nieih4zVj1UZf3ciOjbBuNDTlxLRy3zvzzdWLwuM+z0iGpHwnCEHvc7jzjBW4/qkogdPDAfXUI/bRwo1wFi9yFg9Qwp1EhFdVsC4qxPRwALGwUN7emgHY/XLUqiZHi1umwyf+ShboxWuIKJZRISJ1MVWWBwCX/grmKg92x4iop9F/r+AiPYkorQu/1VSqN8Q0anG6n969nkq8BBikcPxFWDN3+rZ90Yiuify/+cD54yJosMEx8GhmzzjzwlEyBODSYknuSz3QJSJUqjb+NpiQXPxJyIaTESrZvkAKdQTvMj4gmb4PrD4fTHl0G9JoW5ASpjn/nyCv+duKaWpD3jcHxmrka6ViO7G6rdiN1pn00REU6VQK+M/xurLiWgcNQ7HSqF6J9QRi2Lf6H+M1X8hou2IaJ5nf0zkD7Ob7+JmIvJZJGOlUCu0V2P1vzN+/z14YXxGCvVNzz5TsN2z7ZzYeVgi+r1n37ZpQsbqpbEJL8qelXsrdsyfiejBwDUpSq65qoAxYGwchElMCrWjawdjNbwUPPBZ2ZqIHpFCDfWM/0ZgwQmBCfcEeFNsBcbH/ZtnAaoGFrPRWKikUC1JD6rcYBey+1Ir4GLcKIVqsxqN1bCYzqXGYBXk3iXYbw67xEWwa/wXPPF8K2bZRYHr9xi7KvFj3w7c/Bs5Pi/PQ7kGJiYp1GDHecAt+nEgifvAhIvGvlIofE6UOzz7rszWnQvf+HDniyoLhOX1eoHGwN2ua8tMzPncrszGxpBOWMRx7rOlUCMKHrcvEc2VQm0RqhQxVk9Ikydia9dTS9Dj6ykpVJvgysEIWB8QuGtJU2jFDbCQ3cYdEnRJ9bZ8ZiDQu1jDVWpkrL6YLUZX1AoPzfVSqHPzNH1kl9MnGh/te0kQp6uECtx78SIG6QK5aaP452BedFsS3MeZk2LzwGkNraxnhZpGrBWyMnlR9+WlHVXRqyP7w12fTMUBDXNEJzR8zZyhYax+NqBHH1u5lxNNcNzBwSda1xJECB/kdzlUat8wyWXqgJCDk9O+1Ys7sF6fcPcnq4z1cGD1OsFzDG74oQFRGXl0OmftbaYCc2P1+Gpt4nOwNNDgoBYk7RnYO+O1bWZdOs5EKpZ4/Sy8iLyR+LwLT6iB6W5pE33rpcW5LA50IT0gMskhx6iWb7LqkzGX7OoEHViRhBvSa6o9OFv6Wohz+6CdOBfRxWHcSLBXLQvM+VgUUx8Q6P+VFeRb1aMbTYWZ7LqHgM4WzOznZgVoQJko2MBNGe6l4hgQjYjzNU26YLt43FiNWvI8zAjU7I5JNcFxHyrfOwJqDayMW6RQO/O5vcQuSy3brp+S1tphlyVUbD8vRd4h8pdWvB0raeqBsRrW4cBAET6SKOeyxlnLAnOc2+2cDnRJARMd9KITjdW+Bpc1gXW1audwKi/UWS2WbTxR56uoWI4vqGX6g1VaRiWiSgNTND3tmdYdQdV+lhq9iiC8KutEW3A2dl5LDm2yt0Zdm7H6HinUEYHM9M4AFQOYtNKAyDC+mHUib2V7lldbNBZIlHeIIIcUCjfc1x2bP0QunS9DnrPrB7H25YtSDg6UQFWbeNF+vZvH8vVZIZVzQ6DkNCkUEkR35Z8BHJHzRWMBrtsSvpb3cTF7qmThTgSaKSSNnSPRSWhz87npga/SIg7yQPt5DBNXCd+daOJZUDVSh/sKaWRSKNxDfRO+shBe1sOsnxXFdYHyxV71fPEzdJlBLBQPyxHxwQMzqMjOuyWNC7vP8Un5I9Y4S0oar5sIvx9gDL/LM0s51nhjdZqX4JaUlHQBGmKCq8AdHCa7XqOXwARGv/5ap4yUlJQ0MA3VLonf4j0kQ5cE/B0TCnx5b0lJyWeAhprgAAuYR2d4a/e2ndBevKSk5P+YhrV4uAbxoZSF0sgl2izUEbekpKTr0HAWXAVuhjcyQdmS90XCJSUlXRtn37FGYUnrgtbmphbU2aXpe7Vpc1PLpCWtwXSrkpKSLkDDWnARLgmUFrnYvFKHVlJS0rVpWA0uTpoIaeg1gyUlJdRl+B88DVKRsv3n+QAAAABJRU5ErkJggg=="
+        alt="רכבת ישראל" style="height:22px;opacity:.85;flex-shrink:0;margin-right:4px">
     </div>`;
 
   if (!activeStationId) {
-    // Board map — 3-row grid layout
-  const row1 = sorted.filter(s => s.order <= 4);
-  const row2 = sorted.filter(s => s.order >= 5 && s.order <= 10);
-  const row3 = sorted.filter(s => s.order >= 11);
+    // Board map — skiza layout: row1 / standalone-left + row2 / gate / row3
+  const row1       = sorted.filter(s => s.order <= 4);
+  const standSt    = sorted.find(s => s.order === 5);   // standalone left (ניסוח מדיד)
+  const row2       = sorted.filter(s => s.order >= 6 && s.order <= 10);
+  const row3       = sorted.filter(s => s.order >= 11);
 
   // Current group's station — only this one is clickable
   const currentTurnGroup = GC.groups[currentTurnGroupIndex];
@@ -1728,68 +1759,77 @@ function renderFacilitator(app) {
 
   function snGrid(s) {
     const here = GC.groups.filter(g => gs(g.id).currentStationOrder === s.order);
-    const isUE = s.type === 'unexpected_event';
-    const isTr = s.type === 'transition' || s.type === 'reflection';
-    const isComp = s.segment === 'compensation' || s.segment === 'transition_to_compensation';
-    const isRefl = s.type === 'reflection';
     const isActive = DEV_MODE || facilitatorPreview || s.order === currentTurnStation;
-    let cls = 'sn';
-    if (isUE) cls += ' sn-ue';
-    else if (isRefl) cls += ' sn-refl';
-    else if (isTr && isComp) cls += ' sn-tr-comp';
-    else if (isTr) cls += ' sn-tr';
-    else if (isComp) cls += ' sn-comp';
-    else cls += ' sn-pro';
-    if (!isActive) cls += ' sn-locked';
-    const label = isUE ? ('⚡ ' + GC.uiCopy.stationTypes.unexpectedEventLabel) : s.name;
-    return `<div class="${cls}" onclick="${isActive ? `openStation('${s.id}')` : ''}"
-      style="${isActive ? 'cursor:pointer' : 'cursor:default;opacity:0.45'}">
-      <div class="sn-month">${s.month||''}</div>
-      <div class="sn-name">${label}</div>
+    const st = stationCircleStyle(s);
+    const icon = stationIcon(s, st.tc);
+    const label = s.type === 'unexpected_event' ? GC.uiCopy.stationTypes.unexpectedEventLabel : s.name;
+    const cls = 'sn' + (isActive ? ' sn-active' : ' sn-locked');
+    return `<div class="${cls}" style="border:5px solid ${st.tc}"
+      onclick="${isActive ? `openStation('${s.id}')` : ''}">
+      ${s.month ? `<div class="sn-month" style="color:${st.tc}">${s.month}</div>` : ''}
+      ${icon}
+      <div class="sn-name" style="color:${st.tc}">${label}</div>
       ${here.length ? `<div class="sn-toks">${here.map(g=>`<span class="sn-tok" style="background:${COLOR[g.colorToken].primary}"></span>`).join('')}</div>` : ''}
-      ${isActive ? '<div style="font-size:8px;color:#1E1F56;font-weight:700;margin-top:3px">&#9654; &#1500;&#1495;&#1510;&#1493;</div>' : ''}
     </div>`;
   }
 
   function arrowDiv(ch) { return `<div class="row-arr">${ch}</div>`; }
 
+  /* Gate separator */
+  const GATE = `<div style="display:flex;align-items:center;gap:10px;margin:4px 8px;direction:ltr">
+    <div style="flex:1;height:2px;background:repeating-linear-gradient(to right,#221f64 0,#221f64 6px,transparent 6px,transparent 14px)"></div>
+    <span style="font-size:16px">🌉</span>
+    <span style="font-size:11px;font-weight:800;color:#221f64;white-space:nowrap;letter-spacing:.04em">&#x2713; אישור תכנית העבודה</span>
+    <div style="flex:1;height:2px;background:repeating-linear-gradient(to right,#221f64 0,#221f64 6px,transparent 6px,transparent 14px)"></div>
+  </div>`;
+
+  /* Vertical connector on physical RIGHT side (between row2-end and gate, and gate and row3-start) */
+  const RCONN = `<div style="direction:ltr;display:flex;justify-content:flex-end;padding-right:22px">
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div style="width:2px;height:14px;background:#B0B4D8"></div>
+      <span style="font-size:14px;color:#B0B4D8;line-height:1">↓</span>
+    </div>
+  </div>`;
+
   html += `<div id="board-wrap">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:0 4px 6px">
-      <span style="font-size:12px;color:#6A70B0;font-style:italic">${GC.uiCopy.map.instruction}</span>
-      <button onclick="openInstructions()" style="background:none;border:1px solid #C0C4E8;color:#1E1F56;border-radius:6px;padding:4px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">${GC.uiCopy.welcome.openInstructionsButton}</button>
+
+    <!-- ROW 1: 5 stations, RTL (order 0 far-right → order 4 far-left) -->
+    <div class="board-row">
+      ${row1.map(s => snGrid(s)).join(arrowDiv('←'))}
     </div>
-    <div style="display:flex;align-items:stretch;gap:6px;direction:rtl">
-      <div style="flex:1;min-width:0">
-        <div class="bsl"><span>${GC.uiCopy.boardSections.a}</span><span class="bsl-months">${GC.uiCopy.boardSections.aMonths}</span></div>
-        <div class="board-row">
-          ${row1.map(s => snGrid(s)).join(arrowDiv('←'))}
-        </div>
-        <div class="board-conn left">
-          <div class="conn-v"></div><span class="conn-a">↓</span>
-        </div>
-        <div class="bsl"><span>${GC.uiCopy.boardSections.b}</span><span class="bsl-months">${GC.uiCopy.boardSections.bMonths}</span></div>
-        <div class="board-row row-ltr">
-          ${row2.map(s => snGrid(s)).join(arrowDiv('→'))}
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;margin:10px 4px;direction:rtl">
-          <div style="flex:1;height:2px;background:repeating-linear-gradient(to left,#1E1F56 0,#1E1F56 6px,transparent 6px,transparent 14px)"></div>
-          <span style="font-size:18px">🌉</span>
-          <span style="font-size:11px;font-weight:800;color:#1E1F56;white-space:nowrap;letter-spacing:.04em">&#x2713; אישור תכנית העבודה</span>
-          <div style="flex:1;height:2px;background:repeating-linear-gradient(to left,#1E1F56 0,#1E1F56 6px,transparent 6px,transparent 14px)"></div>
-        </div>
-        <div class="board-conn right">
-          <div class="conn-v"></div><span class="conn-a">↓</span>
-        </div>
-        <div class="bsl"><span>${GC.uiCopy.boardSections.c}</span><span class="bsl-months">${GC.uiCopy.boardSections.cMonths}</span></div>
-        <div class="board-row">
-          ${row3.map(s => snGrid(s)).join(arrowDiv('←'))}
-        </div>
+
+    <!-- MIDDLE ROW: [standalone LEFT] ─── [row2 going left→right] -->
+    <div style="display:flex;flex-direction:row;align-items:center;direction:ltr;gap:0">
+
+      <!-- Left: standalone (order 5) with up/down connectors -->
+      <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:134px">
+        <div style="width:2px;height:14px;background:#B0B4D8"></div>
+        <span style="font-size:14px;color:#B0B4D8;line-height:1">↓</span>
+        ${snGrid(standSt)}
+        <span style="font-size:14px;color:#B0B4D8;line-height:1">↓</span>
+        <div style="width:2px;height:14px;background:#B0B4D8"></div>
       </div>
-      <div style="display:flex;flex-direction:column;justify-content:space-between;padding:2px 0;gap:4px;min-width:54px">
-        <div style="font-size:10px;font-weight:800;color:#2A5A3A;border:1px solid #2A5A3A;border-radius:6px;padding:4px 6px;text-align:center;line-height:1.3;writing-mode:vertical-rl;transform:rotate(180deg);align-self:flex-start">הקמת תכנית עבודה</div>
-        <div style="font-size:10px;font-weight:800;color:#1E1F56;border:1px solid #1E1F56;border-radius:6px;padding:4px 6px;text-align:center;line-height:1.3;writing-mode:vertical-rl;transform:rotate(180deg);align-self:flex-start">הקמת מודל תגמול</div>
+
+      <!-- Thin horizontal bridge standalone → row2 -->
+      <div style="width:18px;height:2px;background:#B0B4D8;flex-shrink:0"></div>
+
+      <!-- Right: row2 (orders 6-10) left→right -->
+      <div style="flex:1;display:flex;flex-direction:row;align-items:center;overflow-x:auto;padding:10px 4px;gap:0">
+        ${row2.map(s => snGrid(s)).join(arrowDiv('→'))}
       </div>
+
     </div>
+
+    <!-- RIGHT-SIDE connector ↓ (physically at right edge, where row2 ends / row3 starts) -->
+    ${RCONN}
+    ${GATE}
+    ${RCONN}
+
+    <!-- ROW 3: 5 stations, RTL (order 11 far-right → order 15 far-left) -->
+    <div class="board-row">
+      ${row3.map(s => snGrid(s)).join(arrowDiv('←'))}
+    </div>
+
   </div>`;
   } // end if (!activeStationId)
 
