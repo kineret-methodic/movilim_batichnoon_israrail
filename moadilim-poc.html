@@ -1585,7 +1585,8 @@ function showView(view, group) {
   currentView = view;
   currentGroup = group || null;
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
+  if (event && event.target) event.target.classList.add('active');
+  location.hash = group ? view + '/' + group : view;
   renderApp();
 }
 
@@ -2038,6 +2039,7 @@ function openMobile(groupId) {
     if (nb) nb.classList.add('active');
   }
   boardPhonesOpen = false;
+  location.hash = 'mobile/' + groupId;
   renderApp();
 }
 
@@ -2045,6 +2047,7 @@ function openDevContent() {
   currentView = 'devContent';
   boardPhonesOpen = false;
   facilitatorPreview = false;
+  location.hash = 'devContent';
   renderApp();
 }
 
@@ -3106,6 +3109,24 @@ GC.groups.forEach((g, i) => {
     .replace('{division}', g.divisionName);
 });
 document.getElementById('nav').style.display = 'none';
+
+// ── Hash routing: read URL on load ───────────────────────
+(function applyHash() {
+  const hash = location.hash.replace('#', '');
+  if (!hash) return;
+  const [view, group] = hash.split('/');
+  if (view === 'mobile' && group) {
+    currentView = 'mobile';
+    currentGroup = group;
+    gameStarted = true;
+  } else if (view === 'devContent') {
+    currentView = 'devContent';
+    gameStarted = true;
+  } else if (view === 'facilitator') {
+    currentView = 'facilitator';
+  }
+})();
+
 renderApp();
 </script>
 </body>
