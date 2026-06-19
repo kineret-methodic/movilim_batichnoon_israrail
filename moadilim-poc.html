@@ -1768,7 +1768,7 @@ function renderFacilitator(app) {
     station_reward_metric:'wallet', station_weight:'weight',
     station_end:'trophy', station_reflection:'pin',
   };
-  const bIconUrl = (s) => 'עיצובים/design_handoff_board/assets/icons/icon-' +
+  const bIconUrl = (s) => 'assets/icons/icon-' +
     (s.type === 'unexpected_event' ? 'wheel' : (BICON[s.id] || 'gauge')) + '.svg';
 
   // HTML-escape helper
@@ -1837,7 +1837,7 @@ function renderFacilitator(app) {
   const bGatesHtml = seq.filter(n => n.kind==='gate').map(n => `
       <div style="position:absolute;left:${n.cx}px;top:${n.cy}px;transform:translate(-50%,-62px);z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;width:184px">
         <div style="width:124px;height:124px;border-radius:50%;background:#fff;border:4px dashed #8a93a8;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 16px rgba(34,31,100,.10)">
-          <img src="עיצובים/design_handoff_board/assets/icons/icon-gate.svg" alt="" style="width:42px;height:42px;opacity:.8">
+          <img src="assets/icons/icon-gate.svg" alt="" style="width:42px;height:42px;opacity:.8">
         </div>
         <span style="font-size:13.5px;font-weight:700;line-height:1.2;color:#5a6d77;max-width:178px;text-align:center">${bEsc(n.data.name)}</span>
       </div>`).join('');
@@ -1893,7 +1893,7 @@ function renderFacilitator(app) {
     </div>`;
 
   html += `<div id="board-fitwrap" style="flex:1;overflow:hidden;background:#dfe2e8;display:flex;align-items:center;justify-content:center">
-    <div id="gameboard" style="width:1920px;height:1080px;flex:none;transform-origin:center center;position:relative;overflow:hidden;background:#eef0f4 url('עיצובים/design_handoff_board/assets/board-bg.png') center/cover no-repeat">
+    <div id="gameboard" style="width:1920px;height:1080px;flex:none;transform-origin:center center;position:relative;overflow:hidden;background:#eef0f4 url('assets/board-bg.png') center/cover no-repeat">
       <div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:30px 56px 24px;font-family:Heebo,Arial,sans-serif;color:#221f64">
 
         <!-- כותרת: גלולת תור (ימין) · לוגואים (מרכז) · לוגו רכבת (שמאל) -->
@@ -1905,11 +1905,11 @@ function renderFacilitator(app) {
             </div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-            <img src="עיצובים/design_handoff_board/assets/logo-mesilot.png" alt="מסילות" style="height:109px;width:266px">
-            <img src="עיצובים/design_handoff_board/assets/logo-vetichnunim.png" alt="ותכנונים" style="height:93px;width:219px">
+            <img src="assets/logo-mesilot.png" alt="מסילות" style="height:109px;width:266px">
+            <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:93px;width:219px">
           </div>
           <div style="flex:1;display:flex;justify-content:flex-end">
-            <img src="עיצובים/design_handoff_board/assets/logo-rail.png" alt="רכבת ישראל" style="height:28px;width:auto;opacity:.9">
+            <img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:28px;width:auto;opacity:.9">
           </div>
         </div>
 
