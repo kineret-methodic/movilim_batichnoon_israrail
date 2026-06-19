@@ -22,7 +22,6 @@
   .nav-btn.active{background:#F5C800;color:#000000;border-color:#F5C800;font-weight:700}
 
   /* ── Main layout ── */
-  #nav{display:none}
   #app{height:100vh;display:flex;flex-direction:column}
 
   /* ── Facilitator header ── */
@@ -271,10 +270,10 @@
 <div id="nav">
   <span id="nav-label"></span>
   <button class="nav-btn active" id="nav-fac" onclick="showView('facilitator')">🖥 <span id="nav-fac-lbl"></span></button>
-  <button class="nav-btn" id="nav-g1" onclick="showView('mobile','group_1')" style="display:none">📱 <span id="nav-g1-lbl"></span></button>
-  <button class="nav-btn" id="nav-g2" onclick="showView('mobile','group_2')" style="display:none">📱 <span id="nav-g2-lbl"></span></button>
-  <button class="nav-btn" id="nav-g3" onclick="showView('mobile','group_3')" style="display:none">📱 <span id="nav-g3-lbl"></span></button>
-  <button class="nav-btn" id="nav-g4" onclick="showView('mobile','group_4')" style="display:none">📱 <span id="nav-g4-lbl"></span></button>
+  <button class="nav-btn" id="nav-g1" onclick="showView('mobile','group_1')">📱 <span id="nav-g1-lbl"></span></button>
+  <button class="nav-btn" id="nav-g2" onclick="showView('mobile','group_2')">📱 <span id="nav-g2-lbl"></span></button>
+  <button class="nav-btn" id="nav-g3" onclick="showView('mobile','group_3')">📱 <span id="nav-g3-lbl"></span></button>
+  <button class="nav-btn" id="nav-g4" onclick="showView('mobile','group_4')">📱 <span id="nav-g4-lbl"></span></button>
   <button class="nav-btn" id="nav-content" onclick="showView('devContent')" style="display:none">📋 תוכן</button>
 </div>
 <div id="app"></div>
@@ -1744,14 +1743,7 @@ function renderFacilitator(app) {
           </div>`}
       <button class="preview-btn${facilitatorPreview ? ' active' : ''}"
         onclick="facilitatorPreview=!facilitatorPreview;renderApp()"
-        title="${facilitatorPreview ? 'סגור' : 'תצוגת מנחה — פתח תיקי קבוצות'}">🔍</button>
-      ${facilitatorPreview ? GC.groups.map((g,i) => {
-          const col = COLOR[g.colorToken].primary;
-          return `<button onclick="showView('mobile','${g.id}')"
-            style="background:${col};color:#fff;border:none;border-radius:6px;
-              padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;
-              font-family:inherit;white-space:nowrap">📱 ${g.label}</button>`;
-        }).join('') : ''}
+        title="${facilitatorPreview ? 'סגור תצוגת מנחה' : 'תצוגת מנחה — פתח הכל'}">🔍</button>
       <img src="data:image/png;base64,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"
         alt="רכבת ישראל" style="height:22px;opacity:.85;flex-shrink:0;margin-right:4px">
     </div>`;
@@ -3155,7 +3147,11 @@ GC.groups.forEach((g, i) => {
     .replace('{n}', i+1)
     .replace('{division}', g.divisionName);
 });
-if (DEV_MODE) document.getElementById('nav-content').style.display = '';
+if (!DEV_MODE) {
+  document.getElementById('nav').style.display = 'none';
+} else {
+  document.getElementById('nav-content').style.display = '';
+}
 renderApp();
 </script>
 </body>
