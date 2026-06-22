@@ -265,6 +265,8 @@
   details summary::-webkit-details-marker{display:none}
   details summary::marker{display:none}
 </style>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 </head>
 <body>
 <div id="nav">
@@ -279,6 +281,26 @@
 <div id="app"></div>
 
 <script>
+// ── Firebase sync ────────────────────────────────────────
+firebase.initializeApp({
+  apiKey: "AIzaSyA3g2FxtbkxQ5e7kirc68ZdHQnCTC04Eo4",
+  authDomain: "mesilotvetichnoonim.firebaseapp.com",
+  databaseURL: "https://mesilotvetichnoonim-default-rtdb.firebaseio.com",
+  projectId: "mesilotvetichnoonim",
+  storageBucket: "mesilotvetichnoonim.firebasestorage.app",
+  messagingSenderId: "1021516240299",
+  appId: "1:1021516240299:web:00c84883aaa1ba2d846eee"
+});
+const fbDb = firebase.database();
+
+function pushGameState() {
+  fbDb.ref('gameState').set({
+    gameStarted: gameStarted,
+    currentTurnGroupIndex: currentTurnGroupIndex
+  });
+}
+// ────────────────────────────────────────────────────────
+
 const GC = {
   "groups": [
     {
@@ -1570,6 +1592,7 @@ function advanceTurn() {
     GC.groups.forEach(g => { gameState[g.id].playedThisRound = false; });
     currentTurnGroupIndex = 0;
   }
+  pushGameState();
 }
 
 function skipWaitingGroup(groupId) {
@@ -1640,6 +1663,7 @@ function renderWelcome(app) {
 function startGame() {
   gameStarted = true;
   instructionsOpen = false;
+  pushGameState();
   renderApp();
 }
 
@@ -3156,7 +3180,16 @@ document.getElementById('nav').style.display = 'none';
   if (view === 'mobile' && group) {
     currentView = 'mobile';
     currentGroup = group;
-    gameStarted = true;
+    // Listen for real-time game state from facilitator
+    fbDb.ref('gameState').on('value', (snapshot) => {
+      const state = snapshot.val();
+      if (state !== null) {
+        gameStarted = state.gameStarted;
+        currentTurnGroupIndex = state.currentTurnGroupIndex;
+      }
+      renderApp();
+    });
+    return; // listener will call renderApp
   } else if (view === 'devContent') {
     currentView = 'devContent';
     gameStarted = true;
