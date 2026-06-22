@@ -3198,6 +3198,9 @@ document.getElementById('nav').style.display = 'none';
   }
 })();
 
+// Facilitator loading the page → reset Firebase to pre-game (unlocks all mobile folders)
+if (currentView !== 'mobile') pushGameState();
+
 renderApp();
 </script>
 </body>
