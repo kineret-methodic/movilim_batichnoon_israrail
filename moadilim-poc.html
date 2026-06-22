@@ -1646,14 +1646,14 @@ function renderWelcome(app) {
     <div style="min-height:100vh;background:#F0F2F7;display:flex;flex-direction:column;
       align-items:center;justify-content:flex-start;padding:32px 24px;direction:rtl">
       <div style="width:100%;max-width:640px">
-        ${renderInstructionsContent()}
-        <div style="text-align:left;margin-top:16px">
+        <div style="text-align:left;margin-bottom:12px">
           <button onclick="enterBoard()"
             style="background:none;border:1.5px solid #C0C4E0;border-radius:6px;
               width:36px;height:36px;font-size:18px;cursor:pointer;color:#6A70A0;
               display:inline-flex;align-items:center;justify-content:center"
             title="כניסה ללוח">✕</button>
         </div>
+        ${renderInstructionsContent()}
       </div>
     </div>`;
 }
