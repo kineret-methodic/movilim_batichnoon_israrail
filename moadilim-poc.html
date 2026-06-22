@@ -1814,7 +1814,7 @@ function renderFacilitator(app) {
   const bStationsHtml = seq.filter(n => n.kind==='station').map(n => {
     const s = n.data, col = bColorOf(s);
     const name = s.type === 'unexpected_event' ? GC.uiCopy.stationTypes.unexpectedEventLabel : s.name;
-    const isClickable = DEV_MODE || facilitatorPreview || s.order === activeOrder;
+    const isClickable = DEV_MODE || facilitatorPreview || s.order === activeOrder || s.id === 'station_start';
     const locked = s.order > reachedMax && !facilitatorPreview && !DEV_MODE;
     const anim = s.order === activeOrder ? 'pulseRing 2s infinite' : 'none';
     const lockOpacity = locked ? 0.62 : 0;
