@@ -295,7 +295,7 @@ const fbDb = firebase.database();
 
 function pushGameState() {
   fbDb.ref('gameState').set({
-    gameStarted: gameStarted,
+    gameStarted: phonesActive,
     currentTurnGroupIndex: currentTurnGroupIndex
   });
 }
@@ -1647,22 +1647,25 @@ function renderWelcome(app) {
       align-items:center;justify-content:flex-start;padding:32px 24px;direction:rtl">
       <div style="width:100%;max-width:640px">
         ${renderInstructionsContent()}
-        <div style="text-align:center;margin-top:28px">
-          <button onclick="startGame()"
-            style="background:#1E1F56;color:#FFFFFF;border:none;border-radius:10px;
-              padding:14px 48px;font-size:16px;font-weight:700;cursor:pointer;
-              font-family:inherit;letter-spacing:.02em;
-              box-shadow:0 2px 12px rgba(30,31,86,.25)">
-            ${w.startButton}
-          </button>
+        <div style="text-align:left;margin-top:16px">
+          <button onclick="enterBoard()"
+            style="background:none;border:1.5px solid #C0C4E0;border-radius:6px;
+              width:36px;height:36px;font-size:18px;cursor:pointer;color:#6A70A0;
+              display:inline-flex;align-items:center;justify-content:center"
+            title="כניסה ללוח">✕</button>
         </div>
       </div>
     </div>`;
 }
 
-function startGame() {
+function enterBoard() {
   gameStarted = true;
   instructionsOpen = false;
+  renderApp();
+}
+
+function activatePhones() {
+  phonesActive = true;
   pushGameState();
   renderApp();
 }
@@ -1683,6 +1686,7 @@ let revealedGroups = new Set();
 let softWarningGroup = null;
 let lastOutcome = null;
 let gameStarted = false;
+let phonesActive = false; // controls Firebase phone locking (separate from board visibility)
 let instructionsOpen = false;
 let roundNumber = 1;
 let currentTurnGroupIndex = 0; // index into GC.groups array
@@ -2303,6 +2307,16 @@ function renderStationModal() {
             <div style="font-size:12px;color:${col.primary};margin-bottom:16px;font-weight:600">${activeGroup.divisionName}</div>
             <img src="${QR_CODES[activeGroup.id]}" alt="QR ${activeGroup.label}"
               style="width:200px;height:200px;border-radius:8px;display:block;margin:0 auto" />
+          </div>
+          <div style="margin-top:24px">
+            ${phonesActive
+              ? `<div style="font-size:14px;font-weight:700;color:#1A8C4E">✓ המשחק החל — הקבוצות ננעלות לפי תור</div>`
+              : `<button onclick="activatePhones()"
+                  style="background:#1E1F56;color:#fff;border:none;border-radius:10px;
+                    padding:12px 40px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;
+                    box-shadow:0 2px 12px rgba(30,31,86,.25)">
+                  מתחילים
+                </button>`}
           </div>
         </div>`;
     } else {
