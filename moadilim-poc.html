@@ -294,10 +294,32 @@ firebase.initializeApp({
 const fbDb = firebase.database();
 
 function pushGameState() {
+  const groupData = {};
+  GC.groups.forEach(g => {
+    groupData[g.id] = {
+      points: gameState[g.id].points,
+      finishedRound: gameState[g.id].finishedRound
+    };
+  });
   fbDb.ref('gameState').set({
     gameStarted: phonesActive,
-    currentTurnGroupIndex: currentTurnGroupIndex
+    currentTurnGroupIndex: currentTurnGroupIndex,
+    gameOver: gameOver,
+    winnerId: winnerId,
+    groupData: groupData
   });
+}
+
+function endGame() {
+  const ranked = [...GC.groups].sort((a, b) => {
+    const ga = gameState[a.id], gb = gameState[b.id];
+    if (ga.finishedRound !== gb.finishedRound) return ga.finishedRound - gb.finishedRound;
+    return gb.points - ga.points;
+  });
+  gameOver = true;
+  winnerId = ranked[0].id;
+  pushGameState();
+  renderApp();
 }
 // ────────────────────────────────────────────────────────
 
@@ -1509,7 +1531,9 @@ GC.groups.forEach(g => {
     currentStationOrder: 1,
     points: 0,
     waitingOneRound: false,
+    waitingReason: null,
     playedThisRound: false,
+    finishedRound: null,
     usedUnexpectedEventIds: [],
     completedStationIds: ['station_start'],
   };
@@ -1545,6 +1569,7 @@ function applyOutcome(groupId, stationId, outcome) {
     g.points += 0;
     g.currentStationOrder = st.order + 1;
     g.waitingOneRound = true;
+    g.waitingReason = 'wrong';
   }
   // advanceTurn() called in goBackToMap — after facilitator returns to map
 }
@@ -1600,6 +1625,7 @@ function skipWaitingGroup(groupId) {
   // Do NOT advance station — let advanceTurn's auto-skip handle the wait
   const g = gameState[groupId];
   g.waitingOneRound = false;
+  g.waitingReason = null;
   g.playedThisRound = true;
   advanceTurn();
   activeStationId = null;
@@ -1667,7 +1693,98 @@ function enterBoard() {
 function activatePhones() {
   phonesActive = true;
   pushGameState();
-  renderApp();
+  closeStationModal();
+}
+
+function launchConfetti() {
+  const canvas = document.createElement('canvas');
+  canvas.style.cssText = 'position:fixed;inset:0;z-index:9999;pointer-events:none';
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  const colors = ['#00aeff','#1abe9b','#f4c40f','#e84d3d','#9b59b6','#2ecc71','#e67e22','#fff'];
+  const pieces = Array.from({length: 150}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height - canvas.height,
+    w: 8 + Math.random() * 10,
+    h: 4 + Math.random() * 5,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    rot: Math.random() * Math.PI * 2,
+    vx: (Math.random() - 0.5) * 2.5,
+    vy: 2.5 + Math.random() * 3.5,
+    vr: (Math.random() - 0.5) * 0.18,
+  }));
+  const start = performance.now();
+  function draw(now) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const elapsed = now - start;
+    const fade = elapsed > 3000 ? Math.max(0, 1 - (elapsed - 3000) / 1000) : 1;
+    pieces.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+      if (p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; }
+      ctx.save();
+      ctx.globalAlpha = 0.85 * fade;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    if (elapsed < 4000) requestAnimationFrame(draw);
+    else canvas.remove();
+  }
+  requestAnimationFrame(draw);
+}
+
+function renderGameOverOverlay() {
+  const ranked = [...GC.groups].sort((a, b) => {
+    const ga = gameState[a.id], gb = gameState[b.id];
+    if (ga.finishedRound !== gb.finishedRound) return ga.finishedRound - gb.finishedRound;
+    return gb.points - ga.points;
+  });
+  const winner = ranked[0];
+  const winnerCol = COLOR[winner.colorToken];
+  const medals = ['🥇', '🥈', '🥉', '4'];
+  const rows = ranked.map((g, i) => {
+    const gst = gameState[g.id];
+    const col = COLOR[g.colorToken];
+    const isWin = g.id === winnerId;
+    return `<div style="display:flex;align-items:center;gap:12px;padding:10px 16px;
+        background:${isWin ? col.light : '#F8F9FC'};border-radius:10px;
+        border:1.5px solid ${isWin ? col.primary : '#E0E4F0'}">
+      <div style="font-size:22px;min-width:32px;text-align:center">${medals[i]}</div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:700;color:#1E1F56">${g.label}</div>
+        <div style="font-size:11px;color:#8A90C0">${g.divisionName}</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:15px;font-weight:800;color:${col.primary}">${gst.points}</div>
+        <div style="font-size:10px;color:#8A90C0">נק' · סבב ${gst.finishedRound}</div>
+      </div>
+    </div>`;
+  }).join('');
+  return `
+    <div style="position:fixed;inset:0;background:rgba(20,18,70,.78);z-index:800;
+      display:flex;align-items:center;justify-content:center;padding:20px;direction:rtl">
+      <div style="background:#fff;border-radius:20px;width:100%;max-width:460px;
+        padding:32px 28px;box-shadow:0 16px 56px rgba(20,18,70,.4);text-align:center">
+        <div style="font-size:60px;line-height:1;margin-bottom:10px">🏆</div>
+        <div style="font-size:26px;font-weight:900;color:#1E1F56;margin-bottom:6px">המשחק הסתיים!</div>
+        <div style="display:inline-block;background:${winnerCol.primary};color:#fff;
+          border-radius:10px;padding:7px 22px;font-size:14px;font-weight:700;margin-bottom:24px">
+          מנצחת: ${winner.label} — ${winner.divisionName}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:28px;text-align:right">
+          ${rows}
+        </div>
+        <button onclick="gameOverDismissed=true;renderApp()"
+          style="background:#1E1F56;color:#fff;border:none;border-radius:10px;
+            padding:12px 44px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">
+          סגור
+        </button>
+      </div>
+    </div>`;
 }
 
 function openInstructions() {
@@ -1687,6 +1804,10 @@ let softWarningGroup = null;
 let lastOutcome = null;
 let gameStarted = false;
 let phonesActive = false; // controls Firebase phone locking (separate from board visibility)
+let gameOver = false;
+let winnerId = null;
+let gameOverConfettiLaunched = false;
+let gameOverDismissed = false;
 let instructionsOpen = false;
 let roundNumber = 1;
 let currentTurnGroupIndex = 0; // index into GC.groups array
@@ -1847,9 +1968,15 @@ function renderFacilitator(app) {
     const anim = s.order === activeOrder ? 'pulseRing 2s infinite' : 'none';
     const lockOpacity = locked ? 0.62 : 0;
     const labelColor = locked ? '#a7abc0' : col, monthColor = locked ? '#bcc0d0' : '#9aa0b8';
-    const toks = (tokensByOrder[s.order]||[]).map(gi =>
-      `<div style="width:30px;height:30px;border-radius:50%;background:${GP[gi].bg};border:3px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;color:${GP[gi].fg};font-size:14px;font-weight:800">${gi+1}</div>`
-    ).join('');
+    const toks = (tokensByOrder[s.order]||[]).map(gi => {
+      const isCur = gi === currentTurnGroupIndex;
+      const sz = isCur ? '44px' : '30px';
+      const fs = isCur ? '18px' : '14px';
+      const tf = isCur ? 'translateY(-7px)' : 'none';
+      const sh = isCur ? '0 4px 12px rgba(0,0,0,.35)' : '0 2px 5px rgba(0,0,0,.25)';
+      const bw = isCur ? '3.5px' : '3px';
+      return `<div style="width:${sz};height:${sz};border-radius:50%;background:${GP[gi].bg};border:${bw} solid #fff;box-shadow:${sh};display:flex;align-items:center;justify-content:center;color:${GP[gi].fg};font-size:${fs};font-weight:800;transform:${tf};transition:all .2s;flex-shrink:0">${gi+1}</div>`;
+    }).join('');
     return `
       <div style="position:absolute;left:${n.cx}px;top:${n.cy}px;transform:translate(-50%,-62px);z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;width:184px;cursor:${isClickable?'pointer':'default'}"
            onclick="${isClickable ? `openStation('${s.id}')` : ''}">
@@ -1978,6 +2105,11 @@ function renderFacilitator(app) {
     html += renderStationModal();
   }
 
+  // Game-over overlay
+  if (gameOver && !gameOverDismissed) {
+    html += renderGameOverOverlay();
+  }
+
   // Check round complete
   const allPlayedOrWaiting = GC.groups.every(g => {
     const gst = gs(g.id);
@@ -2041,6 +2173,10 @@ function renderFacilitator(app) {
   }
 
   app.innerHTML = html;
+  if (gameOver && !gameOverDismissed && !gameOverConfettiLaunched) {
+    gameOverConfettiLaunched = true;
+    setTimeout(launchConfetti, 80);
+  }
   // Scale the projected gameboard to fill available space
   fitBoard();
 }
@@ -2233,17 +2369,27 @@ function renderStationModal() {
     ? ueSet.some(e => gst.usedUnexpectedEventIds.includes(e.resultId))
     : false;
   const canClose = DEV_MODE || facilitatorPreview || answered || station.id === 'station_start'
+    || station.id === 'station_end'
+    || isWaiting
     || (station.type === 'unexpected_event' && (activeUEResult !== null || ueAlreadyUsed));
 
   let content = '';
 
   if (isWaiting && !DEV_MODE) {
     // Group is waiting — show skip prompt (suppressed in dev mode)
+    const waitColor = COLOR[currentGroup.colorToken].primary;
+    const waitReasonText = gst.waitingReason === 'unexpected'
+      ? 'בגלל: גלגל הבלת"מ'
+      : 'בגלל: תשובה שגויה בסבב הקודם';
     content = `
-      <div style="text-align:center;padding:24px 0">
-        <p style="font-size:15px;color:#3A3E78;margin-bottom:20px">
-          ${copy.groupCard.waitingMessage}
-        </p>
+      <div style="text-align:center;padding:16px 0">
+        <div style="display:inline-block;background:${waitColor}18;border:1.5px solid ${waitColor}55;
+          border-radius:8px;padding:6px 20px;margin-bottom:14px;font-size:13px;font-weight:700;color:${waitColor}">
+          ${currentGroup.label} — ${currentGroup.divisionName}
+        </div>
+        <div style="font-size:22px;font-weight:800;color:#1E1F56;margin-bottom:6px">${station.name}</div>
+        <p style="font-size:14px;color:#3A3E78;margin-bottom:4px">${copy.groupCard.waitingMessage}</p>
+        <p style="font-size:12px;color:#8A90C0;margin-bottom:24px">${waitReasonText}</p>
         <button onclick="skipWaitingGroup('${currentGroup.id}')"
           style="background:#1E1F56;color:#fff;border:none;border-radius:8px;
             padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">
@@ -2309,14 +2455,12 @@ function renderStationModal() {
               style="width:200px;height:200px;border-radius:8px;display:block;margin:0 auto" />
           </div>
           <div style="margin-top:24px">
-            ${phonesActive
-              ? `<div style="font-size:14px;font-weight:700;color:#1A8C4E">✓ המשחק החל — הקבוצות ננעלות לפי תור</div>`
-              : `<button onclick="activatePhones()"
-                  style="background:#1E1F56;color:#fff;border:none;border-radius:10px;
-                    padding:12px 40px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;
-                    box-shadow:0 2px 12px rgba(30,31,86,.25)">
-                  מתחילים
-                </button>`}
+            <button onclick="activatePhones()"
+                style="background:#1E1F56;color:#fff;border:none;border-radius:10px;
+                  padding:12px 40px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;
+                  box-shadow:0 2px 12px rgba(30,31,86,.25)">
+                מתחילים
+              </button>
           </div>
         </div>`;
     } else {
@@ -2328,7 +2472,7 @@ function renderStationModal() {
           </div>
           <div style="font-size:20px;font-weight:800;color:#1E1F56;margin-bottom:10px">${tm.title}</div>
           <p style="font-size:14px;color:#3A3E78;line-height:1.7">${tm.body}</p>
-          ${answered ? `` : `<button onclick="revealedGroups.add('${currentGroup.id}_outcome');renderApp()"
+          ${answered ? `` : `<button onclick="revealedGroups.add('${currentGroup.id}_outcome');${station.id === 'station_end' ? 'launchConfetti();' : ''}renderApp()"
             style="margin-top:16px;background:#1E1F56;color:#fff;border:none;border-radius:8px;
               padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
             ${GC.uiCopy.groupCard.approveTransition}
@@ -2436,7 +2580,7 @@ function renderStationModal() {
       <div style="background:#F0F2F7;border-radius:14px;width:100%;max-width:700px;
         max-height:90vh;overflow-y:auto;padding:24px;box-shadow:0 8px 32px rgba(30,31,86,.3)">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-          ${station.type === 'unexpected_event' || station.id === 'station_start'
+          ${station.type === 'unexpected_event' || station.id === 'station_start' || station.id === 'station_end' || isWaiting
             ? `<div style="flex:1"></div>`
             : `<div style="flex:1">
                 <div style="font-size:11px;color:#8A90C0">${station.month || ''}</div>
@@ -2620,14 +2764,26 @@ function openStation(stationId) {
 }
 
 function goBackToMap() {
-  // Advance turn only when facilitator explicitly returns to map.
-  // In DEV_MODE there are no turn restrictions — skip advanceTurn entirely.
+  // Detect station_end completion before advancing turn
+  if (!DEV_MODE && activeStationId === 'station_end') {
+    const finishingGroup = GC.groups[currentTurnGroupIndex];
+    const g = gameState[finishingGroup.id];
+    if (g.finishedRound === null) {
+      g.finishedRound = roundNumber;
+      g.playedThisRound = true;
+      g.currentStationOrder = stationById('station_end').order + 1;
+    }
+  }
   if (!DEV_MODE) advanceTurn();
   activeStationId = null;
   lastOutcome = null;
   outcomePopupVisible = false;
   revealedGroups = new Set();
   stopTimer();
+  if (!DEV_MODE && GC.groups.every(g => gameState[g.id].finishedRound !== null)) {
+    endGame();
+    return;
+  }
   renderApp();
 }
 
@@ -2655,8 +2811,8 @@ function dismissOutcomePopup() {
 
 function closeStationModal() {
   // X button — close without advancing turn.
-  // But if an outcome was already applied, we must still advance (state already changed).
-  if (lastOutcome) {
+  // But if an outcome was already applied, or it's station_end, we must go back (state already changed).
+  if (lastOutcome || activeStationId === 'station_end') {
     goBackToMap();
   } else {
     activeStationId = null;
@@ -2861,6 +3017,53 @@ let mobileSplashDone = {};
 function renderMobile(app, groupId) {
   const group = GC.groups.find(g => g.id === groupId) || GC.groups[0];
   const col = COLOR[group.colorToken];
+
+  if (gameOver && winnerId) {
+    const isWinner = group.id === winnerId;
+    const winnerGroup = GC.groups.find(g => g.id === winnerId);
+    const winnerCol = COLOR[winnerGroup.colorToken];
+    const ranked = [...GC.groups].sort((a, b) => {
+      const ga = gameState[a.id] || {}, gb = gameState[b.id] || {};
+      if ((ga.finishedRound||99) !== (gb.finishedRound||99)) return (ga.finishedRound||99) - (gb.finishedRound||99);
+      return (gb.points||0) - (ga.points||0);
+    });
+    const myRank = ranked.findIndex(g => g.id === group.id) + 1;
+    const medals = ['🥇', '🥈', '🥉', '4️⃣'];
+    const rows = ranked.map((g, i) => {
+      const gst = gameState[g.id] || {};
+      const gc = COLOR[g.colorToken];
+      const isMe = g.id === group.id;
+      return `<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;
+          background:${isMe ? gc.light : '#F8F9FC'};border-radius:8px;
+          border:1.5px solid ${isMe ? gc.primary : '#E0E4F0'}">
+        <span style="font-size:18px;min-width:28px">${medals[i]}</span>
+        <div style="flex:1;font-size:13px;font-weight:700;color:#1E1F56">${g.label}</div>
+        <div style="font-size:13px;font-weight:800;color:${gc.primary}">${gst.points||0} נק'</div>
+      </div>`;
+    }).join('');
+    app.innerHTML = `<div dir="rtl" style="min-height:100vh;background:${isWinner ? winnerCol.light : '#F5F7FA'};
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:32px 24px;text-align:center">
+      <div style="font-size:72px;line-height:1;margin-bottom:12px">${isWinner ? '🏆' : medals[myRank-1]}</div>
+      <div style="font-size:28px;font-weight:900;color:#1E1F56;margin-bottom:6px">
+        ${isWinner ? 'ניצחנו!' : 'כל הכבוד!'}
+      </div>
+      <div style="display:inline-block;background:${col.primary};color:#fff;
+        border-radius:10px;padding:6px 20px;font-size:14px;font-weight:700;margin-bottom:6px">
+        ${group.label} — ${group.divisionName}
+      </div>
+      ${!isWinner ? `<div style="font-size:13px;color:#8A90C0;margin-bottom:4px">מקום ${myRank}</div>
+        <div style="font-size:13px;color:#3A3E78;margin-bottom:20px">מנצחת: ${winnerGroup.label}</div>` : `<div style="margin-bottom:20px"></div>`}
+      <div style="width:100%;max-width:340px;display:flex;flex-direction:column;gap:8px">
+        ${rows}
+      </div>
+    </div>`;
+    if (isWinner && !gameOverConfettiLaunched) {
+      gameOverConfettiLaunched = true;
+      setTimeout(launchConfetti, 80);
+    }
+    return;
+  }
 
   app.innerHTML = `<div id="mobile-wrap" dir="rtl"></div>`;
   const wrap = document.getElementById('mobile-wrap');
@@ -3158,6 +3361,7 @@ function doUEOutcome(groupId, waitRounds) {
   g.currentStationOrder = st.order + 1; // always advance — wait happens at the NEXT station
   if (waitRounds > 0) {
     g.waitingOneRound = true;
+    g.waitingReason = 'unexpected';
   }
   activeUEResult = null;
   goBackToMap();
@@ -3200,6 +3404,16 @@ document.getElementById('nav').style.display = 'none';
       if (state !== null) {
         gameStarted = state.gameStarted;
         currentTurnGroupIndex = state.currentTurnGroupIndex;
+        gameOver = !!state.gameOver;
+        winnerId = state.winnerId || null;
+        if (state.groupData) {
+          GC.groups.forEach(g => {
+            if (state.groupData[g.id]) {
+              gameState[g.id].points = state.groupData[g.id].points || 0;
+              gameState[g.id].finishedRound = state.groupData[g.id].finishedRound || null;
+            }
+          });
+        }
       }
       renderApp();
     });
