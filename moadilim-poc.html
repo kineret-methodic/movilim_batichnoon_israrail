@@ -11,6 +11,9 @@
   body{font-family:'Heebo','Arial',sans-serif;background:#D6D6D6;color:#1A1C50;-webkit-font-smoothing:antialiased}
   @keyframes pulseRing{0%{box-shadow:0 0 0 0 rgba(0,174,255,.5)}70%{box-shadow:0 0 0 18px rgba(0,174,255,0)}100%{box-shadow:0 0 0 0 rgba(0,174,255,0)}}
   @keyframes pulseTeal{0%{box-shadow:0 0 0 0 rgba(0,174,255,.5)}70%{box-shadow:0 0 0 14px rgba(0,174,255,0)}100%{box-shadow:0 0 0 0 rgba(0,174,255,0)}}
+  @keyframes trophyPop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+  @keyframes shine{0%,100%{box-shadow:0 0 0 0 rgba(244,196,15,.5)}50%{box-shadow:0 0 0 26px rgba(244,196,15,0)}}
+  @keyframes confFall{0%{transform:translateY(-40px) rotate(0deg);opacity:0}10%{opacity:1}100%{transform:translateY(1120px) rotate(720deg);opacity:1}}
 
   /* ── Nav bar ── */
   #nav{position:fixed;top:0;right:0;left:0;background:#1E1F56;
@@ -1944,51 +1947,182 @@ function launchConfetti() {
 }
 
 function renderGameOverOverlay() {
-  const ranked = [...GC.groups].sort((a, b) => {
-    const ga = gameState[a.id], gb = gameState[b.id];
-    if (ga.finishedRound !== gb.finishedRound) return ga.finishedRound - gb.finishedRound;
-    return gb.points - ga.points;
-  });
-  const winner = ranked[0];
-  const winnerCol = COLOR[winner.colorToken];
-  const medals = ['🥇', '🥈', '🥉', '4'];
-  const rows = ranked.map((g, i) => {
-    const gst = gameState[g.id];
-    const col = COLOR[g.colorToken];
-    const isWin = g.id === winnerId;
-    return `<div style="display:flex;align-items:center;gap:12px;padding:10px 16px;
-        background:${isWin ? col.light : '#F8F9FC'};border-radius:10px;
-        border:1.5px solid ${isWin ? col.primary : '#E0E4F0'}">
-      <div style="font-size:22px;min-width:32px;text-align:center">${medals[i]}</div>
-      <div style="flex:1">
-        <div style="font-size:14px;font-weight:700;color:#1E1F56">${g.label}</div>
-        <div style="font-size:11px;color:#8A90C0">${g.divisionName}</div>
-      </div>
-      <div style="text-align:center">
-        <div style="font-size:15px;font-weight:800;color:${col.primary}">${gst.points}</div>
-        <div style="font-size:10px;color:#8A90C0">נק' · סבב ${gst.finishedRound}</div>
+  const END_GP = [
+    { bg:'#00aeff', fg:'#fff', fgSoft:'rgba(255,255,255,.85)', tint:'#eaf6fd' },
+    { bg:'#1abe9b', fg:'#fff', fgSoft:'rgba(255,255,255,.85)', tint:'#e8f7f2' },
+    { bg:'#f4c40f', fg:'#221f64', fgSoft:'rgba(34,31,100,.7)', tint:'#fdf7e0' },
+    { bg:'#7b5fd4', fg:'#fff', fgSoft:'rgba(255,255,255,.85)', tint:'#f1ecfb' },
+  ];
+  const CONF = ['#00aeff','#1abe9b','#f4c40f','#7b5fd4','#e84d3d','#221f64'];
+  const RANK = ['🥇 מקום ראשון','🥈 מקום שני','🥉 מקום שלישי','מקום רביעי'];
+  const eEsc = (t) => String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const lefts = [5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,3,8,13,18,23,28,33,38,43,48,53,58,63,68,73,78,83,88,93,2,7,12,17];
+  const ws = [7,10,8,12,9,7,11,8,10,12,7,9,11,8,10,12,7,9,8,10,12,7,9,11,8,10,7,12,9,8,11,10,7,9,12,8,10,7,11,9,8,12];
+  const hs = [10,14,12,16,11,13,10,15,12,14,11,16,10,13,15,12,11,14,16,10,13,15,12,11,14,16,10,13,12,15,11,14,16,10,13,12,15,11,14,16,10,13];
+  const durs = [3.2,4.1,3.7,5.0,4.4,3.8,4.7,3.5,4.2,5.1,3.9,4.6,3.3,4.8,4.0,3.6,4.9,3.4,5.2,4.3,3.8,4.5,3.1,4.7,3.9,4.2,5.0,3.6,4.1,4.8,3.3,4.4,5.1,3.7,4.0,4.6,3.2,4.9,3.5,4.3,5.0,3.8];
+  const dlys = [0,0.5,1.0,1.5,2.0,2.5,3.0,3.5,0.2,0.7,1.2,1.7,2.2,2.7,3.2,0.4,0.9,1.4,1.9,2.4,2.9,0.1,0.6,1.1,1.6,2.1,2.6,3.1,0.3,0.8,1.3,1.8,2.3,2.8,0.0,0.5,1.0,1.5,2.0,2.5,3.0,3.5];
+  const conf = Array.from({length:42},(_,i)=>`<span style="position:absolute;top:-40px;left:${lefts[i]}%;width:${ws[i]}px;height:${hs[i]}px;background:${CONF[i%CONF.length]};border-radius:2px;opacity:0;animation:confFall ${durs[i]}s linear ${dlys[i]}s infinite"></span>`).join('');
+  const FINAL = [...GC.groups]
+    .map((g,gi)=>({gi,g,gp:END_GP[gi],points:(gameState[g.id]||{}).points||0,finishedRound:(gameState[g.id]||{}).finishedRound||99}))
+    .sort((a,b)=>{ if(a.finishedRound!==b.finishedRound) return a.finishedRound-b.finishedRound; return b.points-a.points; });
+  const win=FINAL[0],wg=win.g,wp=win.gp;
+  const standings=FINAL.map((f,idx)=>{const first=idx===0;return `
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:9px;background:${first?f.gp.tint:'#fff'};border:2px solid ${first?f.gp.bg:'#e6e8f0'};border-radius:18px;padding:16px 12px 18px;box-shadow:0 5px 16px rgba(34,31,100,.10)">
+      <span style="font-size:15px;font-weight:800;color:${first?'#9a7a00':'#aab0c4'}">${RANK[idx]||('מקום '+(idx+1))}</span>
+      <div style="width:58px;height:58px;border-radius:50%;background:${f.gp.bg};border:3px solid #fff;box-shadow:0 2px 6px rgba(34,31,100,.2);display:flex;align-items:center;justify-content:center;color:${f.gp.fg};font-size:25px;font-weight:800">${f.gi+1}</div>
+      <span style="font-size:19px;font-weight:800;color:#1b1c4e">${eEsc(f.g.label)}</span>
+      <span style="font-size:12.5px;font-weight:500;color:#6a70a0;text-align:center;line-height:1.3">${eEsc(f.g.divisionName)}</span>
+      <div style="display:flex;align-items:baseline;gap:4px"><span style="font-size:26px;font-weight:900;color:#1b1c4e;font-variant-numeric:tabular-nums">${f.points}</span><span style="font-size:12px;font-weight:700;color:#9aa0b8">נק׳</span></div>
+    </div>`;}).join('');
+  const es=GC.uiCopy.endScreen;
+  const sc=Math.min(window.innerWidth/1920,window.innerHeight/1080);
+  return `
+    <div style="position:fixed;inset:0;z-index:800;overflow:hidden;background:#dfe2e8;display:flex;align-items:center;justify-content:center;direction:rtl">
+      <div style="width:1920px;height:1080px;flex:none;transform:scale(${sc});transform-origin:center center;position:relative;overflow:hidden;background:#eef0f4 url('assets/board-bg.png') center/cover no-repeat">
+        <div style="position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none">${conf}</div>
+        <div style="position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;padding:40px 80px 44px">
+          <div style="flex-shrink:0;display:flex;align-items:center;height:90px">
+            <div style="flex:1;display:flex;justify-content:flex-start;margin-top:6px"><img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:32px;width:auto;opacity:.9"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+              <img src="assets/logo-mesilot.png" alt="מסילות" style="height:68px;width:auto">
+              <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:56px;width:auto">
+            </div>
+            <div style="flex:1"></div>
+          </div>
+          <div style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+              <div style="width:172px;height:172px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#ffe9a3,#f4c40f 70%);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 30px rgba(244,196,15,.4);animation:trophyPop .6s ease-out,shine 2.4s ease-out .6s infinite"><img src="assets/icons/icon-trophy.svg" alt="" style="width:96px;height:96px;filter:brightness(0) invert(1)"></div>
+              <span style="font-size:21px;font-weight:800;letter-spacing:.1em;color:#9a7a00">${eEsc(es.winnerLabel||'הקבוצה המנצחת')}</span>
+              <span style="font-size:74px;font-weight:900;line-height:1;color:${wp.bg}">${eEsc(wg.label)}</span>
+              <span style="font-size:24px;font-weight:600;color:#5a6075">${eEsc(wg.divisionName)}</span>
+              <div style="display:flex;align-items:baseline;gap:8px;background:${wp.bg};border-radius:999px;padding:10px 30px;margin-top:4px;box-shadow:0 6px 16px rgba(34,31,100,.18)"><span style="font-size:34px;font-weight:900;color:${wp.fg};font-variant-numeric:tabular-nums">${win.points}</span><span style="font-size:16px;font-weight:700;color:${wp.fgSoft}">נקודות</span></div>
+            </div>
+            <div style="display:flex;gap:16px;width:100%;max-width:1500px;margin-top:6px">${standings}</div>
+          </div>
+          <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:16px">
+            <button onclick="showCommitment()" style="padding:18px 48px;border-radius:16px;border:none;cursor:pointer;font-family:inherit;font-size:21px;font-weight:800;color:#fff;background:#221f64;box-shadow:0 6px 18px rgba(34,31,100,.26)">← להמשך — התחייבות אישית</button>
+          </div>
+        </div>
       </div>
     </div>`;
-  }).join('');
+}
+
+function showCommitment() {
+  commitmentOpen = true;
+  renderApp();
+}
+
+function renderCommitmentOverlay() {
+  const cEsc = (t) => String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const es = GC.uiCopy.endScreen;
+  const sc = Math.min(window.innerWidth/1920, window.innerHeight/1080);
   return `
-    <div style="position:fixed;inset:0;background:rgba(20,18,70,.78);z-index:800;
-      display:flex;align-items:center;justify-content:center;padding:20px;direction:rtl">
-      <div style="background:#fff;border-radius:20px;width:100%;max-width:460px;
-        padding:32px 28px;box-shadow:0 16px 56px rgba(20,18,70,.4);text-align:center">
-        <div style="font-size:60px;line-height:1;margin-bottom:10px">🏆</div>
-        <div style="font-size:26px;font-weight:900;color:#1E1F56;margin-bottom:6px">המשחק הסתיים!</div>
-        <div style="display:inline-block;background:${winnerCol.primary};color:#fff;
-          border-radius:10px;padding:7px 22px;font-size:14px;font-weight:700;margin-bottom:24px">
-          מנצחת: ${winner.label} — ${winner.divisionName}
+    <div style="position:fixed;inset:0;z-index:900;overflow:hidden;background:#dfe2e8;display:flex;align-items:center;justify-content:center;direction:rtl">
+      <div style="width:1920px;height:1080px;flex:none;transform:scale(${sc});transform-origin:center center;position:relative;overflow:hidden;background:#eef0f4 url('assets/board-bg.png') center/cover no-repeat">
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding:46px 90px 54px">
+          <div style="flex-shrink:0;width:100%;display:flex;align-items:center;gap:24px;height:150px">
+            <div style="flex:1;display:flex;justify-content:flex-start;margin-top:8px"><img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:34px;width:auto;opacity:.9"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+              <img src="assets/logo-mesilot.png" alt="מסילות" style="height:82px;width:auto">
+              <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:68px;width:auto">
+            </div>
+            <div style="flex:1"></div>
+          </div>
+          <div style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%">
+            <div style="width:100%;max-width:1320px;background:#fff;border:3px solid #221f64;border-radius:30px;box-shadow:0 16px 44px rgba(34,31,100,.14);padding:58px 70px;display:flex;flex-direction:column;align-items:center;gap:26px;position:relative;overflow:hidden">
+              <div style="position:absolute;inset:14px;border:2px dashed #d9cdab;border-radius:20px;pointer-events:none"></div>
+              <div style="width:84px;height:84px;border-radius:50%;background:#fef3d0;border:5px solid #f4c40f;display:flex;align-items:center;justify-content:center;z-index:1"><img src="assets/icons/icon-pin.svg" alt="" style="width:44px;height:44px"></div>
+              <span style="font-size:18px;font-weight:800;letter-spacing:.06em;color:#9a6a00;z-index:1">השאלה לכל משתתף.ת</span>
+              <p style="font-size:40px;font-weight:800;line-height:1.4;color:#1b1c4e;text-align:center;text-wrap:pretty;z-index:1">${cEsc(es.commitmentQuestion||'')}</p>
+              <div style="display:flex;align-items:center;gap:14px;z-index:1;margin-top:2px">
+                <span style="height:2px;width:46px;background:#e6dcc2"></span>
+                <span style="font-size:19px;font-weight:700;color:#7c84a0">פעולה אחת קונקרטית · מדידה · בת-ביצוע</span>
+                <span style="height:2px;width:46px;background:#e6dcc2"></span>
+              </div>
+            </div>
+          </div>
+          <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:30px">
+            <button onclick="commitmentOpen=false;gameOverDismissed=true;renderApp()" style="padding:17px 52px;border-radius:15px;border:2px solid #221f64;background:#fff;cursor:pointer;font-family:inherit;font-size:20px;font-weight:800;color:#221f64">סיום המשחק</button>
+          </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:28px;text-align:right">
-          ${rows}
+      </div>
+    </div>`;
+}
+
+function renderAnswerKeyView() {
+  const AK_GP = [
+    ['#00aeff','#fff','rgba(255,255,255,.82)'],
+    ['#1abe9b','#fff','rgba(255,255,255,.82)'],
+    ['#f4c40f','#221f64','rgba(34,31,100,.62)'],
+    ['#7b5fd4','#fff','rgba(255,255,255,.82)'],
+  ];
+  const AK_ICON = {station_start:'flag',station_company_goal:'target',station_outcome_metric:'gauge',station_top10:'top10',station_measurable:'doc',station_output_metric:'clipboard',station_milestones:'milestone',station_deputy_ceo:'lock',station_reward_metric:'wallet',station_weight:'weight',station_end:'trophy',station_reflection:'pin'};
+  const aEsc = (t) => String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  function akColor(s){if(!s)return'#221f64';if(s.type==='unexpected_event')return'#e84d3d';if(s.id==='station_start')return'#1abe9b';if(s.id==='station_reflection')return'#e0a200';if(s.id==='station_end')return'#00aeff';if(s.type==='transition'||s.type==='reflection')return'#5a6d77';return'#221f64';}
+  const akIcon = (s) => 'assets/icons/icon-'+(s&&s.type==='unexpected_event'?'wheel':(AK_ICON[s&&s.id]||'gauge'))+'.svg';
+  const byId = (id) => GC.stations.find(s=>s.id===id);
+  const blocks = (GC.stationQuestions||[]).map(q=>{
+    const s=byId(q.stationId)||{};
+    return {order:s.order||0,name:s.name||'',month:s.month||'',color:akColor(s),iconUrl:akIcon(s),question:q.questionText,principle:q.professionalPrinciple,
+      answers:GC.groups.map((g,i)=>{const a=(q.answersByGroup||{})[g.id]||{};return{num:i+1,label:g.label,division:g.divisionName,color:AK_GP[i][0],fg:AK_GP[i][1],fgSoft:AK_GP[i][2],taskName:a.taskName||'—',whatIsWrong:a.whatIsWrong||'—',correctFix:a.correctFix||'—'};})};
+  }).sort((a,b)=>a.order-b.order);
+  const cf=(GC.uiCopy&&GC.uiCopy.compensationFields)||{};
+  const rm=GC.rewardModelsByGroup||{};
+  const rewardCards=GC.groups.map((g,i)=>{const m=rm[g.id]||{};return{num:i+1,label:g.label,division:g.divisionName,color:AK_GP[i][0],fg:AK_GP[i][1],fgSoft:AK_GP[i][2],modelName:m.modelName||'',fields:[[cf.rewardMetric||'מדד תגמול',m.rewardMetric||'—'],[cf.formula||'נוסחה',m.formula||'—'],[cf.weight||'משקל',m.weight||'—'],[cf.performanceThresholds||'ספי ביצוע',m.performanceThresholds||'—'],[cf.dataSource||'מקור נתונים',m.dataSource||'—']]};});
+  const blocksHtml=blocks.map(b=>`
+    <div style="background:#fff;border-radius:20px;border:1px solid #e3e6ef;box-shadow:0 5px 16px rgba(34,31,100,.07);overflow:hidden">
+      <div style="display:flex;align-items:center;gap:16px;padding:18px 24px;border-bottom:1px solid #eef0f5;border-right:8px solid ${b.color};flex-wrap:wrap">
+        <div style="width:60px;height:60px;border-radius:50%;background:#fff;border:5px solid ${b.color};display:flex;align-items:center;justify-content:center;flex-shrink:0"><img src="${b.iconUrl}" alt="" style="width:30px;height:30px"></div>
+        <div style="display:flex;flex-direction:column;gap:1px;flex-shrink:0"><span style="font-size:12px;font-weight:700;color:#9aa0b8">${aEsc(b.month)}</span><span style="font-size:22px;font-weight:800;line-height:1.1;color:${b.color}">${aEsc(b.name)}</span></div>
+        <div style="width:1px;height:42px;background:#eef0f5;margin:0 6px"></div>
+        <p style="font-size:16px;font-weight:600;line-height:1.45;color:#3a3f5c;flex:1;min-width:0">${aEsc(b.question)}</p>
+      </div>
+      <div style="padding:14px 24px;background:#faf7ef;border-bottom:1px solid #eef0f5;display:flex;gap:11px;align-items:flex-start">
+        <span style="font-size:12px;font-weight:800;color:#9a6a00;background:#f7e9c6;border-radius:7px;padding:4px 10px;white-space:nowrap;flex-shrink:0">עיקרון מקצועי</span>
+        <p style="font-size:14px;font-weight:500;line-height:1.5;color:#5a5436">${aEsc(b.principle)}</p>
+      </div>
+      <div style="padding:18px 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px">
+        ${b.answers.map(a=>`
+          <div style="border:1.5px solid #ececf3;border-radius:14px;overflow:hidden;display:flex;flex-direction:column">
+            <div style="display:flex;align-items:center;gap:9px;padding:9px 14px;background:${a.color}">
+              <span style="width:26px;height:26px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;color:${a.color};font-size:13px;font-weight:800;flex-shrink:0">${a.num}</span>
+              <span style="font-size:14px;font-weight:800;color:${a.fg}">${aEsc(a.label)}</span>
+              <span style="font-size:12px;font-weight:500;color:${a.fgSoft};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${aEsc(a.division)}</span>
+            </div>
+            <div style="padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;font-weight:800;color:${b.color}">משימה</span><span style="font-size:14px;font-weight:600;color:#1b1c4e;line-height:1.35">${aEsc(a.taskName)}</span></div>
+              <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;font-weight:800;color:#c0392b">מה לא תקין</span><span style="font-size:13px;font-weight:500;color:#4a4f64;line-height:1.45">${aEsc(a.whatIsWrong)}</span></div>
+              <div style="display:flex;flex-direction:column;gap:2px;background:#e9f7ef;border-radius:9px;padding:9px 11px;border:1px solid #c8e9d5"><span style="font-size:11px;font-weight:800;color:#1a7a44">תיקון נכון</span><span style="font-size:13px;font-weight:600;color:#185c36;line-height:1.45">${aEsc(a.correctFix)}</span></div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+  const rewardHtml=rewardCards.map(r=>`
+    <div style="background:#fff;border:1.5px solid #e3e6ef;border-radius:16px;overflow:hidden;box-shadow:0 4px 14px rgba(34,31,100,.06)">
+      <div style="display:flex;align-items:center;gap:11px;padding:13px 18px;background:${r.color}">
+        <span style="width:32px;height:32px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;color:${r.color};font-size:15px;font-weight:800;flex-shrink:0">${r.num}</span>
+        <div style="display:flex;flex-direction:column;min-width:0"><span style="font-size:15px;font-weight:800;color:${r.fg};line-height:1.15">${aEsc(r.label)} · ${aEsc(r.division)}</span><span style="font-size:12px;font-weight:600;color:${r.fgSoft};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${aEsc(r.modelName)}</span></div>
+      </div>
+      <div style="padding:14px 18px;display:flex;flex-direction:column;gap:10px">
+        ${r.fields.map(f=>`<div style="display:flex;flex-direction:column;gap:1px"><span style="font-size:11px;font-weight:800;color:#9aa0b8">${aEsc(f[0])}</span><span style="font-size:13.5px;font-weight:600;color:#2a2f48;line-height:1.4">${aEsc(f[1])}</span></div>`).join('')}
+      </div>
+    </div>`).join('');
+  return `
+    <div style="position:fixed;inset:0;z-index:850;overflow:auto;background:#eef0f4;font-family:Heebo,Arial,sans-serif;color:#1b1c4e;direction:rtl">
+      <div style="position:sticky;top:0;z-index:5;background:#221f64;color:#fff;padding:16px 30px;display:flex;align-items:center;gap:18px;box-shadow:0 4px 18px rgba(34,31,100,.22)">
+        <button onclick="answerKeyOpen=false;renderApp()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;padding:8px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">← חזרה ללוח</button>
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:22px;font-weight:900;line-height:1">מפתח תשובות למנחה</span><span style="font-size:13px;font-weight:500;color:#b9bce0">כל התחנות והתשובות — לעיון המנחה בלבד</span></div>
+        <div style="flex:1"></div>
+        <span style="font-size:13px;font-weight:800;background:#f4c40f;color:#221f64;border-radius:999px;padding:6px 15px;white-space:nowrap">${aEsc(blocks.length+' תחנות · '+GC.groups.length+' קבוצות')}</span>
+      </div>
+      <div style="max-width:1340px;margin:0 auto;padding:26px 26px 90px;display:flex;flex-direction:column;gap:20px">
+        ${blocksHtml}
+        <div style="display:flex;align-items:center;gap:12px;margin-top:14px">
+          <span style="height:3px;flex:1;background:#cdd2de;border-radius:3px"></span>
+          <span style="font-size:20px;font-weight:900;color:#221f64;white-space:nowrap">מודל התגמול — מפתח</span>
+          <span style="height:3px;flex:1;background:#cdd2de;border-radius:3px"></span>
         </div>
-        <button onclick="gameOverDismissed=true;renderApp()"
-          style="background:#1E1F56;color:#fff;border:none;border-radius:10px;
-            padding:12px 44px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">
-          סגור
-        </button>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px">${rewardHtml}</div>
       </div>
     </div>`;
 }
@@ -2015,6 +2149,8 @@ let winnerId = null;
 let gameOverConfettiLaunched = false;
 let gameOverDismissed = false;
 let instructionsOpen = false;
+let commitmentOpen = false;
+let answerKeyOpen = false;
 let roundNumber = 1;
 let currentTurnGroupIndex = 0; // index into GC.groups array
 let timerInterval = null;
@@ -2194,8 +2330,8 @@ function renderFacilitator(app) {
           <div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);display:flex;gap:4px;z-index:4">${toks}</div>
         </div>
         <div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:1px">
-          <span style="font-size:11px;font-weight:600;color:${monthColor}">${bEsc(s.month||'')}</span>
-          <span style="font-size:13.5px;font-weight:700;line-height:1.2;color:${labelColor};max-width:178px">${bEsc(name)}</span>
+          <span style="font-size:13px;font-weight:700;color:${monthColor}">${bEsc(s.month||'')}</span>
+          <span style="font-size:16px;font-weight:800;line-height:1.2;color:${labelColor};max-width:190px">${bEsc(name)}</span>
         </div>
       </div>`;
   }).join('');
@@ -2229,16 +2365,16 @@ function renderFacilitator(app) {
           <div style="display:flex;align-items:center;gap:11px">
             <div style="width:38px;height:38px;border-radius:50%;background:${GP[gi].bg};border:3px solid #fff;box-shadow:0 2px 6px rgba(34,31,100,.22);display:flex;align-items:center;justify-content:center;color:${GP[gi].fg};font-size:17px;font-weight:800;flex-shrink:0">${gi+1}</div>
             <div style="flex:1;min-width:0">
-              <div style="font-size:15px;font-weight:800;color:#1b1c4e">${bEsc(g.label)}</div>
-              <div style="font-size:11.5px;font-weight:500;color:#6a70a0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${bEsc(g.divisionName)}</div>
+              <div style="font-size:17px;font-weight:800;color:#1b1c4e">${bEsc(g.label)}</div>
+              <div style="font-size:13px;font-weight:500;color:#6a70a0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${bEsc(g.divisionName)}</div>
             </div>
             <span style="font-size:12px;font-weight:800;border-radius:999px;padding:5px 13px;background:${c.bg};color:${c.fg};white-space:nowrap;flex-shrink:0">${c.chip}</span>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid #edeef5;padding-top:9px">
-            <div style="font-size:11.5px;font-weight:600;color:#5a6075;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">📍 ${bEsc(nameByOrder[groupOrders[gi]]||'—')}</div>
+            <div style="font-size:13px;font-weight:600;color:#5a6075;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">📍 ${bEsc(nameByOrder[groupOrders[gi]]||'—')}</div>
             <div style="display:flex;align-items:baseline;gap:4px;flex-shrink:0">
-              <span style="font-size:24px;font-weight:800;color:#1b1c4e;font-variant-numeric:tabular-nums">${pointsByGroup[gi]}</span>
-              <span style="font-size:11px;font-weight:700;color:#9aa0b8">נק׳</span>
+              <span style="font-size:27px;font-weight:800;color:#1b1c4e;font-variant-numeric:tabular-nums">${pointsByGroup[gi]}</span>
+              <span style="font-size:12.5px;font-weight:700;color:#9aa0b8">נק׳</span>
             </div>
           </div>
         </div>
@@ -2267,13 +2403,13 @@ function renderFacilitator(app) {
         <div style="display:flex;align-items:center;gap:24px;flex-shrink:0;height:150px">
           <div style="flex:1;display:flex;justify-content:flex-start">
             <div style="background:#221f64;border-radius:40px;padding:8px 20px 8px 14px;display:flex;align-items:center;gap:11px;box-shadow:0 5px 16px rgba(34,31,100,.22)">
-              <span style="background:#f4c40f;color:#221f64;font-weight:800;font-size:13px;border-radius:20px;padding:4px 12px">תור פעיל</span>
-              <span style="color:#fff;font-size:16px;font-weight:700">${bEsc(bTurnText)}</span>
+              <span style="background:#f4c40f;color:#221f64;font-weight:800;font-size:15px;border-radius:20px;padding:5px 14px">תור פעיל</span>
+              <span style="color:#fff;font-size:19px;font-weight:700">${bEsc(bTurnText)}</span>
             </div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-            <img src="assets/logo-mesilot.png" alt="מסילות" style="height:109px;width:266px">
-            <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:93px;width:219px">
+            <img src="assets/logo-mesilot.png" alt="מסילות" style="height:82px;width:auto">
+            <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:68px;width:auto">
           </div>
           <div style="flex:1;display:flex;justify-content:flex-end">
             <img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:28px;width:auto;opacity:.9">
@@ -2300,6 +2436,8 @@ function renderFacilitator(app) {
       <div style="position:absolute;bottom:166px;left:28px;z-index:50;display:flex;flex-direction:column-reverse;align-items:center;gap:12px">
         <button onclick="toggleBoardPhones()" title="פתיחת תיקי הקבוצות"
           style="width:56px;height:56px;border-radius:50%;border:2px solid #cfe9f7;background:${boardPhonesOpen?'#cfeefc':'#ffffff'};color:#0a6aa0;font-size:23px;cursor:pointer;box-shadow:0 5px 16px rgba(34,31,100,.22);display:flex;align-items:center;justify-content:center">🔍</button>
+        <button onclick="answerKeyOpen=true;renderApp()" title="מפתח תשובות למנחה"
+          style="width:56px;height:56px;border-radius:50%;border:2px solid #d0d4e8;background:#fff;color:#221f64;font-size:20px;cursor:pointer;box-shadow:0 5px 16px rgba(34,31,100,.22);display:flex;align-items:center;justify-content:center">📋</button>
         ${bPhonesHtml}
       </div>
     </div>
@@ -2314,6 +2452,16 @@ function renderFacilitator(app) {
   // Game-over overlay
   if (gameOver && !gameOverDismissed) {
     html += renderGameOverOverlay();
+  }
+
+  // Commitment overlay (shown after clicking "→ התחייבות אישית" on end screen)
+  if (commitmentOpen) {
+    html += renderCommitmentOverlay();
+  }
+
+  // Answer key overlay
+  if (answerKeyOpen) {
+    html += renderAnswerKeyView();
   }
 
   // Check round complete
@@ -2873,7 +3021,7 @@ function renderStationModal() {
   } else if (station.type === 'unexpected_event') {
     const ueGroupColor = COLOR[currentGroup.colorToken].primary;
     const ueGroupBadge = `
-      <h2 style="font-size:30px;font-weight:900;color:#1E1F56;margin:0 0 16px;text-align:center">גלגל הבלת"מ</h2>
+      <h2 style="font-size:36px;font-weight:900;color:#8a2433;margin:0 0 16px;text-align:center">גלגל הבלת"מ</h2>
       <div style="display:inline-block;background:${ueGroupColor}18;border:1.5px solid ${ueGroupColor}55;
         border-radius:8px;padding:6px 20px;margin-bottom:20px;font-size:13px;font-weight:700;color:${ueGroupColor}">
         ${currentGroup.label} — ${currentGroup.divisionName}</div>`;
@@ -2892,8 +3040,8 @@ function renderStationModal() {
             : `<div style="display:inline-block;background:#FEE8EC;border:1px solid #F0A0B0;border-radius:6px;padding:6px 16px;font-size:13px;font-weight:700;color:#A0001A">⏸ הקבוצה ממתינה סבב אחד</div>`}
         </div>
         <button onclick="doUEOutcome('${currentGroup.id}',${noDelay ? 0 : 1})"
-          style="background:#1E1F56;color:#fff;border:none;border-radius:10px;
-            padding:14px 32px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit">
+          style="background:#fff;color:#221f64;border:2px solid #221f64;border-radius:12px;
+            padding:14px 32px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit">
           הבנו, ממשיכים ←</button>`;
     } else if (ueAlreadyUsed) {
       ueContent = `
@@ -2925,8 +3073,8 @@ function renderStationModal() {
         : '';
       ueContent = `
         ${ueGroupBadge}
-        <div style="background:#fbf2f3;border:6px solid #8a2433;border-radius:18px;padding:32px 40px;display:flex;flex-direction:column;align-items:center;gap:24px;position:relative">
-          <div style="position:absolute;inset:8px;border:2px solid #d8b3b9;border-radius:11px;pointer-events:none"></div>
+        <div style="background:#fbf2f3;border:6px solid #8a2433;border-radius:30px;padding:32px 40px;display:flex;flex-direction:column;align-items:center;gap:24px;position:relative">
+          <div style="position:absolute;inset:14px;border:2px solid #d8b3b9;border-radius:18px;pointer-events:none"></div>
           <div class="wheel-css" style="display:block;position:relative;z-index:1"></div>
           <button onclick="spinWheel('${currentGroup.id}','${station.unexpectedEventSetId}')"
             style="background:#8a2433;color:#fff;border:none;border-radius:10px;
@@ -3509,26 +3657,32 @@ function renderFolderLocked(wrap, group, pal, currentGroup) {
 }
 
 function renderSplash(wrap, group, pal) {
-  const copy = GC.uiCopy;
+  const gpIdx = GC.groups.indexOf(group);
+  const tm = (GC.transitionMessages && GC.transitionMessages.transition_start) || {};
+  const sEsc = (t) => String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  wrap.style.cssText = 'width:100%;min-height:100vh;background:#e7e9ef;display:flex;justify-content:center;font-family:Heebo,Arial,sans-serif;color:#1b1c4e';
   wrap.innerHTML = `
-    <div class="splash-bar" style="background:${pal.primary}"></div>
-    <div class="splash">
-      <div class="splash-logo">
-        <div class="splash-logo-line"></div>
-        <span class="splash-logo-text" style="color:${pal.primary}">${copy.appTitle}</span>
-        <div class="splash-logo-line"></div>
+    <div style="width:100%;max-width:460px;min-height:100vh;background:${pal.tint};display:flex;flex-direction:column;overflow:hidden;box-shadow:0 0 40px rgba(34,31,100,.12)">
+      <div style="flex-shrink:0;background:#fff;border-bottom:3px solid ${pal.primary};padding:18px 22px;display:flex;flex-direction:column;align-items:center;gap:12px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <img src="assets/logo-mesilot.png" alt="מסילות" style="height:32px;width:auto">
+          <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:26px;width:auto">
+        </div>
       </div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
-        <span class="splash-badge" style="background:${pal.primary}">${group.label}</span>
-        <span class="splash-div">${group.divisionName}</span>
+      <div style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:32px 28px">
+        <div style="width:112px;height:112px;border-radius:50%;background:#fff;border:6px solid ${pal.primary};display:flex;align-items:center;justify-content:center;color:${pal.primary};font-size:52px;font-weight:900;box-shadow:0 8px 22px rgba(34,31,100,.14)">${gpIdx+1}</div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px">
+          <span style="font-size:27px;font-weight:900;color:#1b1c4e">${sEsc(group.label)}</span>
+          <span style="font-size:16px;font-weight:600;color:#5a6075;text-align:center">${sEsc(group.divisionName)}</span>
+        </div>
+        <div style="width:100%;background:#fff;border-radius:18px;padding:22px;display:flex;flex-direction:column;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(34,31,100,.08)">
+          <span style="font-size:20px;font-weight:800;color:${pal.primary};text-align:center">${sEsc(tm.title||'כולם לעלות!')}</span>
+          <p style="font-size:14.5px;font-weight:500;line-height:1.6;color:#4a5070;text-align:center;text-wrap:pretty">${sEsc(tm.body||'')}</p>
+        </div>
       </div>
-      <div class="splash-intro-card">
-        <p>${copy.messages.mobileIntro}</p>
+      <div style="flex-shrink:0;padding:18px 24px 28px">
+        <button onclick="startFolder('${group.id}')" style="width:100%;padding:18px;border-radius:16px;border:none;cursor:pointer;font-family:inherit;font-size:19px;font-weight:800;color:${pal.fg};background:${pal.primary};box-shadow:0 6px 18px rgba(34,31,100,.18);display:flex;align-items:center;justify-content:center;gap:10px">כניסה לתיק העבודה<span style="font-size:20px;line-height:1">←</span></button>
       </div>
-      <button class="splash-btn" style="background:${pal.primary}"
-        onclick="startFolder('${group.id}')">
-        ${copy.buttons.openFolder}
-      </button>
     </div>`;
 }
 
@@ -3543,6 +3697,7 @@ let reminderOpen = {};
 let refOpen = false, refTab = 'goals', openGoals = {};
 
 function renderFolder(wrap, group, pal) {
+  wrap.style.cssText = 'position:relative;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden';
   const gid = group.id;
   const tab = activeTab[gid] || 'tasks';
   const tasks = GC.visibleTasks[gid] || [];
@@ -3553,20 +3708,22 @@ function renderFolder(wrap, group, pal) {
   wrap.innerHTML = `
     <div style="flex-shrink:0;background:#fff;border-bottom:3px solid ${pal.primary};padding:18px 20px 14px">
       <div style="display:flex;align-items:center;gap:10px">
-        <span style="background:${pal.primary};color:${pal.fg};font-size:17px;font-weight:800;border-radius:999px;padding:5px 15px">${group.label}</span>
-        <span style="font-size:17px;font-weight:600;color:#5a6075">${group.divisionName}</span>
+        <span style="background:${pal.primary};color:${pal.fg};font-size:14px;font-weight:800;border-radius:999px;padding:5px 15px">${group.label}</span>
+        <span style="font-size:15px;font-weight:600;color:#5a6075;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${group.divisionName}</span>
+        <div style="flex:1"></div>
+        <button onclick="switchGroupFolder()" title="החלפת קבוצה (תצוגה)" style="width:30px;height:30px;border-radius:50%;border:1px solid #e0e3ee;background:#fff;cursor:pointer;font-size:13px;color:#9aa0b8">↻</button>
       </div>
-      <div style="display:flex;align-items:center;gap:9px;margin-top:12px">
-        <img src="assets/logo-mesilot.png" alt="מסילות" style="height:30px;width:auto">
-        <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:22px;width:auto;margin-top:3px">
+      <div style="display:flex;align-items:center;justify-content:center;margin-top:14px">
+        <img src="assets/logo-mesilot.png" alt="מסילות" style="height:44px;width:auto">
+        <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:36px;width:auto;margin-top:4px">
       </div>
     </div>
     <div style="flex-shrink:0;display:flex;background:#fff;border-bottom:1px solid #eceef4">
-      <button onclick="switchTab('${gid}','tasks')" style="flex:1;padding:14px 8px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:17px;font-weight:${tab==='tasks'?'800':'500'};color:${tab==='tasks'?pal.deep:'#8990a8'};border-bottom:3px solid ${tab==='tasks'?pal.primary:'transparent'}">משימות לבדיקה</button>
-      <button onclick="switchTab('${gid}','compensation')" style="flex:1;padding:14px 8px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:17px;font-weight:${tab==='compensation'?'800':'500'};color:${tab==='compensation'?pal.deep:'#8990a8'};border-bottom:3px solid ${tab==='compensation'?pal.primary:'transparent'}">מודל תגמול לבדיקה</button>
+      <button onclick="switchTab('${gid}','tasks')" style="flex:1;padding:14px 8px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:15px;font-weight:${tab==='tasks'?'800':'500'};color:${tab==='tasks'?pal.deep:'#8990a8'};border-bottom:3px solid ${tab==='tasks'?pal.primary:'transparent'}">משימות לבדיקה</button>
+      <button onclick="switchTab('${gid}','compensation')" style="flex:1;padding:14px 8px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:15px;font-weight:${tab==='compensation'?'800':'500'};color:${tab==='compensation'?pal.deep:'#8990a8'};border-bottom:3px solid ${tab==='compensation'?pal.primary:'transparent'}">מודל תגמול לבדיקה</button>
     </div>
-    <div style="flex:1;min-height:0;overflow:auto;padding:16px 16px 16px">${content}</div>
-    <div style="flex-shrink:0;background:#fff;padding:12px 16px 16px;border-top:1px solid #eceef4">
+    <div style="flex:1;min-height:0;overflow:auto;padding:16px 16px 96px">${content}</div>
+    <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,#fff 72%,rgba(255,255,255,0));padding:14px 16px 18px">
       <button onclick="openRef()" style="width:100%;padding:16px;border-radius:14px;border:none;cursor:pointer;font-family:inherit;font-size:17px;font-weight:800;color:${pal.fg};background:${pal.primary};box-shadow:0 5px 16px rgba(34,31,100,.22);display:flex;align-items:center;justify-content:center;gap:10px">
         <span style="font-size:20px">📖</span>חומרי עזר · צריכים תזכורת?
       </button>
@@ -3603,7 +3760,7 @@ function renderTaskCard(task, pal, gid) {
   const detail = open ? `
     <div style="padding:4px 16px 18px;display:flex;flex-direction:column;gap:16px">
       <div style="display:flex;flex-direction:column;gap:9px">
-        <span style="font-size:17px;font-weight:800;letter-spacing:.03em;color:${pal.primary}">${GC.uiCopy.taskSections.strategic}</span>
+        <span style="font-size:12px;font-weight:800;letter-spacing:.03em;color:${pal.primary}">${GC.uiCopy.taskSections.strategic}</span>
         <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.companyGoal}</span><span class="f-val">${dv(task.companyGoal,'companyGoal')}</span></div>
         <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.goal}</span><span class="f-val">${dv(task.goal,'goal')}</span></div>
         <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.outcomeMetric}</span><span class="f-val">${dv(task.outcomeMetric,'outcomeMetric')}</span></div>
@@ -3611,14 +3768,14 @@ function renderTaskCard(task, pal, gid) {
       </div>
       <div style="height:1px;background:#eef0f5"></div>
       <div style="display:flex;flex-direction:column;gap:9px">
-        <span style="font-size:17px;font-weight:800;letter-spacing:.03em;color:${pal.primary}">${GC.uiCopy.taskSections.details}</span>
+        <span style="font-size:12px;font-weight:800;letter-spacing:.03em;color:${pal.primary}">${GC.uiCopy.taskSections.details}</span>
         <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.taskDescription}</span><span class="f-val">${dv(task.taskDescription,'taskDescription')}</span></div>
         <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.annualAchievement}</span><span class="f-val">${dv(task.annualAchievement,'annualAchievement')}</span></div>
         <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.outputMetricType}</span><span class="f-val">${dv(task.outputMetricType,'outputMetricType')}</span></div>
       </div>
       <div style="height:1px;background:#eef0f5"></div>
       <div style="${msWrapStyle}">
-        <span style="font-size:17px;font-weight:800;letter-spacing:.03em;color:${pal.primary}">${GC.uiCopy.taskSections.planning}${milestonesErr ? ' <span style="color:#E07000;font-size:13px">⚠️</span>' : ''}</span>
+        <span style="font-size:12px;font-weight:800;letter-spacing:.03em;color:${pal.primary}">${GC.uiCopy.taskSections.planning}${milestonesErr ? ' <span style="color:#E07000;font-size:13px">⚠️</span>' : ''}</span>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           ${['Q1','Q2','Q3','Q4'].map(q => {
             const qVal = milestonesErr
@@ -3825,6 +3982,12 @@ function doUEOutcome(groupId, waitRounds) {
 }
 
 function switchTab(gid, tab) { activeTab[gid] = tab; renderApp(); }
+function switchGroupFolder() {
+  const idx = GC.groups.findIndex(g => g.id === currentGroup);
+  if (idx < 0) return;
+  const next = GC.groups[(idx + 1) % GC.groups.length];
+  openMobile(next.id);
+}
 function toggleTask(gid, taskId) {
   if (!openTasks[gid]) openTasks[gid] = {};
   openTasks[gid][taskId] = !openTasks[gid][taskId];
