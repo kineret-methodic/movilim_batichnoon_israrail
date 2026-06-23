@@ -1816,42 +1816,78 @@ function showView(view, group) {
 }
 
 function renderInstructionsContent() {
-  const w = GC.uiCopy.welcome;
-  return `
-    <div style="max-width:600px;margin:0 auto;padding:8px 0">
-      <h2 style="font-size:20px;font-weight:700;color:#1E1F56;margin-bottom:12px;text-align:center">
-        ${w.title}
-      </h2>
-      <p style="font-size:14px;color:#3A3E78;line-height:1.7;margin-bottom:20px;
-        padding:14px 16px;background:#EEF0FF;border-radius:8px;border-right:4px solid #1E1F56">
-        ${w.intro}
-      </p>
-      <div style="display:flex;flex-direction:column;gap:12px">
-        ${w.sections.map(s => `
-          <div style="background:#FFFFFF;border:1px solid #D0D4F0;border-radius:8px;padding:14px 16px">
-            <div style="font-size:13px;font-weight:700;color:#1E1F56;margin-bottom:5px">${s.title}</div>
-            <div style="font-size:13px;color:#3A3E78;line-height:1.6">${s.body}</div>
-          </div>`).join('')}
-      </div>
-    </div>`;
+  return '';
 }
 
 function renderWelcome(app) {
   const w = GC.uiCopy.welcome;
-  app.innerHTML = `
-    <div style="min-height:100vh;background:#F0F2F7;display:flex;flex-direction:column;
-      align-items:center;justify-content:flex-start;padding:32px 24px;direction:rtl">
-      <div style="width:100%;max-width:640px">
-        <div style="text-align:left;margin-bottom:12px">
-          <button onclick="enterBoard()"
-            style="background:none;border:1.5px solid #C0C4E0;border-radius:6px;
-              width:36px;height:36px;font-size:18px;cursor:pointer;color:#6A70A0;
-              display:inline-flex;align-items:center;justify-content:center"
-            title="כניסה ללוח">✕</button>
+  const ACCENT = ['#221f64','#00aeff','#1abe9b','#e84d3d','#e0a200'];
+  const ICONS = ['pin','gauge','top10','wheel','trophy'];
+  const wEsc = (t) => String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  function scoreColor(line) {
+    if (/מלא|10/.test(line)) return ['#1a7a44', 800];
+    if (/חלק|5\s*נק|: 5/.test(line)) return ['#9a6a00', 800];
+    if (/שגוי|0\s*נק|: 0/.test(line)) return ['#c0392b', 800];
+    return ['#4a4636', 500];
+  }
+  const sections = w.sections || [];
+  const rules = sections.map((s, i) => {
+    const isScoring = /ניקוד|נקודות/.test(s.title);
+    const raw = String(s.body || '').split(/<br\s*\/?>/i).map(t => t.trim()).filter(Boolean);
+    const lines = raw.map(t => { const sc = isScoring ? scoreColor(t) : ['#4a4636', 500]; return [t, sc[0], sc[1]]; });
+    return { num: i+1, title: s.title, lines, color: ACCENT[i % ACCENT.length], icon: ICONS[i % ICONS.length] };
+  });
+  const splitAt = rules.length >= 5 ? 3 : Math.ceil(rules.length / 2);
+  const cardHtml = (r) => `
+    <div style="width:31%;background:#fff;border:1.5px solid #ece3cd;border-radius:20px;padding:20px 22px;display:flex;gap:16px;box-shadow:0 5px 16px rgba(34,31,100,.07)">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:9px;flex-shrink:0">
+        <div style="width:58px;height:58px;border-radius:50%;background:#fff;border:5px solid ${r.color};display:flex;align-items:center;justify-content:center;color:${r.color};font-size:26px;font-weight:800">${r.num}</div>
+        <img src="assets/icons/icon-${r.icon}.svg" alt="" style="width:28px;height:28px;opacity:.85">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;min-width:0">
+        <span style="font-size:21px;font-weight:800;line-height:1.15;color:${r.color}">${wEsc(r.title)}</span>
+        <div style="display:flex;flex-direction:column;gap:3px">
+          ${r.lines.map(ln => `<span style="font-size:16.5px;font-weight:${ln[2]};line-height:1.5;color:${ln[1]};text-wrap:pretty">${wEsc(ln[0])}</span>`).join('')}
         </div>
-        ${renderInstructionsContent()}
       </div>
     </div>`;
+  const topCards = rules.slice(0, splitAt).map(cardHtml).join('');
+  const bottomCards = rules.slice(splitAt).map(cardHtml).join('');
+  app.innerHTML = `
+    <div id="board-fitwrap" style="flex:1;overflow:hidden;background:#dfe2e8;display:flex;align-items:center;justify-content:center">
+      <div id="gameboard" style="width:1920px;height:1080px;flex:none;transform-origin:center center;position:relative;overflow:hidden;background:#eef0f4 url('assets/board-bg.png') center/cover no-repeat;font-family:Heebo,Arial,sans-serif;direction:rtl">
+        <div style="position:absolute;inset:30px;background:#f7f2e6;border-radius:30px;box-shadow:0 18px 50px rgba(34,31,100,.16);border:3px solid #e6dcc2;overflow:hidden">
+          <div style="position:absolute;inset:14px;border:2px dashed #d9cdab;border-radius:20px;pointer-events:none;z-index:0"></div>
+          <div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%;padding:30px 54px 32px">
+            <div style="flex-shrink:0;display:flex;align-items:center;gap:24px;height:104px">
+              <div style="flex:1;display:flex;justify-content:flex-start"><span style="font-size:26px;font-weight:900;color:#221f64">${wEsc(w.title)}</span></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+                <img src="assets/logo-mesilot.png" alt="מסילות" style="height:54px;width:auto">
+                <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:38px;width:auto">
+              </div>
+              <div style="flex:1;display:flex;justify-content:flex-end"><img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:32px;width:auto;opacity:.9"></div>
+            </div>
+            <div style="flex-shrink:0;display:flex;align-items:center;gap:20px;background:#221f64;border-radius:18px;padding:16px 28px;margin-top:6px">
+              <div style="width:58px;height:58px;border-radius:50%;background:#f4c40f;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <img src="assets/icons/icon-target.svg" alt="" style="width:30px;height:30px">
+              </div>
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <span style="font-size:15px;font-weight:800;letter-spacing:.05em;color:#f4c40f">מטרת המשחק</span>
+                <p style="font-size:20px;font-weight:600;line-height:1.45;color:#fff;text-wrap:pretty">${wEsc(w.intro)}</p>
+              </div>
+            </div>
+            <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:18px;margin-top:14px">
+              <div style="display:flex;justify-content:center;gap:20px">${topCards}</div>
+              <div style="display:flex;justify-content:center;gap:20px">${bottomCards}</div>
+            </div>
+            <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:14px">
+              <button onclick="enterBoard()" style="padding:17px 56px;border-radius:15px;border:none;cursor:pointer;font-family:inherit;font-size:21px;font-weight:800;color:#fff;background:#1a8c4e;box-shadow:0 6px 18px rgba(26,140,78,.28)">${wEsc(w.startButton || 'התחילו משחק')}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  fitBoard();
 }
 
 function enterBoard() {
@@ -2312,34 +2348,73 @@ function renderFacilitator(app) {
 
   // Instructions modal overlay
   if (instructionsOpen) {
-    html += `<div onclick="if(event.target===this)closeInstructions()"
-      style="position:fixed;inset:0;background:rgba(30,31,86,.55);z-index:800;
-        display:flex;align-items:flex-start;justify-content:center;
-        padding:32px 16px;overflow-y:auto;direction:rtl">
-      <div style="background:#F0F2F7;border-radius:14px;width:100%;max-width:640px;
-        padding:28px 24px;box-shadow:0 8px 32px rgba(30,31,86,.25);
-        position:relative;margin:auto">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-          <span style="font-size:15px;font-weight:700;color:#1E1F56">${GC.uiCopy.welcome.title}</span>
-          <button onclick="closeInstructions()"
-            style="background:#1E1F56;color:#FFFFFF;border:none;border-radius:7px;
-              padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">
-            ${GC.uiCopy.welcome.closeInstructionsButton}
-          </button>
+    const wo = GC.uiCopy.welcome;
+    const ACCENTo = ['#221f64','#00aeff','#1abe9b','#e84d3d','#e0a200'];
+    const ICONSo = ['pin','gauge','top10','wheel','trophy'];
+    const oEsc = (t) => String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    function oScoreColor(line) {
+      if (/מלא|10/.test(line)) return ['#1a7a44', 800];
+      if (/חלק|5\s*נק|: 5/.test(line)) return ['#9a6a00', 800];
+      if (/שגוי|0\s*נק|: 0/.test(line)) return ['#c0392b', 800];
+      return ['#4a4636', 500];
+    }
+    const oSections = wo.sections || [];
+    const oRules = oSections.map((s, i) => {
+      const isScoring = /ניקוד|נקודות/.test(s.title);
+      const raw = String(s.body || '').split(/<br\s*\/?>/i).map(t => t.trim()).filter(Boolean);
+      const lines = raw.map(t => { const sc = isScoring ? oScoreColor(t) : ['#4a4636', 500]; return [t, sc[0], sc[1]]; });
+      return { num: i+1, title: s.title, lines, color: ACCENTo[i % ACCENTo.length], icon: ICONSo[i % ICONSo.length] };
+    });
+    const oSplitAt = oRules.length >= 5 ? 3 : Math.ceil(oRules.length / 2);
+    const oCardHtml = (r) => `
+      <div style="width:31%;background:#fff;border:1.5px solid #ece3cd;border-radius:20px;padding:20px 22px;display:flex;gap:16px;box-shadow:0 5px 16px rgba(34,31,100,.07)">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:9px;flex-shrink:0">
+          <div style="width:58px;height:58px;border-radius:50%;background:#fff;border:5px solid ${r.color};display:flex;align-items:center;justify-content:center;color:${r.color};font-size:26px;font-weight:800">${r.num}</div>
+          <img src="assets/icons/icon-${r.icon}.svg" alt="" style="width:28px;height:28px;opacity:.85">
         </div>
-        <p style="font-size:13px;color:#3A3E78;line-height:1.7;margin-bottom:16px;
-          padding:12px 14px;background:#EEF0FF;border-radius:8px;border-right:4px solid #1E1F56">
-          ${GC.uiCopy.welcome.intro}
-        </p>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          ${GC.uiCopy.welcome.sections.map(s => `
-            <div style="background:#FFFFFF;border:1px solid #D0D4F0;border-radius:8px;padding:12px 14px">
-              <div style="font-size:12px;font-weight:700;color:#1E1F56;margin-bottom:4px">${s.title}</div>
-              <div style="font-size:12px;color:#3A3E78;line-height:1.6">${s.body}</div>
-            </div>`).join('')}
+        <div style="display:flex;flex-direction:column;gap:7px;min-width:0">
+          <span style="font-size:21px;font-weight:800;line-height:1.15;color:${r.color}">${oEsc(r.title)}</span>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            ${r.lines.map(ln => `<span style="font-size:16.5px;font-weight:${ln[2]};line-height:1.5;color:${ln[1]};text-wrap:pretty">${oEsc(ln[0])}</span>`).join('')}
+          </div>
         </div>
-      </div>
-    </div>`;
+      </div>`;
+    const oTopCards = oRules.slice(0, oSplitAt).map(oCardHtml).join('');
+    const oBottomCards = oRules.slice(oSplitAt).map(oCardHtml).join('');
+    html += `
+      <div style="position:fixed;inset:0;z-index:800;overflow:hidden;background:#dfe2e8;display:flex;align-items:center;justify-content:center">
+        <div id="instr-board" style="width:1920px;height:1080px;flex:none;transform-origin:center center;position:relative;overflow:hidden;background:#eef0f4 url('assets/board-bg.png') center/cover no-repeat;font-family:Heebo,Arial,sans-serif;direction:rtl">
+          <div style="position:absolute;inset:30px;background:#f7f2e6;border-radius:30px;box-shadow:0 18px 50px rgba(34,31,100,.16);border:3px solid #e6dcc2;overflow:hidden">
+            <div style="position:absolute;inset:14px;border:2px dashed #d9cdab;border-radius:20px;pointer-events:none;z-index:0"></div>
+            <div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%;padding:30px 54px 32px">
+              <div style="flex-shrink:0;display:flex;align-items:center;gap:24px;height:104px">
+                <div style="flex:1;display:flex;justify-content:flex-start"><span style="font-size:26px;font-weight:900;color:#221f64">${oEsc(wo.title)}</span></div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+                  <img src="assets/logo-mesilot.png" alt="מסילות" style="height:54px;width:auto">
+                  <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:38px;width:auto">
+                </div>
+                <div style="flex:1;display:flex;justify-content:flex-end"><img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:32px;width:auto;opacity:.9"></div>
+              </div>
+              <div style="flex-shrink:0;display:flex;align-items:center;gap:20px;background:#221f64;border-radius:18px;padding:16px 28px;margin-top:6px">
+                <div style="width:58px;height:58px;border-radius:50%;background:#f4c40f;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                  <img src="assets/icons/icon-target.svg" alt="" style="width:30px;height:30px">
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px">
+                  <span style="font-size:15px;font-weight:800;letter-spacing:.05em;color:#f4c40f">מטרת המשחק</span>
+                  <p style="font-size:20px;font-weight:600;line-height:1.45;color:#fff;text-wrap:pretty">${oEsc(wo.intro)}</p>
+                </div>
+              </div>
+              <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:18px;margin-top:14px">
+                <div style="display:flex;justify-content:center;gap:20px">${oTopCards}</div>
+                <div style="display:flex;justify-content:center;gap:20px">${oBottomCards}</div>
+              </div>
+              <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:14px">
+                <button onclick="closeInstructions()" style="padding:17px 56px;border-radius:15px;border:none;cursor:pointer;font-family:inherit;font-size:21px;font-weight:800;color:#fff;background:#221f64;box-shadow:0 6px 18px rgba(34,31,100,.28)">${oEsc(wo.closeInstructionsButton || 'חזרה למשחק')}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`;
   }
 
   app.innerHTML = html;
@@ -2350,6 +2425,9 @@ function renderFacilitator(app) {
   }
   // Scale the projected gameboard to fill available space
   fitBoard();
+  const ib = document.getElementById('instr-board');
+  const iw = ib && ib.parentElement;
+  if (ib && iw) ib.style.transform = 'scale(' + Math.min(iw.clientWidth/1920, iw.clientHeight/1080) + ')';
 }
 
 // ── Projected board auto-fit ─────────────────────────────
@@ -2560,11 +2638,15 @@ function renderStationModal() {
     : (station.type === 'transition' || station.type === 'reflection') ? '#5a6d77'
     : '#221f64';
   const GP_Q = [
-    { bg:'#00aeff', fg:'#fff' }, { bg:'#1abe9b', fg:'#fff' },
-    { bg:'#f4c40f', fg:'#221f64' }, { bg:'#7b5fd4', fg:'#fff' },
+    { bg:'#00aeff', fg:'#fff', deep:'#0a6aa0', soft:'#a6def7', tint:'#f3fbff' },
+    { bg:'#1abe9b', fg:'#fff', deep:'#11876e', soft:'#a6e3d4', tint:'#f1fcf8' },
+    { bg:'#f4c40f', fg:'#221f64', deep:'#9a7a00', soft:'#f0dd8e', tint:'#fffdf3' },
+    { bg:'#7b5fd4', fg:'#fff', deep:'#5b3eb0', soft:'#c8bdef', tint:'#f3eefb' },
   ];
   const gpIdx = GC.groups.indexOf(currentGroup);
   const gp = GP_Q[gpIdx] || GP_Q[0];
+  const TINT_ST = { '#221f64':'#eceefb', '#e84d3d':'#fdeeeb', '#1abe9b':'#e8f7f2', '#00aeff':'#eaf6fd', '#e0a200':'#fbf2da', '#5a6d77':'#eef1f3' };
+  const stTint = TINT_ST[stColor] || '#eceefb';
   const grpFgSoft = gp.fg === '#fff' ? 'rgba(255,255,255,.85)' : 'rgba(34,31,100,.7)';
   const CIRC = 590.6;
   const fmtSec = (sec) => { const m = Math.floor(sec/60), s = sec%60; return m + ':' + String(s).padStart(2,'0'); };
@@ -2622,141 +2704,104 @@ function renderStationModal() {
       </div>`;
 
   } else if (question) {
+    stationRowHtml = '';
     const total = question.timerSeconds;
     const remaining = timerRemaining;
     const frac = total > 0 ? remaining / total : 0;
     const low = remaining <= 10;
-    const timerColor = remaining === 0 ? '#e84d3d' : low ? '#e0a200' : '#221f64';
-    const timerBtnLabel = timerRunning ? 'עצרו'
-      : (timerRemaining > 0 && timerRemaining < total ? 'המשך' : 'הפעילו טיימר');
-    const timerBtnBg = timerRunning ? '#c0392b' : '#1a8c4e';
+    const timerColor = remaining === 0 ? '#e84d3d' : (low ? '#e0a200' : '#221f64');
+    const timerSoft = ({ '#221f64':'#c9cbe8', '#e0a200':'#eccf86', '#e84d3d':'#f3b3ab' })[timerColor] || '#c9cbe8';
+    const timerBtnLabel = (remaining < total && remaining > 0) ? 'המשך' : 'הפעילו טיימר';
     const ans = question.answersByGroup[currentGroup.id];
     const revealed = revealedGroups.has(currentGroup.id);
+    const QCIRC = 377;
 
-    let rightPane = '';
+    let mid = '';
     if (!revealed) {
-      rightPane = `
-        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center">
-          <p style="font-size:16px;font-weight:500;color:#7a809a;line-height:1.5">הקבוצה מציגה את תשובתה.<br>חשפו את התשובה הנכונה כשמוכנים.</p>
-          <button onclick="revealGroup('${currentGroup.id}')"
-            style="padding:16px 34px;border-radius:14px;border:none;cursor:pointer;font-family:inherit;
-              font-size:19px;font-weight:800;color:${gp.fg};background:${gp.bg};
-              box-shadow:0 5px 14px rgba(34,31,100,.2)">חשפו תשובה</button>
+      mid = `
+        <div style="display:flex;flex-direction:column;align-items:center;gap:15px;width:100%">
+          <div style="position:relative;width:182px;height:206px;display:flex;align-items:flex-end;justify-content:center">
+            <div style="position:absolute;top:2px;left:50%;transform:translateX(-50%);width:18px;height:18px;border:4px solid ${timerColor};border-radius:50%;z-index:3"></div>
+            <div style="position:absolute;top:17px;left:50%;transform:translateX(-50%);width:28px;height:16px;border-radius:6px;background:${timerColor};z-index:3"></div>
+            <div style="position:absolute;top:42px;right:18px;width:18px;height:14px;border-radius:5px;background:${timerColor};transform:rotate(42deg)"></div>
+            <div style="position:absolute;top:42px;left:18px;width:18px;height:14px;border-radius:5px;background:${timerColor};transform:rotate(-42deg)"></div>
+            <div onclick="toggleTimer(${total})" title="הפעלה / עצירה" style="position:relative;width:172px;height:172px;cursor:pointer">
+              <svg width="172" height="172" viewBox="0 0 172 172">
+                <circle cx="86" cy="86" r="82" fill="#fff" stroke="${timerColor}" stroke-width="6"></circle>
+                <circle cx="86" cy="86" r="70" fill="none" stroke="${timerSoft}" stroke-width="5" stroke-dasharray="4 32.6" stroke-linecap="round"></circle>
+                <g style="transform:rotate(-90deg);transform-origin:center">
+                  <circle cx="86" cy="86" r="60" fill="none" stroke="#edeef5" stroke-width="12"></circle>
+                  <circle cx="86" cy="86" r="60" fill="none" stroke="${timerColor}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${QCIRC}" stroke-dashoffset="${(QCIRC*(1-frac)).toFixed(1)}" style="transition:stroke-dashoffset .9s linear,stroke .3s"></circle>
+                </g>
+              </svg>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+                <span style="font-size:46px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1;color:${timerColor}">${fmtSec(remaining)}</span>
+              </div>
+            </div>
+          </div>
+          ${timerRunning ? '' : `<button onclick="toggleTimer(${total})" style="width:100%;max-width:380px;padding:17px;border-radius:14px;border:none;cursor:pointer;font-family:inherit;font-size:20px;font-weight:800;color:#fff;background:#1a8c4e;box-shadow:0 4px 12px rgba(26,140,78,.28)">${timerBtnLabel}</button>`}
+          <button onclick="revealGroup('${currentGroup.id}')" style="width:100%;max-width:380px;padding:16px;border-radius:14px;border:2px solid ${gp.bg};cursor:pointer;font-family:inherit;font-size:19px;font-weight:800;color:${gp.deep};background:#fff">חשפו תשובה</button>
         </div>`;
     } else if (!answered) {
-      rightPane = `
-        <div style="display:flex;flex-direction:column;gap:13px;overflow-y:auto">
-          <div style="display:flex;flex-direction:column;gap:3px">
-            <span style="font-size:13px;font-weight:800;color:${gp.bg}">משימה</span>
-            <span style="font-size:17px;font-weight:600;color:#1b1c4e;line-height:1.4">${qEsc(ans ? ans.taskName : '')}</span>
+      mid = `
+        <div style="display:flex;flex-direction:column;gap:13px;width:100%;background:#fff;border:1.5px solid ${gp.soft};border-radius:16px;padding:20px 22px">
+          <div style="display:flex;gap:20px">
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+              <span style="font-size:14px;font-weight:800;color:${stColor}">משימה</span>
+              <span style="font-size:18px;font-weight:600;color:#1b1c4e;line-height:1.4">${qEsc(ans ? ans.taskName : '')}</span>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+              <span style="font-size:14px;font-weight:800;color:#c0392b">מה לא תקין</span>
+              <span style="font-size:16px;font-weight:500;color:#3a3f5c;line-height:1.45">${qEsc(ans ? ans.whatIsWrong : '')}</span>
+            </div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:3px">
-            <span style="font-size:13px;font-weight:800;color:#c0392b">מה לא תקין</span>
-            <span style="font-size:16px;font-weight:500;color:#3a3f5c;line-height:1.5">${qEsc(ans ? ans.whatIsWrong : '')}</span>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:4px;background:#e9f7ef;border-radius:12px;padding:13px 15px;border:1px solid #bfe6cf">
-            <span style="font-size:13px;font-weight:800;color:#1a7a44">תיקון נכון</span>
+          <div style="display:flex;flex-direction:column;gap:3px;background:#e9f7ef;border-radius:12px;padding:13px 16px;border:1px solid #bfe6cf">
+            <span style="font-size:14px;font-weight:800;color:#1a7a44">תיקון נכון</span>
             <span style="font-size:16px;font-weight:600;color:#185c36;line-height:1.5">${qEsc(ans ? ans.correctFix : '')}</span>
           </div>
-          ${ans && ans.facilitatorNotes ? `
-            <div style="display:flex;flex-direction:column;gap:3px">
-              <span style="font-size:13px;font-weight:700;color:#9370c0">הערת מנחה</span>
-              <span style="font-size:14px;font-weight:500;color:#503880;line-height:1.5">${qEsc(ans.facilitatorNotes)}</span>
-            </div>` : ''}
-          <div style="display:flex;gap:10px;margin-top:4px;flex-shrink:0">
-            <button onclick="doOutcome('${currentGroup.id}','correct')"
-              style="flex:1;padding:14px 8px;border-radius:12px;border:none;cursor:pointer;font-family:inherit;
-                font-size:15px;font-weight:800;color:#fff;background:#1a8c4e;line-height:1.2">
-              נכון<br><span style="font-size:11px;font-weight:600;opacity:.9">התקדמו</span></button>
-            <button onclick="doOutcome('${currentGroup.id}','partial')"
-              style="flex:1;padding:14px 8px;border-radius:12px;border:none;cursor:pointer;font-family:inherit;
-                font-size:15px;font-weight:800;color:#221f64;background:#f4c40f;line-height:1.2">
-              חלקי<br><span style="font-size:11px;font-weight:600;opacity:.8">טעות + המתנה</span></button>
-            <button onclick="doOutcome('${currentGroup.id}','wrong')"
-              style="flex:1;padding:14px 8px;border-radius:12px;border:none;cursor:pointer;font-family:inherit;
-                font-size:15px;font-weight:800;color:#fff;background:#e84d3d;line-height:1.2">
-              שגוי<br><span style="font-size:11px;font-weight:600;opacity:.9">טעות + חזרה</span></button>
+          <div style="display:flex;gap:11px">
+            <button onclick="doOutcome('${currentGroup.id}','correct')" style="flex:1;padding:14px 6px;border-radius:13px;border:none;cursor:pointer;font-family:inherit;font-size:17px;font-weight:800;color:#fff;background:#1a8c4e;line-height:1.3">נכון<br><span style="font-size:13px;font-weight:700;opacity:.95">+10 נק׳ · מתקדמים</span></button>
+            <button onclick="doOutcome('${currentGroup.id}','partial')" style="flex:1;padding:14px 6px;border-radius:13px;border:none;cursor:pointer;font-family:inherit;font-size:17px;font-weight:800;color:#221f64;background:#f4c40f;line-height:1.3">חלקי<br><span style="font-size:13px;font-weight:700;opacity:.85">+5 נק׳ · ממתינים סבב</span></button>
+            <button onclick="doOutcome('${currentGroup.id}','wrong')" style="flex:1;padding:14px 6px;border-radius:13px;border:none;cursor:pointer;font-family:inherit;font-size:17px;font-weight:800;color:#fff;background:#e84d3d;line-height:1.3">שגוי<br><span style="font-size:13px;font-weight:700;opacity:.95">0 נק׳ · חוזרים תחנה</span></button>
           </div>
         </div>`;
     } else {
-      const o = lastOutcome ? lastOutcome.outcome : 'correct';
-      const oColor = o === 'correct' ? '#1a8c4e' : o === 'partial' ? '#e0a200' : '#e84d3d';
-      const oIcon  = o === 'correct' ? '✓' : o === 'partial' ? '!' : '↩';
-      const oMsg   = o === 'correct' ? copy.messages.correctOutcome
-                   : o === 'partial' ? copy.messages.partialOutcome
-                   : ((lastOutcome && lastOutcome.stayed) ? copy.messages.wrongOutcomeStayed : copy.messages.wrongOutcome);
-      rightPane = `
-        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center">
-          <div style="width:74px;height:74px;border-radius:50%;background:${oColor};display:flex;align-items:center;justify-content:center;color:#fff;font-size:38px;font-weight:800">${oIcon}</div>
-          <p style="font-size:19px;font-weight:700;color:#1b1c4e;line-height:1.5;max-width:380px">${qEsc(oMsg)}</p>
-          <button onclick="dismissOutcomePopup()"
-            style="padding:13px 30px;border-radius:12px;border:2px solid #221f64;background:#fff;
-              cursor:pointer;font-family:inherit;font-size:16px;font-weight:800;color:#221f64">חזרה למסלול</button>
+      const o2 = lastOutcome ? lastOutcome.outcome : 'correct';
+      const o2Color = o2 === 'correct' ? '#1a8c4e' : o2 === 'partial' ? '#e0a200' : '#e84d3d';
+      const o2Icon = o2 === 'correct' ? '✓' : o2 === 'partial' ? '!' : '↩';
+      const o2Points = o2 === 'correct' ? '+10 נקודות' : o2 === 'partial' ? '+5 נקודות' : '0 נקודות';
+      const o2Msg = o2 === 'correct' ? copy.messages.correctOutcome : o2 === 'partial' ? copy.messages.partialOutcome : ((lastOutcome && lastOutcome.stayed) ? copy.messages.wrongOutcomeStayed : copy.messages.wrongOutcome);
+      mid = `
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;width:100%;padding:8px 0">
+          <div style="width:86px;height:86px;border-radius:50%;background:${o2Color};display:flex;align-items:center;justify-content:center;color:#fff;font-size:44px;font-weight:800">${o2Icon}</div>
+          <span style="font-size:34px;font-weight:800;color:${o2Color}">${o2Points}</span>
+          <p style="font-size:22px;font-weight:700;color:#1b1c4e;line-height:1.5;max-width:480px">${qEsc(o2Msg)}</p>
+          <button onclick="dismissOutcomePopup()" style="padding:14px 34px;border-radius:13px;border:2px solid #221f64;background:#fff;cursor:pointer;font-family:inherit;font-size:18px;font-weight:800;color:#221f64">חזרה למסלול</button>
         </div>`;
     }
 
     mainHtml = `
-      <div style="flex:1;min-height:0;display:flex;gap:30px;margin-top:24px;align-items:stretch">
-        <div style="flex:1.45;display:flex;flex-direction:column;gap:22px;min-width:0">
-          <div style="flex:1;background:#fff;border-radius:22px;border:1px solid #e4e7f1;
-            box-shadow:0 8px 26px rgba(34,31,100,.10);padding:38px 44px;
-            display:flex;flex-direction:column;justify-content:center;gap:22px;
-            position:relative;overflow:hidden">
-            <div style="position:absolute;top:0;right:0;width:8px;height:100%;background:${stColor}"></div>
-            <span style="font-size:15px;font-weight:800;letter-spacing:.04em;color:${stColor}">השאלה</span>
-            <p style="font-size:38px;font-weight:700;line-height:1.45;color:#1b1c4e">${qEsc(question.questionText)}</p>
-          </div>
-          <div style="flex-shrink:0;background:#f3f1ea;border-radius:16px;border:1px dashed #c9c2ad;
-            padding:18px 24px;display:flex;gap:14px;align-items:flex-start">
-            <span style="font-size:13px;font-weight:800;color:#9a6a00;background:#f7e9c6;
-              border-radius:8px;padding:5px 12px;white-space:nowrap;flex-shrink:0">עיקרון מקצועי</span>
-            <p style="font-size:17px;font-weight:500;line-height:1.55;color:#5a5436">${qEsc(question.professionalPrinciple)}</p>
-          </div>
-        </div>
-
-        <div style="flex:1;display:flex;flex-direction:column;gap:24px;min-width:0">
-          <div style="flex-shrink:0;background:#fff;border-radius:22px;border:1px solid #e4e7f1;
-            box-shadow:0 8px 26px rgba(34,31,100,.10);padding:26px;
-            display:flex;flex-direction:column;align-items:center;gap:16px">
-            <div style="position:relative;width:212px;height:212px">
-              <svg width="212" height="212" viewBox="0 0 212 212" style="transform:rotate(-90deg)">
-                <circle cx="106" cy="106" r="94" fill="none" stroke="#edeef5" stroke-width="16"></circle>
-                <circle id="timer-ring-arc" cx="106" cy="106" r="94" fill="none"
-                  stroke="${timerColor}" stroke-width="16" stroke-linecap="round"
-                  stroke-dasharray="${CIRC}" stroke-dashoffset="${(CIRC * (1 - frac)).toFixed(1)}"
-                  style="transition:stroke-dashoffset .9s linear,stroke .3s"></circle>
-              </svg>
-              <div style="position:absolute;inset:0;display:flex;flex-direction:column;
-                align-items:center;justify-content:center;gap:2px">
-                <span id="timer-display"
-                  style="font-size:60px;font-weight:800;font-variant-numeric:tabular-nums;
-                    line-height:1;color:${timerColor}">${fmtSec(remaining)}</span>
-                <span style="font-size:13px;font-weight:600;color:#9aa0b8">דקות:שניות</span>
-              </div>
+      <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding-top:4px">
+        <div style="width:860px;max-height:100%;background:${gp.tint};border-radius:30px;border:6px solid ${gp.bg};box-shadow:0 22px 55px rgba(34,31,100,.20);position:relative;display:flex;flex-direction:column;align-items:center;padding:32px 50px 36px;overflow:hidden">
+          <div style="position:absolute;inset:14px;border:2px solid ${gp.soft};border-radius:20px;pointer-events:none;z-index:0"></div>
+          <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%;gap:15px">
+            <div style="width:100px;height:100px;border-radius:50%;background:${stTint};border:5px solid ${stColor};display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(34,31,100,.10)">
+              <img src="${qIconUrl(station)}" alt="" style="width:52px;height:52px">
             </div>
-            <button id="timer-btn" onclick="toggleTimer(${total})"
-              style="width:100%;padding:13px;border-radius:12px;border:none;cursor:pointer;
-                font-family:inherit;font-size:17px;font-weight:800;color:#fff;background:${timerBtnBg};
-                box-shadow:0 4px 12px rgba(34,31,100,.18)">${timerBtnLabel}</button>
-          </div>
-
-          <div style="flex:1;min-height:0;border-radius:22px;border:2px solid ${gp.bg};
-            background:#fff;box-shadow:0 8px 26px rgba(34,31,100,.10);overflow:hidden;
-            display:flex;flex-direction:column">
-            <div style="background:${gp.bg};padding:14px 20px;display:flex;
-              align-items:center;gap:13px;flex-shrink:0">
-              <div style="width:42px;height:42px;border-radius:50%;background:#fff;
-                display:flex;align-items:center;justify-content:center;
-                color:${gp.bg};font-size:19px;font-weight:800;flex-shrink:0">${gpIdx + 1}</div>
-              <div style="flex:1;min-width:0">
-                <div style="font-size:18px;font-weight:800;color:${gp.fg};line-height:1.1">${qEsc(currentGroup.label)}</div>
-                <div style="font-size:13px;font-weight:500;color:${grpFgSoft};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${qEsc(currentGroup.divisionName)}</div>
-              </div>
-              <span style="font-size:13px;font-weight:800;background:rgba(255,255,255,.92);
-                color:${gp.bg};border-radius:999px;padding:5px 14px;white-space:nowrap">בתורה כעת</span>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:7px">
+              <span style="font-size:17px;font-weight:700;color:#8a90aa">${qEsc(station.month || '')}</span>
+              <span style="font-size:34px;font-weight:800;line-height:1.05;color:${stColor};text-align:center">${qEsc(station.name)}</span>
+              <span style="display:inline-flex;align-items:center;gap:9px;background:${gp.bg};border-radius:999px;padding:5px 18px 5px 7px;margin-top:2px">
+                <span style="width:28px;height:28px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;color:${gp.bg};font-size:15px;font-weight:800">${gpIdx + 1}</span>
+                <span style="font-size:16px;font-weight:800;color:${gp.fg}">${qEsc(currentGroup.label + ' · ' + currentGroup.divisionName)}</span>
+              </span>
             </div>
-            <div style="flex:1;min-height:0;overflow:auto;padding:20px 22px;
-              display:flex;flex-direction:column;gap:14px">${rightPane}</div>
+            <p style="font-size:29px;font-weight:700;line-height:1.4;color:#1b1c4e;text-align:center;text-wrap:pretty">${qEsc(question.questionText)}</p>
+            ${mid}
+            <div style="background:#fff;border-radius:14px;border:1px dashed ${gp.soft};padding:13px 20px;display:flex;gap:12px;align-items:flex-start;width:100%">
+              <span style="font-size:13px;font-weight:800;color:#9a6a00;background:#f7e9c6;border-radius:7px;padding:4px 11px;white-space:nowrap;flex-shrink:0">עיקרון</span>
+              <p style="font-size:15.5px;font-weight:500;line-height:1.5;color:#5a5436;text-align:right">${qEsc(question.professionalPrinciple)}</p>
+            </div>
           </div>
         </div>
       </div>`;
