@@ -1864,9 +1864,8 @@ function renderWelcome(app) {
           <div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%;padding:30px 54px 32px">
             <div style="flex-shrink:0;display:flex;align-items:center;gap:24px;height:104px">
               <div style="flex:1;display:flex;justify-content:flex-start"><span style="font-size:26px;font-weight:900;color:#221f64">${wEsc(w.title)}</span></div>
-              <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-                <img src="assets/logo-mesilot.png" alt="מסילות" style="height:54px;width:auto">
-                <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:38px;width:auto">
+              <div style="display:flex;align-items:center;justify-content:center">
+                <img src="assets/logo-game.png" alt="מסילות ותכנונים" style="height:104px;width:auto">
               </div>
               <div style="flex:1;display:flex;justify-content:flex-end"><img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:32px;width:auto;opacity:.9"></div>
             </div>
@@ -1983,9 +1982,8 @@ function renderGameOverOverlay() {
         <div style="position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;padding:40px 80px 44px">
           <div style="flex-shrink:0;display:flex;align-items:center;height:90px">
             <div style="flex:1;display:flex;justify-content:flex-start;margin-top:6px"><img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:32px;width:auto;opacity:.9"></div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-              <img src="assets/logo-mesilot.png" alt="מסילות" style="height:68px;width:auto">
-              <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:56px;width:auto">
+            <div style="display:flex;align-items:center;justify-content:center">
+              <img src="assets/logo-game.png" alt="מסילות ותכנונים" style="height:128px;width:auto">
             </div>
             <div style="flex:1"></div>
           </div>
@@ -2022,9 +2020,8 @@ function renderCommitmentOverlay() {
         <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding:46px 90px 54px">
           <div style="flex-shrink:0;width:100%;display:flex;align-items:center;gap:24px;height:150px">
             <div style="flex:1;display:flex;justify-content:flex-start;margin-top:8px"><img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:34px;width:auto;opacity:.9"></div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-              <img src="assets/logo-mesilot.png" alt="מסילות" style="height:82px;width:auto">
-              <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:68px;width:auto">
+            <div style="display:flex;align-items:center;justify-content:center">
+              <img src="assets/logo-game.png" alt="מסילות ותכנונים" style="height:148px;width:auto">
             </div>
             <div style="flex:1"></div>
           </div>
@@ -2111,6 +2108,7 @@ function renderAnswerKeyView() {
     <div style="position:fixed;inset:0;z-index:850;overflow:auto;background:#eef0f4;font-family:Heebo,Arial,sans-serif;color:#1b1c4e;direction:rtl">
       <div style="position:sticky;top:0;z-index:5;background:#221f64;color:#fff;padding:16px 30px;display:flex;align-items:center;gap:18px;box-shadow:0 4px 18px rgba(34,31,100,.22)">
         <button onclick="answerKeyOpen=false;renderApp()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;padding:8px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">← חזרה ללוח</button>
+        <img src="assets/logo-game.png" alt="מסילות ותכנונים" style="height:46px;width:auto">
         <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:22px;font-weight:900;line-height:1">מפתח תשובות למנחה</span><span style="font-size:13px;font-weight:500;color:#b9bce0">כל התחנות והתשובות — לעיון המנחה בלבד</span></div>
         <div style="flex:1"></div>
         <span style="font-size:13px;font-weight:800;background:#f4c40f;color:#221f64;border-radius:999px;padding:6px 15px;white-space:nowrap">${aEsc(blocks.length+' תחנות · '+GC.groups.length+' קבוצות')}</span>
@@ -2407,9 +2405,8 @@ function renderFacilitator(app) {
               <span style="color:#fff;font-size:19px;font-weight:700">${bEsc(bTurnText)}</span>
             </div>
           </div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-            <img src="assets/logo-mesilot.png" alt="מסילות" style="height:82px;width:auto">
-            <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:68px;width:auto">
+          <div style="display:flex;align-items:center;justify-content:center">
+            <img src="assets/logo-game.png" alt="מסילות ותכנונים" style="height:150px;width:auto">
           </div>
           <div style="flex:1;display:flex;justify-content:flex-end">
             <img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:28px;width:auto;opacity:.9">
@@ -2537,9 +2534,8 @@ function renderFacilitator(app) {
             <div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%;padding:30px 54px 32px">
               <div style="flex-shrink:0;display:flex;align-items:center;gap:24px;height:104px">
                 <div style="flex:1;display:flex;justify-content:flex-start"><span style="font-size:26px;font-weight:900;color:#221f64">${oEsc(wo.title)}</span></div>
-                <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-                  <img src="assets/logo-mesilot.png" alt="מסילות" style="height:54px;width:auto">
-                  <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:38px;width:auto">
+                <div style="display:flex;align-items:center;justify-content:center">
+                  <img src="assets/logo-game.png" alt="מסילות ותכנונים" style="height:104px;width:auto">
                 </div>
                 <div style="flex:1;display:flex;justify-content:flex-end"><img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:32px;width:auto;opacity:.9"></div>
               </div>
@@ -2813,9 +2809,8 @@ function renderStationModal() {
           <span style="color:#fff;font-size:16px;font-weight:700">${qEsc(currentGroup.label + ' · ' + currentGroup.divisionName)}</span>
         </div>
       </div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-        <img src="assets/logo-mesilot.png" alt="מסילות" style="height:54px;width:auto">
-        <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:38px;width:auto">
+      <div style="display:flex;align-items:center;justify-content:center">
+        <img src="assets/logo-game.png" alt="מסילות ותכנונים" style="height:70px;width:auto">
       </div>
       <div style="flex:1;display:flex;justify-content:flex-end">
         <img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:26px;width:auto;opacity:.9">
@@ -3664,10 +3659,7 @@ function renderSplash(wrap, group, pal) {
   wrap.innerHTML = `
     <div style="width:100%;max-width:460px;min-height:100vh;background:${pal.tint};display:flex;flex-direction:column;overflow:hidden;box-shadow:0 0 40px rgba(34,31,100,.12)">
       <div style="flex-shrink:0;background:#fff;border-bottom:3px solid ${pal.primary};padding:18px 22px;display:flex;flex-direction:column;align-items:center;gap:12px">
-        <div style="display:flex;align-items:center;gap:6px">
-          <img src="assets/logo-mesilot.png" alt="מסילות" style="height:32px;width:auto">
-          <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:26px;width:auto">
-        </div>
+        <img src="assets/logo-game.png" alt="מסילות ותכנונים" style="height:58px;width:auto">
       </div>
       <div style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:32px 28px">
         <div style="width:112px;height:112px;border-radius:50%;background:#fff;border:6px solid ${pal.primary};display:flex;align-items:center;justify-content:center;color:${pal.primary};font-size:52px;font-weight:900;box-shadow:0 8px 22px rgba(34,31,100,.14)">${gpIdx+1}</div>
@@ -3714,8 +3706,7 @@ function renderFolder(wrap, group, pal) {
         <button onclick="switchGroupFolder()" title="החלפת קבוצה (תצוגה)" style="width:30px;height:30px;border-radius:50%;border:1px solid #e0e3ee;background:#fff;cursor:pointer;font-size:13px;color:#9aa0b8">↻</button>
       </div>
       <div style="display:flex;align-items:center;justify-content:center;margin-top:14px">
-        <img src="assets/logo-mesilot.png" alt="מסילות" style="height:44px;width:auto">
-        <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:36px;width:auto;margin-top:4px">
+        <img src="assets/logo-game.png" alt="מסילות ותכנונים" style="height:80px;width:auto">
       </div>
     </div>
     <div style="flex-shrink:0;display:flex;background:#fff;border-bottom:1px solid #eceef4">
