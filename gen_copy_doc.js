@@ -3,7 +3,7 @@ const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
         Header, Footer, PageNumber } = require('docx');
 const fs = require('fs');
 
-// ── קריאת נתוני המשחק מה-HTML (מקור האמת) ─────────────────
+// ── Read GC from HTML (single source of truth) ───────────
 const htmlContent = fs.readFileSync('moadilim-poc.html', 'utf8');
 const gcStart = htmlContent.indexOf('const GC = ') + 'const GC = '.length;
 let depth = 0, inStr = false, escaped = false, idx = gcStart;
@@ -19,18 +19,19 @@ while (idx < htmlContent.length) {
 }
 const GC = JSON.parse(htmlContent.slice(gcStart, idx + 1));
 
+// ── Helpers ───────────────────────────────────────────────
 const NAVY  = '221f64';
 const TEAL  = '1abe9b';
 const LGRAY = 'f5f6fa';
 const MGRAY = 'e3e6ef';
 const WHITE = 'ffffff';
 
-// A4: 11906 DXA wide, margins 1134 DXA (2 cm) each → content 9638
+// A4: 11906 DXA wide, 2cm margins → content 9638
 const TW = 9638;
-const C1 = 1800; // מפתח בקוד
-const C2 = 2600; // טקסט נוכחי
-const C3 = 2400; // היכן מופיע
-const C4 = 2838; // תיקון / הערה
+const C1 = 1800; // key
+const C2 = 2600; // current text
+const C3 = 2400; // where it appears
+const C4 = 2838; // correction / note
 
 const b = { style: BorderStyle.SINGLE, size: 1, color: MGRAY };
 const borders = { top: b, bottom: b, left: b, right: b };
@@ -55,12 +56,11 @@ function dCell(text, width, shade, color) {
     margins: cellMargins,
     children: [new Paragraph({
       alignment: AlignmentType.RIGHT, bidirectional: true,
-      children: [new TextRun({ text: text || '', font: 'Arial', size: 20, color: color || '2a2a2a' })]
+      children: [new TextRun({ text: String(text || '—'), font: 'Arial', size: 20, color: color || '2a2a2a' })]
     })]
   });
 }
 
-// rows: [key, currentText, whereItAppears]
 function makeTable(rows) {
   return new Table({
     width: { size: TW, type: WidthType.DXA },
@@ -68,47 +68,38 @@ function makeTable(rows) {
     rows: [
       new TableRow({
         tableHeader: true,
-        children: [
-          hCell('מפתח בקוד', C1),
-          hCell('טקסט נוכחי', C2),
-          hCell('היכן מופיע', C3),
-          hCell('תיקון / הערה', C4),
-        ]
+        children: [hCell('מפתח בקוד', C1), hCell('טקסט נוכחי', C2), hCell('היכן מופיע', C3), hCell('תיקון / הערה', C4)]
       }),
       ...rows.map(([key, val, where], i) => new TableRow({
         children: [
-          dCell(key,   C1, i%2),
-          dCell(val,   C2, i%2),
-          dCell(where, C3, i%2, '555577'),
-          dCell('',    C4, i%2),
+          dCell(key,   C1, i % 2),
+          dCell(val,   C2, i % 2),
+          dCell(where, C3, i % 2, '555577'),
+          dCell('',    C4, i % 2),
         ]
       }))
     ]
   });
 }
 
-const h1 = (text) => new Paragraph({
-  heading: HeadingLevel.HEADING_1, bidirectional: true, alignment: AlignmentType.RIGHT,
-  children: [new TextRun({ text, font: 'Arial', size: 34, bold: true, color: NAVY })]
-});
+const h1   = t => new Paragraph({ heading: HeadingLevel.HEADING_1, bidirectional: true, alignment: AlignmentType.RIGHT,
+  children: [new TextRun({ text: t, font: 'Arial', size: 34, bold: true, color: NAVY })] });
+const h2   = t => new Paragraph({ heading: HeadingLevel.HEADING_2, bidirectional: true, alignment: AlignmentType.RIGHT,
+  children: [new TextRun({ text: t, font: 'Arial', size: 24, bold: true, color: '555555' })] });
+const note = t => new Paragraph({ bidirectional: true, alignment: AlignmentType.RIGHT, spacing: { after: 80 },
+  children: [new TextRun({ text: t, font: 'Arial', size: 18, color: '888888', italics: true })] });
+const gap  = () => new Paragraph({ spacing: { after: 180 }, children: [new TextRun('')] });
 
-const h2 = (text) => new Paragraph({
-  heading: HeadingLevel.HEADING_2, bidirectional: true, alignment: AlignmentType.RIGHT,
-  children: [new TextRun({ text, font: 'Arial', size: 24, bold: true, color: '555555' })]
-});
+// ── Shortcuts into GC ─────────────────────────────────────
+const copy = GC.uiCopy;
+const btn  = copy.buttons;
+const msg  = copy.messages;
+const sb   = copy.statusBar;
 
-const note = (text) => new Paragraph({
-  bidirectional: true, alignment: AlignmentType.RIGHT,
-  spacing: { after: 80 },
-  children: [new TextRun({ text, font: 'Arial', size: 18, color: '888888', italics: true })]
-});
-
-const gap = () => new Paragraph({ spacing: { after: 180 }, children: [new TextRun('')] });
-
-// ════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
 const ch = [];
 
-// ── כותרת ──────────────────────────────────────────────
+// ── Cover ────────────────────────────────────────────────
 ch.push(
   new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 480, after: 200 },
     children: [new TextRun({ text: 'מסמך קופי — מסילות ותכנונים', font: 'Arial', size: 52, bold: true, color: NAVY })] }),
@@ -121,420 +112,372 @@ ch.push(
   new Paragraph({ alignment: AlignmentType.RIGHT, bidirectional: true, spacing: { after: 60 },
     children: [new TextRun({ text: 'כל טבלה = קטגוריה אחת מהממשק. ארבע עמודות:', font: 'Arial', size: 20, color: '444444' })] }),
   new Paragraph({ alignment: AlignmentType.RIGHT, bidirectional: true, spacing: { after: 40 },
-    children: [new TextRun({ text: 'מפתח בקוד — המיקום המדויק ב-gameContent.json או ב-HTML (לאיתור מהיר בעת עדכון)', font: 'Arial', size: 20, color: '444444' })] }),
+    children: [new TextRun({ text: 'מפתח בקוד — המיקום המדויק ב-gameContent.json או ב-HTML', font: 'Arial', size: 20, color: '444444' })] }),
   new Paragraph({ alignment: AlignmentType.RIGHT, bidirectional: true, spacing: { after: 40 },
-    children: [new TextRun({ text: 'טקסט נוכחי — הניסוח הקיים במערכת', font: 'Arial', size: 20, color: '444444' })] }),
+    children: [new TextRun({ text: 'טקסט נוכחי — הניסוח הקיים במערכת (נקרא ישירות מקובץ ה-HTML)', font: 'Arial', size: 20, color: '444444' })] }),
   new Paragraph({ alignment: AlignmentType.RIGHT, bidirectional: true, spacing: { after: 40 },
     children: [new TextRun({ text: 'היכן מופיע — איפה בממשק הטקסט נראה', font: 'Arial', size: 20, color: '444444' })] }),
   new Paragraph({ alignment: AlignmentType.RIGHT, bidirectional: true, spacing: { after: 400 },
     children: [new TextRun({ text: 'תיקון / הערה — מלאי כאן את השינויים הרצויים', font: 'Arial', size: 20, bold: true, color: TEAL })] }),
 );
 
-// ── 1. מטא ─────────────────────────────────────────────
-ch.push(h1('1. כותרות ומטא'), note('מקור: gameContent.json → uiCopy'));
+// ── 1. Meta ──────────────────────────────────────────────
+ch.push(h1('1. כותרות ומטא'), note('מקור: GC.uiCopy'));
 ch.push(makeTable([
-  ['uiCopy.appTitle',     'מסילות ותכנונים',      'מסך פתיחה — כותרת ראשית גדולה'],
-  ['uiCopy.pageTitle',    'מסילות ותכנונים - Proof of Concept', 'כותרת ה-tab בדפדפן'],
-  ['uiCopy.gameSubtitle', 'התוכנית לא מתקדמת כי הזמן עובר - היא מתקדמת כי הנאמן מוביל אותה נכון.', 'מסך פתיחה — כיתוב אפור מתחת לכותרת'],
+  ['uiCopy.appTitle',     copy.appTitle,     'מסך פתיחה — כותרת ראשית גדולה'],
+  ['uiCopy.pageTitle',    copy.pageTitle,    'כותרת ה-tab בדפדפן'],
+  ['uiCopy.gameSubtitle', copy.gameSubtitle, 'מסך פתיחה — כיתוב אפור מתחת לכותרת'],
 ]));
 ch.push(gap());
 
-// ── 2. מסך פתיחה ────────────────────────────────────────
-ch.push(h1('2. מסך פתיחה'), note('מקור: gameContent.json → uiCopy.welcome'));
+// ── 2. Welcome screen ────────────────────────────────────
+ch.push(h1('2. מסך פתיחה'), note('מקור: GC.uiCopy.welcome'));
 ch.push(makeTable([
-  ['uiCopy.welcome.title',                  'ברוכים הבאים למסילות ותכנונים!',   'מסך פתיחה — כותרת כרטיס מרכזי'],
-  ['uiCopy.welcome.intro',                  'במשחק הזה תובילו תכנית עבודה חטיבתית לאורך השנה: מהגדרת המשימות, דרך דיוק המדדים ואבני הדרך, ועד לאישור תכנית העבודה ומודל התגמול.', 'מסך פתיחה — פסקת הסבר'],
-  ['uiCopy.welcome.startButton',            '(הוסר — הוחלף בכפתור X)',             'מסך פתיחה — כפתור הכניסה ללוח הוחלף ב-X ללא טקסט'],
-  ['uiCopy.welcome.openInstructionsButton', 'הנחיות המשחק',                       'מסך פתיחה — כפתור משני (קו תחתון)'],
-  ['uiCopy.welcome.closeInstructionsButton','חזרה למפה',                           'חלונית הנחיות — כפתור סגירה'],
-  ['hardcoded: station_start activatePhones', 'מתחילים',                           'תחנת כולם לעלות — כפתור התחלת המשחק (נועל טלפוני קבוצות לפי תור)'],
-  ['hardcoded: station_start phonesActive',   '✓ המשחק החל — הקבוצות ננעלות לפי תור', 'תחנת כולם לעלות — הודעת אישור לאחר לחיצה על מתחילים'],
+  ['uiCopy.welcome.title',                  copy.welcome.title,                  'מסך פתיחה — כותרת כרטיס מרכזי'],
+  ['uiCopy.welcome.intro',                  copy.welcome.intro,                  'מסך פתיחה — פסקת הסבר'],
+  ['uiCopy.welcome.startButton',            copy.welcome.startButton || '(הוסר — הוחלף בכפתור X)', 'מסך פתיחה — כפתור כניסה ללוח'],
+  ['uiCopy.welcome.openInstructionsButton', copy.welcome.openInstructionsButton, 'מסך פתיחה — כפתור משני (קו תחתון)'],
+  ['uiCopy.welcome.closeInstructionsButton',copy.welcome.closeInstructionsButton,'חלונית הנחיות — כפתור סגירה'],
+  ['hardcoded: station_start activatePhones', 'מתחילים',                          'תחנת כולם לעלות — כפתור התחלת המשחק'],
+  ['hardcoded: station_start phonesActive',   '✓ המשחק החל — הקבוצות ננעלות לפי תור', 'תחנת כולם לעלות — הודעת אישור לאחר לחיצה'],
 ]));
 ch.push(gap());
 
-// ── 3. הוראות המשחק ─────────────────────────────────────
-ch.push(h1('3. הוראות המשחק'), note('מקור: gameContent.json → uiCopy.welcome.sections[]'));
+// ── 3. Game instructions ─────────────────────────────────
+ch.push(h1('3. הוראות המשחק'), note('מקור: GC.uiCopy.welcome.sections[]'));
+const secRows = (copy.welcome.sections || []).flatMap((s, i) => [
+  ['welcome.sections[' + i + '].title', s.title, 'חלונית הנחיות — כותרת פסקה ' + (i + 1)],
+  ['welcome.sections[' + i + '].body',  s.body,  'חלונית הנחיות — גוף פסקה ' + (i + 1)],
+]);
+ch.push(makeTable(secRows));
+ch.push(gap());
+
+// ── 4. Facilitator board header ──────────────────────────
+ch.push(h1('4. לוח המנחה — כותרת ומצב משחק'), note('מקור: GC.uiCopy'));
 ch.push(makeTable([
-  ['welcome.sections[0].title', 'איך משחקים?',        'חלונית הנחיות — כותרת פסקה 1'],
-  ['welcome.sections[0].body',  'כל קבוצה מתקדמת על גבי מסלול המשחק. בתחנות המקצועיות הקבוצה בודקת את תיק תכנית העבודה שלה במובייל, מאתרת אי-דיוקים ומשיבה בעל פה למנחה.', 'חלונית הנחיות — גוף פסקה 1'],
-  ['welcome.sections[1].title', 'תפקיד המנחה',        'חלונית הנחיות — כותרת פסקה 2'],
-  ['welcome.sections[1].body',  'המנחה מפעילה את התחנות דרך המסך המוקרן, מציגה שאלות, מפעילה טיימר, חושפת תשובות ומעדכנת את מצב המשחק לפי איכות המענה.', 'חלונית הנחיות — גוף פסקה 2'],
-  ['welcome.sections[2].title', 'מה המשתתפים עושים?', 'חלונית הנחיות — כותרת פסקה 3'],
-  ['welcome.sections[2].body',  'כל קבוצה פותחת את תיק תכנית העבודה החטיבתי שלה, מתייעצת בזמן מוגבל ומנסה לזהות מה דורש תיקון. שימו לב — התיק נעול בזמן שקבוצה אחרת עונה.', 'חלונית הנחיות — גוף פסקה 3'],
-  ['welcome.sections[3].title', 'תשובות והתקדמות',    'חלונית הנחיות — כותרת פסקה 4'],
-  ['welcome.sections[3].body',  'תשובה נכונה — 10 נקודות, הקבוצה מתקדמת. תשובה חלקית — 5 נקודות, הקבוצה מתקדמת. תשובה שגויה — 0 נקודות, הקבוצה נשארת במקום ומדלגת על הסבב הבא.', 'חלונית הנחיות — גוף פסקה 4'],
-  ['welcome.sections[4].title', 'בלת"מים',             'חלונית הנחיות — כותרת פסקה 5'],
-  ['welcome.sections[4].body',  'בתחנות בלת"מ מסובבים גלגל ופועלים לפי ההוראה. בלת"מ יכול לגרום לעיכוב של סבב אחד או שניים — הקבוצה לא משחקת בסבבים אלה. קבוצה לא מסובבת שוב את אותו גלגל באותה תחנה.', 'חלונית הנחיות — גוף פסקה 5'],
-  ['welcome.sections[5].title', 'איך מנצחים?',         'חלונית הנחיות — כותרת פסקה 6'],
-  ['welcome.sections[5].body',  "המטרה היא להגיע הכי רחוק על המסלול. שוויון במיקום — נקודות שוברות שוויון. בסיום עוברים להתחייבות אישית: מה כל משתתף לוקח לעבודה שלו ב-72 השעות הקרובות.", 'חלונית הנחיות — גוף פסקה 6'],
-  ['welcome.sections[6].title', 'סדר התורות',          'חלונית הנחיות — כותרת פסקה 7'],
-  ['welcome.sections[6].body',  "המשחק מתנהל בסבבים — קבוצה 1, קבוצה 2, קבוצה 3, קבוצה 4, וחוזר חלילה. בראש המסך תמיד מוצג תור מי עכשיו ובאיזו תחנה. בסיום כל סבב מוצג חיווי 'סבב הושלם'.", 'חלונית הנחיות — גוף פסקה 7'],
+  ['uiCopy.turnIndicator',           copy.turnIndicator,    'לוח מנחה — שורת מצב עליונה (מעל המסלול)'],
+  ['uiCopy.map.instruction',         copy.map.instruction,  'לוח מנחה — כיתוב קטן על המסלול'],
+  ['uiCopy.statusBar.activeTurn',    sb.activeTurn,         'לוח מנחה — תג כחול בשורת הסטטוס'],
+  ['uiCopy.statusBar.roundComplete', sb.roundComplete,      'לוח מנחה — הודעה בשורת הסטטוס אחרי סיום סבב'],
+  ['uiCopy.statusBar.noStation',     sb.noStation,          'לוח מנחה — ערך ריק כשאין תחנה פעילה'],
+  ['uiCopy.statusBar.autoAdvance',   sb.autoAdvance,        'לוח מנחה — תג על קבוצה שממתינה להתקדמות אוטומטית'],
+  ['uiCopy.statusBar.position',      sb.position,           'לוח מנחה — תווית עמודת מיקום'],
+  ['uiCopy.statusBar.errors',        sb.errors,             'לוח מנחה — תווית עמודת טעויות'],
+  ['uiCopy.statusBar.nextTurn',      sb.nextTurn,           'לוח מנחה — תווית עמודת "תור הבא"'],
 ]));
 ch.push(gap());
 
-// ── 4. לוח מנחה — כותרת ─────────────────────────────────
-ch.push(h1('4. לוח המנחה — כותרת ומצב משחק'), note('מקור: gameContent.json → uiCopy'));
+// ── 5. Score chips (hardcoded in HTML) ───────────────────
+ch.push(h1('5. לוח תוצאות — כרטיסי קבוצות (תחתית לוח)'), note('מקור: hardcoded HTML (renderFacilitator → CHIP_DEF, bScoreHtml) + GC.uiCopy.statusBar + GC.uiCopy.points'));
 ch.push(makeTable([
-  ['uiCopy.turnIndicator',           'תור {group} — {division} — תחנת {station}', 'לוח מנחה — שורת מצב עליונה (מעל המסלול)'],
-  ['uiCopy.map.instruction',         'לחצו על תחנה להפעלתה',                       'לוח מנחה — כיתוב קטן על המסלול'],
-  ['uiCopy.statusBar.activeTurn',    'תור פעיל',                                    'לוח מנחה — תג כחול בשורת הסטטוס'],
-  ['uiCopy.statusBar.roundComplete', 'סבב הושלם — אפשר להתחיל סבב חדש',           'לוח מנחה — הודעה בשורת הסטטוס אחרי סיום סבב'],
-  ['uiCopy.statusBar.noStation',     '-',                                            'לוח מנחה — ערך ריק כשאין תחנה פעילה'],
-  ['uiCopy.statusBar.autoAdvance',   'יתקדם אוטומטית',                              'לוח מנחה — תג על קבוצה שממתינה להתקדמות אוטומטית'],
-  ['uiCopy.statusBar.position',      'מיקום',                                       'לוח מנחה — תווית עמודת מיקום בשורת סטטוס'],
-  ['uiCopy.statusBar.errors',        'טעויות',                                      'לוח מנחה — תווית עמודת טעויות בשורת סטטוס'],
-  ['uiCopy.statusBar.nextTurn',      'תור הבא',                                     'לוח מנחה — תווית עמודת "תור הבא" בשורת סטטוס'],
-]));
-ch.push(gap());
-
-// ── 5. לוח תוצאות — כרטיסי קבוצות ──────────────────────
-ch.push(h1("5. לוח תוצאות — כרטיסי קבוצות (תחתית לוח)"), note('מקור: hardcoded HTML (renderFacilitator → CHIP_DEF, bScoreHtml) + uiCopy.statusBar'));
-ch.push(makeTable([
-  ['hardcoded: CHIP_DEF.active',   'תור פעיל',               'כרטיס קבוצה (תחתית לוח) — תג סטטוס: הקבוצה ששולטת עכשיו'],
-  ['hardcoded: CHIP_DEF.played',   '✓ שיחקה',                'כרטיס קבוצה — תג: הקבוצה סיימה את תורה בסבב זה'],
+  ['hardcoded: CHIP_DEF.active',   'תור פעיל',               'כרטיס קבוצה — תג סטטוס: הקבוצה ששולטת עכשיו'],
+  ['hardcoded: CHIP_DEF.played',   '✓ שיחקה',                'כרטיס קבוצה — תג: הקבוצה סיימה תורה בסבב זה'],
   ['hardcoded: CHIP_DEF.waiting',  '⏳ ממתינה',               'כרטיס קבוצה — תג: הקבוצה מחכה (בעקבות בלת"מ)'],
-  ['hardcoded: CHIP_DEF.notyet',   'מחכה לתורה',             'כרטיס קבוצה — תג: הקבוצה עוד לא הגיעה לתורה בסבב זה'],
-  ['uiCopy.statusBar.played',      'שיחקה',                   'כרטיס קבוצה — שורת סטטוס מתחת לתג'],
-  ['uiCopy.statusBar.waiting',     'ממתינה סבב',              'כרטיס קבוצה — שורת סטטוס: קבוצה שממתינה סבב'],
-  ['uiCopy.statusBar.notYet',      'מחכה לתורה',             'כרטיס קבוצה — שורת סטטוס: עוד לא שיחקה'],
-  ['uiCopy.points.label',          'נקודות',                  'כרטיס קבוצה — תווית מעל מספר הנקודות (מלא)'],
+  ['hardcoded: CHIP_DEF.notyet',   'מחכה לתורה',             'כרטיס קבוצה — תג: הקבוצה עוד לא הגיעה לתורה'],
+  ['uiCopy.statusBar.played',      sb.played,                 'כרטיס קבוצה — שורת סטטוס מתחת לתג'],
+  ['uiCopy.statusBar.waiting',     sb.waiting,                'כרטיס קבוצה — שורת סטטוס: קבוצה שממתינה סבב'],
+  ['uiCopy.statusBar.notYet',      sb.notYet,                 'כרטיס קבוצה — שורת סטטוס: עוד לא שיחקה'],
+  ['uiCopy.points.label',          copy.points.label,         'כרטיס קבוצה — תווית מעל מספר הנקודות'],
   ['hardcoded: bScoreHtml — נק׳',  'נק׳',                     'כרטיס קבוצה — קיצור "נקודות" בכרטיס הקומפקטי'],
   ['hardcoded: bScoreHtml — 📍',   '📍',                      'כרטיס קבוצה — emoji לפני שם התחנה הנוכחית'],
-  ['hardcoded: nameByOrder — UE',  'גלגל הבלת"מ',             'כרטיס קבוצה — שם התחנה כשהקבוצה נמצאת בתחנת בלת"מ'],
+  ['hardcoded: nameByOrder — UE',  'גלגל הבלת"מ',             'כרטיס קבוצה — שם התחנה כשהקבוצה בתחנת בלת"מ'],
 ]));
 ch.push(gap());
 
-// ── 6. פאנל קבוצה ───────────────────────────────────────
-ch.push(h1('6. פאנל קבוצה — תחנה פעילה'), note('מקור: gameContent.json → uiCopy.groupCard'));
+// ── 6. Group panel ───────────────────────────────────────
+ch.push(h1('6. פאנל קבוצה — תחנה פעילה'), note('מקור: GC.uiCopy.groupCard'));
+const gc = copy.groupCard;
 ch.push(makeTable([
-  ['uiCopy.groupCard.waitingMessage',    'קבוצה זו ממתינה סבב',              'חלון תחנה — הודעה אפורה כשהקבוצה ממתינה'],
-  ['uiCopy.groupCard.skipButton',        'דלגו כדי להמשיך',                  'חלון תחנה — כפתור לדילוג על קבוצה ממתינה'],
-  ['uiCopy.groupCard.stationLocked',     'תחנה זו לא פעילה בתור הנוכחי',    'חלון תחנה — הודעה כשלוחצים על תחנה לא בתור'],
-  ['uiCopy.groupCard.clickToOpen',       '▶ לחצו',                            'לוח מנחה — קישור מעל תחנה ניתנת ללחיצה'],
-  ['uiCopy.groupCard.approveTransition', 'אישור מעבר',                        'חלון תחנת מעבר — כפתור אישור וסגירה'],
-  ['uiCopy.groupCard.answerRecorded',    'התשובה נרשמה.',                     'חלון תחנה — הודעה אחרי בחירת נכון/חלקי/שגוי'],
-  ['uiCopy.groupCard.mustAnswerFirst',   'יש לסמן תשובה לפני חזרה',          'חלון תחנה — הודעת שגיאה אם לוחצים "חזרה" לפני שעונים'],
+  ['uiCopy.groupCard.waitingMessage',    gc.waitingMessage,    'חלון תחנה — הודעה אפורה כשהקבוצה ממתינה'],
+  ['uiCopy.groupCard.skipButton',        gc.skipButton,        'חלון תחנה — כפתור לדילוג על קבוצה ממתינה'],
+  ['uiCopy.groupCard.stationLocked',     gc.stationLocked,     'חלון תחנה — הודעה כשלוחצים על תחנה לא בתור'],
+  ['uiCopy.groupCard.clickToOpen',       gc.clickToOpen,       'לוח מנחה — קישור מעל תחנה ניתנת ללחיצה'],
+  ['uiCopy.groupCard.approveTransition', gc.approveTransition, 'חלון תחנת מעבר — כפתור אישור וסגירה'],
+  ['uiCopy.groupCard.answerRecorded',    gc.answerRecorded,    'חלון תחנה — הודעה אחרי בחירת נכון/חלקי/שגוי'],
+  ['uiCopy.groupCard.mustAnswerFirst',   gc.mustAnswerFirst,   'חלון תחנה — הודעת שגיאה אם לוחצים "חזרה" לפני שעונים'],
 ]));
 ch.push(gap());
 
-// ── 7. כפתורים ──────────────────────────────────────────
-ch.push(h1('7. כפתורים'), note('מקור: gameContent.json → uiCopy.buttons, uiCopy.timer'));
+// ── 7. Buttons ───────────────────────────────────────────
+ch.push(h1('7. כפתורים'), note('מקור: GC.uiCopy.buttons, GC.uiCopy.timer'));
 ch.push(makeTable([
-  ['uiCopy.buttons.startGame',          'התחילו משחק',                  'מסך פתיחה — כפתור ראשי (כחול גדול)'],
-  ['uiCopy.buttons.startTimer',         'הפעילו טיימר',                 'חלון תחנה מקצועית — כפתור הפעלת טיימר'],
-  ['uiCopy.buttons.correct',            'נכון - התקדמו',                    'חלון תחנה — כפתור ירוק (לאחר חשיפת תשובה)'],
-  ['uiCopy.buttons.partial',            'חלקי - טעות + המתנה',             'חלון תחנה — כפתור כתום'],
-  ['uiCopy.buttons.wrong',              'שגוי - טעות + חזרה תחנה',         'חלון תחנה — כפתור אדום'],
-  ['uiCopy.buttons.revealAnswer',       'חשפו תשובה',                   'חלון תחנה — כפתור שחושף את התשובה הנכונה'],
-  ['uiCopy.buttons.openMobileFolder',   'פתח תיק קבוצה',               'חלון תחנה — כפתור שפותח תיק מובייל'],
-  ['uiCopy.buttons.needReminder',       'צריכים תזכורת?',               'תיק מובייל — כפתור שפותח מגירת הגדרות/תזכורת'],
-  ['uiCopy.buttons.openFolder',         'פתחו את תכנית העבודה השנתית', 'תיק מובייל — כפתור קישור לתכנית העבודה'],
-  ['uiCopy.buttons.spinWheel',          'סובבו גלגל',                   'חלון בלת"מ — כפתור הפעלת הגלגל'],
-  ['uiCopy.buttons.backToMap',          'חזרה למסלול',                  'חלון תחנה — כפתור חזרה ללוח (בפינה)'],
-  ['uiCopy.buttons.confirmSoftWarning', 'המשך בכל זאת',                 'חלונית אזהרה — כפתור אישור המשך'],
-  ['uiCopy.buttons.cancel',             'ביטול',                        'חלונית אזהרה — כפתור ביטול'],
-  ['uiCopy.timer.stop',                 'עצרו',                         'טיימר פעיל — כפתור עצירה'],
-  ['uiCopy.timer.resume',               'המשך',                         'טיימר מושהה — כפתור המשך'],
+  ['uiCopy.buttons.startGame',          btn.startGame,          'מסך פתיחה — כפתור ראשי (כחול גדול)'],
+  ['uiCopy.buttons.startTimer',         btn.startTimer,         'חלון תחנה מקצועית — כפתור הפעלת טיימר'],
+  ['uiCopy.buttons.correct',            btn.correct,            'חלון תחנה — כפתור ירוק (אחרי חשיפת תשובה)'],
+  ['uiCopy.buttons.partial',            btn.partial,            'חלון תחנה — כפתור כתום'],
+  ['uiCopy.buttons.wrong',              btn.wrong,              'חלון תחנה — כפתור אדום'],
+  ['uiCopy.buttons.revealAnswer',       btn.revealAnswer,       'חלון תחנה — כפתור שחושף את התשובה הנכונה'],
+  ['uiCopy.buttons.openMobileFolder',   btn.openMobileFolder,   'חלון תחנה — כפתור שפותח תיק מובייל'],
+  ['uiCopy.buttons.spinWheel',          btn.spinWheel,          'חלון בלת"מ — כפתור הפעלת הגלגל'],
+  ['uiCopy.buttons.backToMap',          btn.backToMap,          'חלון תחנה — כפתור חזרה ללוח'],
+  ['uiCopy.buttons.confirmSoftWarning', btn.confirmSoftWarning, 'חלונית אזהרה — כפתור אישור המשך'],
+  ['uiCopy.buttons.cancel',             btn.cancel,             'חלונית אזהרה — כפתור ביטול'],
+  ['uiCopy.timer.stop',                 copy.timer.stop,        'טיימר פעיל — כפתור עצירה'],
+  ['uiCopy.timer.resume',               copy.timer.resume,      'טיימר מושהה — כפתור המשך'],
 ]));
 ch.push(gap());
 
-// ── 8. הודעות מערכת ─────────────────────────────────────
-ch.push(h1('8. הודעות מערכת'), note('מקור: gameContent.json → uiCopy.messages'));
+// ── 8. System messages ───────────────────────────────────
+ch.push(h1('8. הודעות מערכת'), note('מקור: GC.uiCopy.messages'));
 ch.push(makeTable([
-  ['uiCopy.messages.mobileIntro',           'לפניכם הצצה למשימות נבחרות מתוך תכנית העבודה החטיבתית. במהלך המשחק תעבדו עם המשימות המוצגות כאן, אך זכרו: במציאות תכנית העבודה רחבה יותר, ובלת"מים יכולים להגיע גם ממשימות ומגורמים שאינם מוצגים בתיק.', 'תיק מובייל — פסקת הסבר בראש הדף'],
-  ['uiCopy.messages.softWarning',           'שימו לב: לפי מצב המשחק, קבוצה זו עדיין לא הגיעה לתחנה הזו. להמשיך בכל זאת?', 'חלונית אזהרה — גוף הודעה (כשפותחים תחנה לפני הזמן)'],
-  ['uiCopy.messages.stationCompleted',      'תחנה זו כבר הושלמה. בתור הבא הקבוצה מתקדמת חזרה קדימה.', 'חלון תחנה — הודעה כשהתחנה כבר טופלה'],
-  ['uiCopy.messages.unexpectedAlreadyUsed', 'קבוצה זו כבר הפעילה את הבלת"ם הזה. ממשיכים הלאה.', 'חלון בלת"מ — הודעה כשניסו להפעיל בלת"מ שכבר השתמשו בו'],
-  ['uiCopy.messages.correctOutcome',        'מצוין! הקבוצה מתקדמת לתחנה הבאה.',                            'לוח מנחה — באנר תוצאה (ירוק) אחרי לחיצת "נכון"'],
-  ['uiCopy.messages.partialOutcome',        'נספרת טעות. המנחה מדייקת בקצרה. הקבוצה ממתינה לתור הבא.',   'לוח מנחה — באנר תוצאה (כתום) אחרי לחיצת "חלקי"'],
-  ['uiCopy.messages.wrongOutcome',          'נספרת טעות. הקבוצה חוזרת תחנה אחת אחורה.',                  'לוח מנחה — באנר תוצאה (אדום) אחרי לחיצת "שגוי"'],
-  ['uiCopy.messages.wrongOutcomeStayed',    'נספרת טעות. הקבוצה נשארת בתחנה הראשונה.', 'לוח מנחה — וריאנט של הודעת שגיאה (תחנה ראשונה)'],
-  ['uiCopy.messages.autoAdvanceNotice',     'בתור הבא הקבוצה מתקדמת אוטומטית.',         'לוח מנחה — הודעת מידע על קבוצה שתתקדם אוטומטית'],
-  ['uiCopy.messages.mobileTasksFallback',   'תיק המשימות לקבוצה זו יושלם בשלב הבא.',    'תיק מובייל — הודעה כשאין תוכן משימות עדיין'],
-  ['uiCopy.messages.mobileNoCompensation',  'אין נתוני מודל תגמול.',                     'תיק מובייל — הודעה בלשונית "מודל תגמול" כשהיא ריקה'],
-  ['uiCopy.messages.noGroupAnswer',         'אין תשובה ייחודית לקבוצה זו.',              'חלון תחנה — הודעה כשאין תשובה ספציפית לקבוצה זו'],
-  ['uiCopy.messages.noStationQuestion',     'תחנת מעבר — אין שאלה.',                     'חלון תחנה — הודעה בתחנות מעבר שאין בהן שאלה'],
+  ['uiCopy.messages.mobileIntro',           msg.mobileIntro,           'תיק מובייל — פסקת הסבר בראש הדף'],
+  ['uiCopy.messages.softWarning',           msg.softWarning,           'חלונית אזהרה — גוף הודעה (כשפותחים תחנה לפני הזמן)'],
+  ['uiCopy.messages.stationCompleted',      msg.stationCompleted,      'חלון תחנה — הודעה כשהתחנה כבר טופלה'],
+  ['uiCopy.messages.unexpectedAlreadyUsed', msg.unexpectedAlreadyUsed, 'חלון בלת"מ — הודעה כשניסו להפעיל בלת"מ שכבר השתמשו בו'],
+  ['uiCopy.messages.correctOutcome',        msg.correctOutcome,        'לוח מנחה — באנר תוצאה ירוק אחרי "נכון"'],
+  ['uiCopy.messages.partialOutcome',        msg.partialOutcome,        'לוח מנחה — באנר תוצאה כתום אחרי "חלקי"'],
+  ['uiCopy.messages.wrongOutcome',          msg.wrongOutcome,          'לוח מנחה — באנר תוצאה אדום אחרי "שגוי"'],
+  ['uiCopy.messages.wrongOutcomeStayed',    msg.wrongOutcomeStayed,    'לוח מנחה — וריאנט הודעת שגיאה (תחנה ראשונה)'],
+  ['uiCopy.messages.autoAdvanceNotice',     msg.autoAdvanceNotice,     'לוח מנחה — הודעת מידע על קבוצה שתתקדם אוטומטית'],
+  ['uiCopy.messages.mobileTasksFallback',   msg.mobileTasksFallback,   'תיק מובייל — הודעה כשאין תוכן משימות עדיין'],
+  ['uiCopy.messages.mobileNoCompensation',  msg.mobileNoCompensation,  'תיק מובייל — הודעה בלשונית "מודל תגמול" כשהיא ריקה'],
+  ['uiCopy.messages.noGroupAnswer',         msg.noGroupAnswer,         'חלון תחנה — הודעה כשאין תשובה ספציפית לקבוצה'],
+  ['uiCopy.messages.noStationQuestion',     msg.noStationQuestion,     'חלון תחנה — הודעה בתחנות מעבר שאין בהן שאלה'],
 ]));
 ch.push(gap());
 
-// ── 9. תצוגת מובייל ────────────────────────────────────
-ch.push(h1('9. תצוגת מובייל — תיק הקבוצה'), note('מקור: gameContent.json → uiCopy.mobileFolder, uiCopy.tabs, uiCopy.reminderDrawer'));
+// ── 9. Mobile folder ─────────────────────────────────────
+ch.push(h1('9. תצוגת מובייל — תיק הקבוצה'), note('מקור: GC.uiCopy.mobileFolder, GC.uiCopy.tabs, GC.uiCopy.reminderDrawer'));
 ch.push(makeTable([
-  ['uiCopy.mobileFolder.lockedMessage', 'תור {group} — המתינו לתורכם',      'תיק מובייל — כותרת מסך נעילה (גדולה, בעברית)'],
-  ['uiCopy.mobileFolder.lockedWait',    'התיק שלכם ייפתח כשיגיע תורכם',     'תיק מובייל — כיתוב מתחת לכותרת הנעילה'],
-  ['uiCopy.tabs.reviewTasks',           'משימות לבדיקה',                      'תיק מובייל — לשונית ראשונה (ברירת מחדל)'],
-  ['uiCopy.tabs.compensationModel',     'מודל תגמול לבדיקה',                  'תיק מובייל — לשונית שנייה'],
-  ['uiCopy.buttons.needReminder',       'צריכים תזכורת?',                     'תיק מובייל — כפתור בתחתית שפותח מגירת הגדרות'],
-  ['uiCopy.buttons.openFolder',         'פתחו את תכנית העבודה השנתית',       'תיק מובייל — כפתור קישור לתכנית העבודה החטיבתית'],
-  ['uiCopy.reminderDrawer.title',       'הגדרות בסיסיות',                     'מגירת תזכורת — כותרת החלק העליון'],
-  ['uiCopy.completedBadge',             'הושלמה',                             'תיק מובייל — תג ירוק על משימה שסומנה כהושלמה'],
+  ['uiCopy.mobileFolder.lockedMessage', copy.mobileFolder.lockedMessage, 'תיק מובייל — כותרת מסך נעילה (גדולה, בעברית)'],
+  ['uiCopy.mobileFolder.lockedWait',    copy.mobileFolder.lockedWait,    'תיק מובייל — כיתוב מתחת לכותרת הנעילה'],
+  ['uiCopy.tabs.reviewTasks',           copy.tabs.reviewTasks,           'תיק מובייל — לשונית ראשונה (ברירת מחדל)'],
+  ['uiCopy.tabs.compensationModel',     copy.tabs.compensationModel,     'תיק מובייל — לשונית שנייה'],
+  ['hardcoded: openRef button',         '📖 חומרי עזר · צריכים תזכורת?', 'תיק מובייל — כפתור בתחתית שפותח מסך חומרי עזר (hardcoded)'],
+  ['uiCopy.buttons.needReminder',       btn.needReminder,                'ערך GC — כרגע לא בשימוש ישיר (הכפתור hardcoded למעלה)'],
+  ['uiCopy.buttons.openFolder',         btn.openFolder,                  'תיק מובייל — כפתור קישור לתכנית העבודה החטיבתית'],
+  ['uiCopy.reminderDrawer.title',       copy.reminderDrawer.title,       'מגירת תזכורת — כותרת החלק העליון'],
+  ['uiCopy.completedBadge',             copy.completedBadge,             'תיק מובייל — תג ירוק על משימה שסומנה כהושלמה'],
 ]));
 ch.push(gap());
 
-// ── 10. שדות טופס ───────────────────────────────────────
-ch.push(h1('10. שדות טופס ותוויות'), note('מקור: gameContent.json → uiCopy.taskSections, taskFields, compensationFields, answerCard'));
+// ── 9.5 Reference screen ─────────────────────────────────
+ch.push(h1('9.5. מסך חומרי עזר — renderReferenceScreen'), note('מקור: hardcoded HTML (תוויות ממשק) + GC.companyGoals + GC.planningGlossary (תוכן)'));
+
+ch.push(h2('תוויות ממשק (hardcoded ב-HTML)'));
 ch.push(makeTable([
-  ['uiCopy.taskSections.strategic',                  'שיוך אסטרטגי',          'תיק מובייל — כותרת קטע (סקשן) בכרטיס משימה'],
-  ['uiCopy.taskSections.details',                    'פרטי המשימה',            'תיק מובייל — כותרת קטע בכרטיס משימה'],
-  ['uiCopy.taskSections.planning',                   'תכנון לאורך השנה',       'תיק מובייל — כותרת קטע בכרטיס משימה'],
-  ['uiCopy.taskFields.companyGoal',                  'מטרת חברה',              'תיק מובייל — תווית שדה בקטע "שיוך אסטרטגי"'],
-  ['uiCopy.taskFields.goal',                         'יעד',                    'תיק מובייל — תווית שדה'],
-  ['uiCopy.taskFields.outcomeMetric',                'מדד תוצאה',              'תיק מובייל — תווית שדה'],
-  ['uiCopy.taskFields.classification',               'סיווג',                  'תיק מובייל — תווית שדה (Top 10 / שוטפת)'],
-  ['uiCopy.taskFields.taskDescription',              'תיאור משימה',            'תיק מובייל — תווית שדה בקטע "פרטי המשימה"'],
-  ['uiCopy.taskFields.annualAchievement',            'הישג שנתי נדרש',         'תיק מובייל — תווית שדה'],
-  ['uiCopy.taskFields.outputMetricType',             'סוג מדד תפוקה',          'תיק מובייל — תווית שדה (בינארי / כמותי וכו׳)'],
-  ['uiCopy.classificationLabels.top10',              'Top 10',                 'תיק מובייל — ערך בשדה "סיווג"'],
-  ['uiCopy.classificationLabels.routine',            'שוטפת',                  'תיק מובייל — ערך בשדה "סיווג"'],
-  ['uiCopy.compensationFields.rewardMetric',         'מדד תגמול',              'תיק מובייל — תווית שדה בלשונית "מודל תגמול"'],
-  ['uiCopy.compensationFields.formula',              'נוסחה',                  'תיק מובייל — תווית שדה'],
-  ['uiCopy.compensationFields.weight',               'משקל',                   'תיק מובייל — תווית שדה'],
-  ['uiCopy.compensationFields.performanceThresholds','ספי ביצוע',              'תיק מובייל — תווית שדה'],
-  ['uiCopy.compensationFields.dataSource',           'מקור נתונים',            'תיק מובייל — תווית שדה'],
-  ['uiCopy.answerCard.taskLabel',                    'משימה:',                 'חלון תחנה — תווית בכרטיס התשובה (אחרי חשיפה)'],
-  ['uiCopy.answerCard.whatIsWrongLabel',             'מה לא תקין:',            'חלון תחנה — תווית בכרטיס התשובה'],
-  ['uiCopy.answerCard.correctFixLabel',              'תיקון נכון:',            'חלון תחנה — תווית בכרטיס התשובה'],
-  ['uiCopy.answerCard.facilitatorNoteLabel',         'הערת מנחה:',             'חלון תחנה — תווית בכרטיס התשובה'],
+  ['hardcoded: ref screen title',      'חומרי עזר',                     'כותרת ראשית בפס העליון הצבעוני'],
+  ['hardcoded: ref back button',       '→ חזרה לתיק העבודה',            'כפתור חזרה בפס העליון'],
+  ['hardcoded: ref tab 1',             'מטרות ויעדי החברה',              'לשונית ראשונה בפס הטאבים'],
+  ['hardcoded: ref tab 2',             'מילון מושגים',                   'לשונית שנייה בפס הטאבים'],
+  ['hardcoded: ref goals intro',       'מטרות החברה ויעדיה לשנת 2026. הקישו על מטרה כדי לפתוח את היעדים שתחתיה.', 'לשונית מטרות — פסקת הסבר בראש'],
+  ['hardcoded: ref glossary intro',    'מושגים בשפת התכנון — הגדרה, דוגמה וגורם אחראי.',                         'לשונית מילון — פסקת הסבר בראש'],
+  ['hardcoded: ref example label',     'דוגמה',                          'מילון — תווית כרטיס דוגמה (💡)'],
+  ['hardcoded: ref responsible label', 'גורם אחראי:',                    'מילון — תווית שם הגורם האחראי'],
 ]));
 ch.push(gap());
 
-// ── 11. תחנות ───────────────────────────────────────────
-ch.push(h1('11. תחנות — שמות וחודשים'), note('מקור: gameContent.json → stations[].name / stations[].month'));
+ch.push(h2('מטרות החברה ויעדיה (GC.companyGoals)'));
+const goalRows = (GC.companyGoals || []).flatMap(g => [
+  ['companyGoals[' + g.n + '].title', g.title, 'מסך חומרי עזר — שם המטרה (כפתור מתקפל, order: ' + g.n + ')'],
+  ...(g.objectives || []).map(o => [
+    'companyGoals[' + g.n + '].objectives[' + o.code + ']',
+    o.code + ' — ' + o.text,
+    'מסך חומרי עזר — יעד תחת מטרה ' + g.n,
+  ]),
+]);
+ch.push(makeTable(goalRows));
+ch.push(gap());
+
+ch.push(h2('מילון מושגי תכנון (GC.planningGlossary)'));
+const glossRows = (GC.planningGlossary || []).flatMap((d, i) => [
+  ['planningGlossary[' + i + '].term',        d.term,        'מסך חומרי עזר — שם המושג (בולט, בצבע)'],
+  ['planningGlossary[' + i + '].definition',  d.definition,  'מסך חומרי עזר — הגדרה'],
+  ...(d.example     ? [['planningGlossary[' + i + '].example',     d.example,     'מסך חומרי עזר — תוכן כרטיס דוגמה (💡)']] : []),
+  ...(d.responsible ? [['planningGlossary[' + i + '].responsible', d.responsible, 'מסך חומרי עזר — שם הגורם האחראי']]        : []),
+]);
+ch.push(makeTable(glossRows));
+ch.push(gap());
+
+// ── 10. Form fields ──────────────────────────────────────
+ch.push(h1('10. שדות טופס ותוויות'), note('מקור: GC.uiCopy.taskSections, taskFields, compensationFields, answerCard'));
+const tf = copy.taskFields;
+const cf = copy.compensationFields;
+const ac = copy.answerCard;
 ch.push(makeTable([
-  ['stations[station_start].name',           'כולם לעלות',              'לוח מנחה — שם תחנת הפתיחה על המסלול'],
-  ['stations[station_start].month',          'יוני',                    'לוח מנחה — חודש על המסלול'],
-  ['stations[station_company_goal].name',    'מטרת חברה ויעד',          'לוח מנחה — שם תחנה מקצועית על המסלול'],
-  ['stations[station_company_goal].month',   'יוני',                    'לוח מנחה — חודש'],
-  ['stations[station_unexpected_aug].name',  'בלת"מ',                   'לוח מנחה — שם תחנת בלת"מ (אוגוסט)'],
-  ['stations[station_unexpected_aug].month', 'יוני',                    'לוח מנחה — חודש'],
-  ['stations[station_outcome_metric].name',  'מדד תוצאה',               'לוח מנחה — שם תחנה מקצועית'],
-  ['stations[station_outcome_metric].month', 'יולי',                    'לוח מנחה — חודש'],
-  ['stations[station_top10].name',           'Top 10 / שוטפת',          'לוח מנחה — שם תחנה מקצועית'],
-  ['stations[station_top10].month',          'אוגוסט',                  'לוח מנחה — חודש'],
-  ['stations[station_measurable].name',      'ניסוח מדיד',              'לוח מנחה — שם תחנה מקצועית'],
-  ['stations[station_measurable].month',     'ספטמבר',                  'לוח מנחה — חודש'],
-  ['stations[station_unexpected_sep].name',  'בלת"מ',                   'לוח מנחה — שם תחנת בלת"מ (ספטמבר)'],
-  ['stations[station_unexpected_sep].month', 'ספטמבר',                  'לוח מנחה — חודש'],
-  ['stations[station_output_metric].name',   'מדד תפוקה',               'לוח מנחה — שם תחנה מקצועית'],
-  ['stations[station_output_metric].month',  'אוקטובר',                 'לוח מנחה — חודש'],
-  ['stations[station_unexpected_oct].name',  'בלת"מ',                   'לוח מנחה — שם תחנת בלת"מ (אוקטובר)'],
-  ['stations[station_unexpected_oct].month', 'אוקטובר',                 'לוח מנחה — חודש'],
-  ['stations[station_milestones].name',      'אבני דרך רבעוניות',       'לוח מנחה — שם תחנה מקצועית'],
-  ['stations[station_milestones].month',     'נובמבר',                  'לוח מנחה — חודש'],
-  ['stations[station_unexpected_nov].name',  'בלת"מ',                   'לוח מנחה — שם תחנת בלת"מ (נובמבר)'],
-  ['stations[station_unexpected_nov].month', 'נובמבר',                  'לוח מנחה — חודש'],
-  ['stations[station_reward_metric].name',   'מדד תגמול',               'לוח מנחה — שם תחנה מקצועית'],
-  ['stations[station_reward_metric].month',  'דצמבר',                   'לוח מנחה — חודש'],
-  ['stations[station_unexpected_comp].name', 'בלת"מ',                   'לוח מנחה — שם תחנת בלת"מ (דצמבר)'],
-  ['stations[station_unexpected_comp].month','דצמבר',                   'לוח מנחה — חודש'],
-  ['stations[station_weight].name',          'משקל וספי ביצוע',         'לוח מנחה — שם תחנה מקצועית'],
-  ['stations[station_weight].month',         'ינואר',                   'לוח מנחה — חודש'],
-  ['stations[station_end].name',             'מודל תגמול מאושר',        'לוח מנחה — שם תחנת הסיום'],
-  ['stations[station_end].month',            'ינואר',                   'לוח מנחה — חודש'],
-  ['stations[station_reflection].name',      'התחנה הבאה שלי',          'לוח מנחה — שם תחנת רפלקציה'],
-  ['stations[station_reflection].month',     'ינואר',                   'לוח מנחה — חודש'],
-  ['mapGates[gate_workplan_approved].name',  'אישור תכנית העבודה',      'לוח מנחה — שם שער (gate) על המסלול'],
+  ['uiCopy.taskSections.strategic',                  copy.taskSections.strategic,  'תיק מובייל — כותרת קטע "שיוך אסטרטגי"'],
+  ['uiCopy.taskSections.details',                    copy.taskSections.details,    'תיק מובייל — כותרת קטע "פרטי המשימה"'],
+  ['uiCopy.taskSections.planning',                   copy.taskSections.planning,   'תיק מובייל — כותרת קטע "תכנון לאורך השנה"'],
+  ['uiCopy.taskFields.companyGoal',                  tf.companyGoal,               'תיק מובייל — תווית שדה "מטרת חברה"'],
+  ['uiCopy.taskFields.goal',                         tf.goal,                      'תיק מובייל — תווית שדה "יעד"'],
+  ['uiCopy.taskFields.outcomeMetric',                tf.outcomeMetric,             'תיק מובייל — תווית שדה "מדד תוצאה"'],
+  ['uiCopy.taskFields.classification',               tf.classification,            'תיק מובייל — תווית שדה "סיווג"'],
+  ['uiCopy.taskFields.taskDescription',              tf.taskDescription,           'תיק מובייל — תווית שדה "תיאור משימה"'],
+  ['uiCopy.taskFields.annualAchievement',            tf.annualAchievement,         'תיק מובייל — תווית שדה "הישג שנתי נדרש"'],
+  ['uiCopy.taskFields.outputMetricType',             tf.outputMetricType,          'תיק מובייל — תווית שדה "סוג מדד תפוקה"'],
+  ['uiCopy.classificationLabels.top10',              copy.classificationLabels.top10,   'תיק מובייל — ערך בשדה "סיווג" (Top 10)'],
+  ['uiCopy.classificationLabels.routine',            copy.classificationLabels.routine, 'תיק מובייל — ערך בשדה "סיווג" (שוטפת)'],
+  ['uiCopy.compensationFields.rewardMetric',         cf.rewardMetric,              'תיק מובייל — תווית "מדד תגמול"'],
+  ['uiCopy.compensationFields.formula',              cf.formula,                   'תיק מובייל — תווית "נוסחה"'],
+  ['uiCopy.compensationFields.weight',               cf.weight,                    'תיק מובייל — תווית "משקל"'],
+  ['uiCopy.compensationFields.performanceThresholds',cf.performanceThresholds,     'תיק מובייל — תווית "ספי ביצוע"'],
+  ['uiCopy.compensationFields.dataSource',           cf.dataSource,                'תיק מובייל — תווית "מקור נתונים"'],
+  ['uiCopy.answerCard.taskLabel',                    ac.taskLabel,                 'חלון תחנה — תווית "משימה:" בכרטיס התשובה'],
+  ['uiCopy.answerCard.whatIsWrongLabel',             ac.whatIsWrongLabel,          'חלון תחנה — תווית "מה לא תקין:"'],
+  ['uiCopy.answerCard.correctFixLabel',              ac.correctFixLabel,           'חלון תחנה — תווית "תיקון נכון:"'],
+  ['uiCopy.answerCard.facilitatorNoteLabel',         ac.facilitatorNoteLabel,      'חלון תחנה — תווית "הערת מנחה:"'],
 ]));
 ch.push(gap());
 
-// ── 12. שאלות המשחק ─────────────────────────────────────
-ch.push(h1('12. שאלות המשחק'), note('מקור: gameContent.json → questions[].questionText / questions[].professionalPrinciple'));
+// ── 11. Stations ─────────────────────────────────────────
+ch.push(h1('11. תחנות — שמות וחודשים'), note('מקור: GC.stations (ממוין לפי order) + GC.mapGates'));
+const sortedSt = [...GC.stations].sort((a, b) => a.order - b.order);
+const stRows = sortedSt.flatMap(s => [
+  ['stations[' + s.id + '].name  (order:' + s.order + ')', s.name,        'לוח מנחה — שם תחנה על המסלול'],
+  ['stations[' + s.id + '].month',                          s.month || '—', 'לוח מנחה — חודש על המסלול'],
+]);
+(GC.mapGates || []).forEach(g => {
+  stRows.push(['mapGates[' + g.id + '].name  (afterOrder:' + g.afterOrder + ')', g.name, 'לוח מנחה — שם שער (gate) על המסלול']);
+});
+ch.push(makeTable(stRows));
+ch.push(gap());
 
-const questions = [
-  ['q_company_goal',  'מטרת חברה ויעד',
-    'עיינו במשימות לבדיקה. אחת מהן אינה משויכת בצורה מדויקת למטרת החברה או ליעד. אתרו אותה, תקנו את השיוך ונמקו.',
-    'תשובה נכונה מזהה את המשימה עם השיוך השגוי ומתקנת כך שהמשימה תיגזר ממטרת החברה ותשרת יעד מתאים.'],
-  ['q_outcome_metric','מדד תוצאה',
-    'במשימות לבדיקה מופיע בלבול: פעולה הוצגה כמדד תוצאה או מדד הוצג כמשימה. אתרו את הבלבול ותקנו.',
-    'משימה היא פעולה מרכזית שמבצעים בפועל. מדד תוצאה בוחן אם היעד הושג. תשובה נכונה מסווגת מחדש את הרכיבים ומנמקת לפי ההבחנה הזו.'],
-  ['q_top10',         'Top 10 / שוטפת',
-    'עיינו במשימות לבדיקה. אחת מהן סווגה באופן לא מדויק כ-Top 10 או כשוטפת. אתרו אותה, תקנו את הסיווג ונמקו.',
-    'משימת Top 10 צריכה להיות בנתיב הקריטי להשגת יעדי החברה, בעלת חשיבות גבוהה, המשכיות, התאמה למשאבים/תקציב והשפעה משמעותית. משימה שוטפת או אדמיניסטרטיבית לא תסווג כ-Top 10.'],
-  ['q_measurable',    'ניסוח מדיד',
-    'במשימות לבדיקה יש משימה שנוסחה באופן עמום מדי. אתרו אותה ונסחו אותה מחדש כך שיהיה ברור מה מבוצע, למי, באיזה היקף ועד מתי.',
-    'ניסוח טוב כולל פעולה ברורה, תוצר מדיד, היקף או יעד, ומועד. ניסוחים כלליים כמו "הנגשת מידע", "שיפור ממשקים" או "קידום תהליך" אינם מספיקים ללא פירוט מדיד.'],
-  ['q_output_metric', 'מדד תפוקה',
-    'באחת מהמשימות לבדיקה נבחר סוג מדד תפוקה שאינו מתאים. אתרו את המשימה, בחרו סוג מדד מתאים ונמקו.',
-    'בינארי מתאים לבוצע/לא בוצע; כמותי עולה לשאיפה למקסימום; כמותי יורד לשאיפה למינימום; אחוזים להתקדמות יחסית. התשובה צריכה לחבר בין אופי המשימה, ההישג השנתי וסוג המדד.'],
-  ['q_milestones',    'אבני דרך רבעוניות',
-    'עיינו במשימות לבדיקה. באחת מהן פריסת אבני הדרך אינה מאפשרת בקרה לאורך השנה. אתרו אותה והציעו פריסה מתוקנת.',
-    'פריסה תקינה מאפשרת ניהול ובקרה לאורך השנה. משימה שכל אבני הדרך שלה מרוכזות ברבעון 4 נחשבת לתכנון לא מאתגר.'],
-  ['q_reward_metric', 'מדד תגמול',
-    'במודל התגמול לבדיקה יש מדד או נוסחה שאינם מספיק ברורים. אתרו את הבעיה ותקנו.',
-    'מדד תגמול צריך להגדיר כיצד מודדים הצלחה של יחידה לצורך תגמול. נוסחה צריכה להבהיר איך מחשבים את הביצוע בפועל — מה נספר, איך מחושב ומה מקור הנתונים.'],
-  ['q_weight',        'משקל וספי ביצוע',
-    'בדקו את מודל התגמול לבדיקה: האם המשקולות מסתכמות ל-100? האם ספי הביצוע ריאליים ומאתגרים?',
-    'כל המשקולות יחד צריכות להסתכם ל-100. ספי הביצוע צריכים להגדיר עמידה מלאה, חלקית או אי-עמידה, ולהיות ריאליים ומאתגרים.'],
-];
-
-questions.forEach(([id, station, q, principle]) => {
-  ch.push(h2('תחנת ' + station));
+// ── 12. Station questions ────────────────────────────────
+ch.push(h1('12. שאלות המשחק'), note('מקור: GC.stationQuestions'));
+(GC.stationQuestions || []).forEach(q => {
+  const s = GC.stations.find(x => x.id === q.stationId);
+  ch.push(h2('תחנת ' + (s ? s.name : q.stationId)));
   ch.push(makeTable([
-    ['questions[' + id + '].questionText',          q,         'חלון תחנה — שאלה שמוצגת למנחה (מופיעה בראש החלון)'],
-    ['questions[' + id + '].professionalPrinciple', principle, 'חלון תחנה — "תשובה נכונה" שמתגלה אחרי לחיצת "חשפו תשובה"'],
+    ['stationQuestions[' + q.id + '].questionText',          q.questionText,          'חלון תחנה — שאלה שמוצגת למנחה'],
+    ['stationQuestions[' + q.id + '].professionalPrinciple', q.professionalPrinciple, 'חלון תחנה — "תשובה נכונה" שמתגלה אחרי "חשפו תשובה"'],
   ]));
   ch.push(gap());
 });
 
-// ── 13. מסכי מעבר ───────────────────────────────────────
-ch.push(h1('13. מסכי מעבר (תחנות transition)'), note('מקור: gameContent.json → transitionMessages'));
+// ── 13. Transition messages ──────────────────────────────
+ch.push(h1('13. מסכי מעבר (תחנות transition)'), note('מקור: GC.transitionMessages'));
+const tmRows = Object.entries(GC.transitionMessages || {}).flatMap(([key, tm]) => [
+  ['transitionMessages.' + key + '.title', tm.title, 'חלון תחנת מעבר — כותרת'],
+  ['transitionMessages.' + key + '.body',  tm.body,  'חלון תחנת מעבר — גוף טקסט'],
+]);
+ch.push(makeTable(tmRows));
+ch.push(gap());
+
+// ── 14. End screen ───────────────────────────────────────
+ch.push(h1('14. מסך סיום'), note('מקור: GC.uiCopy.endScreen'));
+const es = copy.endScreen;
 ch.push(makeTable([
-  ['transitionMessages.transition_start.title',             'כולם לעלות!',                    'חלון תחנת מעבר — כותרת (תחנת הפתיחה)'],
-  ['transitionMessages.transition_start.body',              'סרקו את הברקוד של הקבוצה ופתחו את תיק תכנית העבודה החטיבתי שלכם. עברו על מבנה התיק: המשימות ומודל התגמול.', 'חלון תחנת מעבר — גוף טקסט'],
-  ['transitionMessages.transition_gate_divisional.title',   'שער האישור החטיבתי',             'חלון תחנת מעבר — כותרת'],
-  ['transitionMessages.transition_gate_divisional.body',    'הגעתם לשער האישור החטיבתי. אם השלמתם את תחנות הליבה הקודמות — ניתן להעביר את התוכנית למנהל אגף ולסמנכ"ל.', 'חלון תחנת מעבר — גוף טקסט'],
-  ['transitionMessages.transition_deputy_ceo.title',        'משנה למנכ"ל — נעילה לעריכה',    'חלון תחנת מעבר — כותרת'],
-  ['transitionMessages.transition_deputy_ceo.body',         'התוכנית הועברה למשנה למנכ"ל. מכאן ואילך המשימה נעולה לעריכה וניתנת לצפייה בלבד.', 'חלון תחנת מעבר — גוף טקסט'],
-  ['transitionMessages.transition_workplan_approved.title', 'טו-טו! תכנית העבודה אושרה',     'חלון תחנת מעבר — כותרת חגיגית'],
-  ['transitionMessages.transition_workplan_approved.body',  'תכנית העבודה אושרה על ידי מנכ"ל ודירקטוריון. פתחתם את מודל התגמול. מכאן ממשיכים: מדד תגמול, נוסחה, משקל וספי ביצוע.', 'חלון תחנת מעבר — גוף טקסט'],
-  ['transitionMessages.transition_model_approved.title',    'טו-טו! מודל התגמול אושר',        'חלון תחנת מעבר — כותרת חגיגית (תחנת הסיום)'],
-  ['transitionMessages.transition_model_approved.body',     'מודל התגמול אושר. הגעתם ליעד.', 'חלון תחנת מעבר — גוף טקסט'],
+  ['uiCopy.endScreen.title',              es.title,              'מסך סיום — כותרת ראשית'],
+  ['uiCopy.endScreen.winnerLabel',        es.winnerLabel,        'מסך סיום — תווית מעל שם הקבוצה הזוכה'],
+  ['uiCopy.endScreen.commitmentQuestion', es.commitmentQuestion, 'מסך סיום — שאלת ההתחייבות האישית (גדולה, מרכז המסך)'],
+  ['uiCopy.endScreen.mentimeterUrl',      es.mentimeterUrl || '—', 'מסך סיום — כתובת ה-QR/Mentimeter'],
+  ['uiCopy.endScreen.mentimeterQrLabel',  es.mentimeterQrLabel,  'מסך סיום — כיתוב מתחת ל-QR Code'],
 ]));
 ch.push(gap());
 
-// ── 14. מסך סיום ────────────────────────────────────────
-ch.push(h1('14. מסך סיום'), note('מקור: gameContent.json → uiCopy.endScreen'));
+// ── 15. Reminder definitions ─────────────────────────────
+ch.push(h1('15. מילון מושגים — מגירת התזכורת'), note('מקור: GC.reminderDefinitions[]'));
+const rdRows = (GC.reminderDefinitions || []).flatMap((d, i) => [
+  ['reminderDefinitions[' + i + '].term',       d.term,       'מגירת תזכורת — שם המושג (מודגש)'],
+  ['reminderDefinitions[' + i + '].definition', d.definition, 'מגירת תזכורת — הגדרה מתחת למושג'],
+]);
+ch.push(makeTable(rdRows));
+ch.push(gap());
+
+// ── 16. Groups ───────────────────────────────────────────
+ch.push(h1('16. קבוצות'), note('מקור: GC.groups[]'));
+const grpRows = (GC.groups || []).flatMap(g => [
+  ['groups[' + g.id + '].label',        g.label,        'לוח מנחה + תיק מובייל — שם הקבוצה'],
+  ['groups[' + g.id + '].divisionName', g.divisionName, 'לוח מנחה + תיק מובייל — שם החטיבה'],
+]);
+ch.push(makeTable(grpRows));
+ch.push(gap());
+
+// ── 17. Months ───────────────────────────────────────────
+ch.push(h1('17. חודשים'), note('מקור: GC.uiCopy.months[]'));
+const mthRows = (copy.months || []).map((m, i) => [
+  'uiCopy.months[' + i + ']', m, 'לוח מנחה — תווית חודש על ציר הזמן',
+]);
+ch.push(makeTable(mthRows));
+ch.push(gap());
+
+// ── 18. Misc microcopy ───────────────────────────────────
+ch.push(h1('18. מיקרו-קופי שונות'), note('מקור: GC.uiCopy'));
+const ob = copy.outcomeBanner || {};
 ch.push(makeTable([
-  ['uiCopy.endScreen.title',              'המשחק הסתיים',            'מסך סיום — כותרת ראשית'],
-  ['uiCopy.endScreen.winnerLabel',        'הקבוצה המנצחת',           'מסך סיום — תווית מעל שם הקבוצה הזוכה'],
-  ['uiCopy.endScreen.commitmentQuestion', 'מה הפעולה הראשונה שתעשו ב-72 השעות הקרובות כדי לקדם את תכנית העבודה ואת מודל התגמול בחטיבה שלכם?', 'מסך סיום — שאלת ההתחייבות האישית (גדולה, מרכז המסך)'],
-  ['uiCopy.endScreen.mentimeterUrl',      'יושלם בתיאום עם הלקוחה', 'מסך סיום — כתובת ה-QR/Mentimeter (טרם נקבעה)'],
-  ['uiCopy.endScreen.mentimeterQrLabel',  'סרקו להתחייבות אישית',   'מסך סיום — כיתוב מתחת ל-QR Code'],
+  ['uiCopy.stationTypes.unexpectedEventLabel', copy.stationTypes.unexpectedEventLabel,     'תג על תחנות בלת"מ במסלול'],
+  ['uiCopy.points.correct',                    copy.points.correct,                        'הודעת תוצאה — ניקוד תשובה נכונה'],
+  ['uiCopy.points.partial',                    copy.points.partial,                        'הודעת תוצאה — ניקוד תשובה חלקית'],
+  ['uiCopy.points.wrong',                      copy.points.wrong,                          'הודעת תוצאה — ניקוד תשובה שגויה'],
+  ['uiCopy.outcomeBanner.correct',             ob.correct  || '{group}: {msg}',            'לוח מנחה — תבנית באנר תוצאה (נכון)'],
+  ['uiCopy.outcomeBanner.partial',             ob.partial  || '{group}: {msg}',            'לוח מנחה — תבנית באנר תוצאה (חלקי)'],
+  ['uiCopy.outcomeBanner.wrong',               ob.wrong    || '{group}: {msg}',            'לוח מנחה — תבנית באנר תוצאה (שגוי)'],
+  ['uiCopy.boardSections.a',                   copy.boardSections.a,                       'לוח מנחה — כותרת מקטע ראשון על ציר הזמן'],
+  ['uiCopy.boardSections.aMonths',             copy.boardSections.aMonths,                 'לוח מנחה — תווית חודשים למקטע א'],
+  ['uiCopy.boardSections.b',                   copy.boardSections.b,                       'לוח מנחה — כותרת מקטע שני'],
+  ['uiCopy.boardSections.bMonths',             copy.boardSections.bMonths,                 'לוח מנחה — תווית חודשים למקטע ב'],
+  ['uiCopy.boardSections.c',                   copy.boardSections.c,                       'לוח מנחה — כותרת מקטע שלישי'],
+  ['uiCopy.boardSections.cMonths',             copy.boardSections.cMonths,                 'לוח מנחה — תווית חודשים למקטע ג'],
 ]));
 ch.push(gap());
 
-// ── 15. מילון מושגים ────────────────────────────────────
-ch.push(h1('15. מילון מושגים — מגירת התזכורת'), note('מקור: gameContent.json → reminderDefinitions[]'));
+// ── 19. UE modal (hardcoded) ─────────────────────────────
+ch.push(h1('19. חלון תחנה — גלגל הבלת"מ'), note('מקור: hardcoded HTML (renderStationModal → unexpected_event branch)'));
 ch.push(makeTable([
-  ['reminderDefinitions[0].term',       'משימה',        'מגירת תזכורת — שם המושג (מודגש)'],
-  ['reminderDefinitions[0].definition', 'פעולה מרכזית שמבצעים בפועל להשגת יעד.', 'מגירת תזכורת — הגדרה מתחת למושג'],
-  ['reminderDefinitions[1].term',       'מדד תוצאה',   'מגירת תזכורת — שם המושג'],
-  ['reminderDefinitions[1].definition', 'מדד הבוחן אם היעד הושג — נמדד מול היעד.', 'מגירת תזכורת — הגדרה'],
-  ['reminderDefinitions[2].term',       'מדד תפוקה',   'מגירת תזכורת — שם המושג'],
-  ['reminderDefinitions[2].definition', 'מדד הבוחן את ביצוע המשימה — נמדד מול המשימה. סוגים: בינארי, כמותי עולה, כמותי יורד, אחוזים.', 'מגירת תזכורת — הגדרה'],
-  ['reminderDefinitions[3].term',       'מדד תגמול',   'מגירת תזכורת — שם המושג'],
-  ['reminderDefinitions[3].definition', 'מדד המגדיר כיצד מודדים הצלחה של יחידה לצורך תגמול, כולל נוסחה, משקל וספי ביצוע.', 'מגירת תזכורת — הגדרה'],
+  ['hardcoded: UE title',               'גלגל הבלת"מ',                     'חלון בלת"מ — כותרת ראשית'],
+  ['hardcoded: UE result header',       '⚡ תוצאת הגלגל',                  'חלון בלת"מ — כותרת קטע לאחר סיבוב'],
+  ['hardcoded: UE no-delay badge',      '✓ ממשיכים קדימה — אין עיכוב',    'חלון בלת"מ — תג ירוק כשתוצאה: אין עיכוב'],
+  ['hardcoded: UE delay badge',         '⏸ הקבוצה ממתינה סבב אחד',        'חלון בלת"מ — תג כתום כשתוצאה: עיכוב'],
+  ['hardcoded: UE confirm button',      'הבנו, ממשיכים ←',                 'חלון בלת"מ — כפתור אישור וסגירה (בלת"מ חדש)'],
+  ['hardcoded: UE already-used button', 'ממשיכים קדימה ←',                 'חלון בלת"מ — כפתור כשהבלת"מ כבר שומש'],
+  ['hardcoded: close tooltip',          'סגירה ללא מעבר תור',              'חלון בלת"מ — tooltip על כפתור ה-X'],
 ]));
 ch.push(gap());
 
-// ── 16. קבוצות ──────────────────────────────────────────
-ch.push(h1('16. קבוצות'), note('מקור: gameContent.json → groups[].label / groups[].divisionName'));
-ch.push(makeTable([
-  ['groups[group_1].label',        'קבוצה 1',                      'לוח מנחה + תיק מובייל — שם הקבוצה'],
-  ['groups[group_1].divisionName', 'חטיבת נייד',                   'לוח מנחה + תיק מובייל — שם החטיבה'],
-  ['groups[group_2].label',        'קבוצה 2',                      'לוח מנחה + תיק מובייל — שם הקבוצה'],
-  ['groups[group_2].divisionName', 'חטיבת משאבי אנוש',             'לוח מנחה + תיק מובייל — שם החטיבה'],
-  ['groups[group_3].label',        'קבוצה 3',                      'לוח מנחה + תיק מובייל — שם הקבוצה'],
-  ["groups[group_3].divisionName", 'חטיבת בטיחות, ביטחון ואיכ"ס', 'לוח מנחה + תיק מובייל — שם החטיבה'],
-  ['groups[group_4].label',        'קבוצה 4',                      'לוח מנחה + תיק מובייל — שם הקבוצה'],
-  ['groups[group_4].divisionName', 'חטיבת פיתוח עסקי',             'לוח מנחה + תיק מובייל — שם החטיבה'],
-]));
-ch.push(gap());
-
-// ── 17. חודשים ──────────────────────────────────────────
-ch.push(h1('17. חודשים'), note('מקור: gameContent.json → uiCopy.months[]'));
-ch.push(makeTable([
-  ['uiCopy.months[0]', 'יוני',    'לוח מנחה — תווית חודש על ציר הזמן'],
-  ['uiCopy.months[1]', 'יולי',    'לוח מנחה — תווית חודש על ציר הזמן'],
-  ['uiCopy.months[2]', 'אוגוסט',  'לוח מנחה — תווית חודש על ציר הזמן'],
-  ['uiCopy.months[3]', 'ספטמבר',  'לוח מנחה — תווית חודש על ציר הזמן'],
-  ['uiCopy.months[4]', 'אוקטובר', 'לוח מנחה — תווית חודש על ציר הזמן'],
-  ['uiCopy.months[5]', 'נובמבר',  'לוח מנחה — תווית חודש על ציר הזמן'],
-  ['uiCopy.months[6]', 'דצמבר',   'לוח מנחה — תווית חודש על ציר הזמן'],
-  ['uiCopy.months[7]', 'ינואר',   'לוח מנחה — תווית חודש על ציר הזמן'],
-]));
-ch.push(gap());
-
-// ── 18. מיקרו-קופי שונות ────────────────────────────────
-ch.push(h1('18. מיקרו-קופי שונות'), note('מקור: gameContent.json → uiCopy שונות'));
-ch.push(makeTable([
-  ['uiCopy.stationTypes.unexpectedEventLabel', 'בלת"מ',                        'תג על תחנות בלת"מ במסלול'],
-  ['uiCopy.points.correct',                    '10 נקודות',                    'הודעת תוצאה — ניקוד תשובה נכונה'],
-  ['uiCopy.points.partial',                    '5 נקודות',                     'הודעת תוצאה — ניקוד תשובה חלקית'],
-  ['uiCopy.points.wrong',                      '0 נקודות',                     'הודעת תוצאה — ניקוד תשובה שגויה'],
-  ['uiCopy.outcomeBanner.correct/partial/wrong','{group}: {msg}',              'לוח מנחה — תבנית פורמט באנר תוצאה'],
-  ['uiCopy.boardSections.a',                   'מקטע א — הקמת תכנית עבודה',   'לוח מנחה — כותרת מקטע ראשון על ציר הזמן'],
-  ['uiCopy.boardSections.aMonths',             'יוני — ספטמבר',               'לוח מנחה — תווית חודשים למקטע א'],
-  ['uiCopy.boardSections.b',                   'המשך תכנית עבודה ואישורים',   'לוח מנחה — כותרת מקטע שני'],
-  ['uiCopy.boardSections.bMonths',             'ספטמבר — נובמבר',             'לוח מנחה — תווית חודשים למקטע ב'],
-  ['uiCopy.boardSections.c',                   'הקמת מודל תגמול',             'לוח מנחה — כותרת מקטע שלישי'],
-  ['uiCopy.boardSections.cMonths',             'דצמבר — ינואר',               'לוח מנחה — תווית חודשים למקטע ג'],
-]));
-ch.push(gap());
-
-// ── 19. חלון תחנה — בלת"מ ───────────────────────────────
-ch.push(h1('19. חלון תחנה — בלת"מ'), note('מקור: hardcoded HTML (renderStationModal → unexpected_event branch)'));
-ch.push(makeTable([
-  ['hardcoded: UE title',                'גלגל הבלת"מ',                     'חלון בלת"מ — כותרת ראשית בראש החלון'],
-  ['hardcoded: UE result header',        '⚡ תוצאת הגלגל',                  'חלון בלת"מ — כותרת קטע לאחר סיבוב הגלגל'],
-  ['hardcoded: UE no-delay badge',       '✓ ממשיכים קדימה — אין עיכוב',    'חלון בלת"מ — תג ירוק כשתוצאת הגלגל: אין עיכוב'],
-  ['hardcoded: UE delay badge',          '⏸ הקבוצה ממתינה סבב אחד',        'חלון בלת"מ — תג כתום כשתוצאת הגלגל: עיכוב'],
-  ['hardcoded: UE confirm button',       'הבנו, ממשיכים ←',                 'חלון בלת"מ — כפתור אישור וסגירה (בלת"מ חדש)'],
-  ['hardcoded: UE already-used button',  'ממשיכים קדימה ←',                 'חלון בלת"מ — כפתור כשהבלת"מ כבר שומש בעבר'],
-  ['hardcoded: close tooltip',           'סגירה ללא מעבר תור',              'חלון בלת"מ — tooltip על כפתור ה-X'],
-]));
-ch.push(gap());
-
-// ── 20. פופ-אפ תוצאה ─────────────────────────────────────
+// ── 20. Outcome popup (hardcoded) ────────────────────────
 ch.push(h1('20. פופ-אפ תוצאה (אחרי נכון / חלקי / שגוי)'), note('מקור: hardcoded HTML (renderStationModal → outcomePopup)'));
 ch.push(makeTable([
-  ['hardcoded: outcome icon — correct',   '✅',                                       'פופ-אפ תוצאה — אייקון גדול בראש (תשובה נכונה)'],
-  ['hardcoded: outcome icon — partial',   '⚠️',                                       'פופ-אפ תוצאה — אייקון (תשובה חלקית)'],
-  ['hardcoded: outcome icon — wrong',     '❌',                                       'פופ-אפ תוצאה — אייקון (תשובה שגויה)'],
-  ['hardcoded: outcome title — correct',  'תשובה נכונה!',                            'פופ-אפ תוצאה — כותרת ירוקה גדולה'],
-  ['hardcoded: outcome title — partial',  'תשובה חלקית',                             'פופ-אפ תוצאה — כותרת כתומה'],
-  ['hardcoded: outcome title — wrong',    'תשובה שגויה',                             'פופ-אפ תוצאה — כותרת אדומה'],
-  ['hardcoded: outcome points — correct', '+10',                                      'פופ-אפ תוצאה — מספר הנקודות (גדול)'],
-  ['hardcoded: outcome points — partial', '+5',                                       'פופ-אפ תוצאה — מספר הנקודות'],
-  ['hardcoded: outcome points — wrong',   '+0',                                       'פופ-אפ תוצאה — מספר הנקודות'],
-  ['hardcoded: outcome points suffix',    'נקודות',                                   'פופ-אפ תוצאה — טקסט ליד מספר הנקודות'],
-  ['hardcoded: outcome next — wrong',     'מתקדמים לתחנה הבאה — ממתינים סבב אחד ⏳', 'פופ-אפ תוצאה — הודעת השלכה (תשובה שגויה)'],
-  ['hardcoded: outcome next — correct',   'מתקדמים לתחנה הבאה 🚀',                  'פופ-אפ תוצאה — הודעת השלכה (נכון/חלקי)'],
-  ['hardcoded: outcome dismiss button',   'הבנו, ממשיכים ←',                         'פופ-אפ תוצאה — כפתור סגירה'],
+  ['hardcoded: outcome icon — correct',   '✅',                                        'פופ-אפ תוצאה — אייקון גדול (נכון)'],
+  ['hardcoded: outcome icon — partial',   '⚠️',                                        'פופ-אפ תוצאה — אייקון (חלקי)'],
+  ['hardcoded: outcome icon — wrong',     '❌',                                        'פופ-אפ תוצאה — אייקון (שגוי)'],
+  ['hardcoded: outcome title — correct',  'תשובה נכונה!',                             'פופ-אפ תוצאה — כותרת ירוקה גדולה'],
+  ['hardcoded: outcome title — partial',  'תשובה חלקית',                              'פופ-אפ תוצאה — כותרת כתומה'],
+  ['hardcoded: outcome title — wrong',    'תשובה שגויה',                              'פופ-אפ תוצאה — כותרת אדומה'],
+  ['hardcoded: outcome points — correct', '+10',                                       'פופ-אפ תוצאה — מספר הנקודות (גדול)'],
+  ['hardcoded: outcome points — partial', '+5',                                        'פופ-אפ תוצאה — מספר הנקודות'],
+  ['hardcoded: outcome points — wrong',   '+0',                                        'פופ-אפ תוצאה — מספר הנקודות'],
+  ['hardcoded: outcome points suffix',    'נקודות',                                    'פופ-אפ תוצאה — טקסט ליד מספר הנקודות'],
+  ['hardcoded: outcome next — wrong',     'מתקדמים לתחנה הבאה — ממתינים סבב אחד ⏳', 'פופ-אפ תוצאה — הודעת השלכה (שגוי)'],
+  ['hardcoded: outcome next — correct',   'מתקדמים לתחנה הבאה 🚀',                   'פופ-אפ תוצאה — הודעת השלכה (נכון/חלקי)'],
+  ['hardcoded: outcome dismiss button',   'הבנו, ממשיכים ←',                          'פופ-אפ תוצאה — כפתור סגירה'],
 ]));
 ch.push(gap());
 
-// ── 21. תצוגת מובייל — כפתור חזרה ───────────────────────
-ch.push(h1('21. תצוגת מובייל — כפתור חזרה ללוח'), note('מקור: hardcoded HTML (renderMobile → backBar) — מוצג רק כשהמנחה פותחת תיק מתוך הלוח'));
+// ── 21. Mobile back button (hardcoded) ───────────────────
+ch.push(h1('21. תצוגת מובייל — כפתור חזרה ללוח'), note('מקור: hardcoded HTML (renderMobile → floating backBtn) — מוצג רק כשהמנחה פותחת תיק מתוך הלוח'));
 ch.push(makeTable([
-  ['hardcoded: mobile backBar button', '← חזרה ללוח', 'תיק מובייל (כשנפתח על-ידי המנחה) — כפתור בראש הדף לחזרה ללוח'],
+  ['hardcoded: mobile backBtn emoji', '🏠', 'תיק מובייל (כשנפתח ע"י המנחה) — כפתור צף בצד ימין לחזרה ללוח'],
 ]));
 ch.push(gap());
 
-// ── 22. תצוגת תוכן פיתוח (☰) ────────────────────────────
-ch.push(h1('22. תצוגת תוכן פיתוח (כפתור ☰)'), note('מקור: hardcoded HTML (renderDevContentView) — נגישה דרך כפתור ☰ בפאנל הטלפונים'));
+// ── 22. Dev content view (hardcoded) ─────────────────────
+ch.push(h1('22. תצוגת תוכן פיתוח (כפתור ☰)'), note('מקור: hardcoded HTML (renderDevContentView) — נגישה דרך כפתור ☰'));
 ch.push(makeTable([
-  ['hardcoded: devContent header',               'סקירת תוכן — כל התחנות',  'תצוגת ☰ — כותרת ראשית של הדף'],
-  ['hardcoded: devContent station count suffix', 'תחנות',                   'תצוגת ☰ — ״16 תחנות״ (כיתוב ספירה)'],
-  ['hardcoded: devContent — no transition msg',  'תחנת מעבר',               'תצוגת ☰ — כשתחנת מעבר אין לה תוכן מיוחד'],
-  ['hardcoded: devContent — no UE items',        'אין פריטים',              'תצוגת ☰ — כשתחנת בלת"מ ריקה מתוכן'],
-  ['hardcoded: devContent — no question',        'אין שאלה',                'תצוגת ☰ — כשתחנה מקצועית ללא שאלה'],
-  ['hardcoded: devContent type badge',           'מקצועית / בלת"מ / מעבר / רפלקציה', 'תצוגת ☰ — תג סוג תחנה על כל כרטיס'],
+  ['hardcoded: devContent header',               'סקירת תוכן — כל התחנות',            'תצוגת ☰ — כותרת ראשית'],
+  ['hardcoded: devContent station count suffix', 'תחנות',                              'תצוגת ☰ — ספירת תחנות'],
+  ['hardcoded: devContent — no transition msg',  'תחנת מעבר',                          'תצוגת ☰ — כשתחנת מעבר ללא תוכן מיוחד'],
+  ['hardcoded: devContent — no UE items',        'אין פריטים',                         'תצוגת ☰ — כשתחנת בלת"מ ריקה'],
+  ['hardcoded: devContent — no question',        'אין שאלה',                           'תצוגת ☰ — כשתחנה מקצועית ללא שאלה'],
+  ['hardcoded: devContent type badge',           'מקצועית / בלת"מ / מעבר / רפלקציה', 'תצוגת ☰ — תג סוג תחנה'],
 ]));
 ch.push(gap());
 
-// ── 23. מיקרו-קופי DEV MODE בלבד ──────────────────────────
-ch.push(h1('23. מיקרו-קופי DEV MODE בלבד'), note('מקור: hardcoded HTML — מופיע רק כשהאפליקציה רצה עם ?devmode=true. לא נראה למשתתפים.'));
+// ── 23. DEV MODE only (hardcoded) ────────────────────────
+ch.push(h1('23. מיקרו-קופי DEV MODE בלבד'), note('מקור: hardcoded HTML — מופיע רק עם ?devmode=true. לא נראה למשתתפים.'));
 ch.push(makeTable([
-  ['hardcoded: nav-content button',               '📋 תוכן',                           'נאב-בר — כפתור ניווט לתצוגת תוכן פיתוח (נסתר; מופיע רק ב-DEV mode)'],
-  ['hardcoded: DEV UE results header',           '⚙ כל התוצאות האפשריות (DEV MODE)', 'חלון בלת"מ — כותרת קטע בחירת תוצאה ידנית'],
-  ['hardcoded: DEV UE select button',            '⚡ בחר',                            'חלון בלת"מ — כפתור בחירת תוצאה ספציפית'],
-  ['hardcoded: DEV UE no-delay option',          '✓ אין עיכוב',                       'חלון בלת"מ — אפשרות: תוצאה ללא עיכוב'],
-  ['hardcoded: DEV UE delay option',             '⏸ המתנה סבב',                       'חלון בלת"מ — אפשרות: תוצאה עם עיכוב'],
-  ['hardcoded: DEV task error marker',           '⚠️ טעות מוטמנת',                    'תיק מובייל — תג על משימה שיש בה טעות מוטמנת'],
-  ['hardcoded: DEV station hint prefix',         '📍 תחנה:',                          'תיק מובייל — תווית הינט לפיתוח'],
-  ['hardcoded: DEV hint labels',                 'שאלה: / מה שגוי: / תיקון:',        'תיק מובייל — תוויות הינט לפיתוח'],
-  ['hardcoded: renderDevView title',             '📋 סקירת תוכן — מצב פיתוח',        'תצוגת DEV — כותרת ראשית'],
-  ['hardcoded: renderDevView incomplete badge',  '⚠ להשלמה',                          'תצוגת DEV — תג על תחנה עם שדות חסרים'],
-  ['hardcoded: renderDevView complete badge',    '✓ הכל מלא',                         'תצוגת DEV — תג על תחנה שלמה'],
-  ['hardcoded: renderDevView field suffix',      'שדות לא מלאים',                     'תצוגת DEV — כיתוב מספר שדות חסרים'],
-  ['hardcoded: renderDevView note',              'שדות ... דורשים תיאום עם הלקוחה', 'תצוגת DEV — הערה על שדות הממתינים לאישור'],
-  ['hardcoded: renderDevView section headers',   'תחנות מקצועיות / ⚡ תחנות בלת"מ / מודל תגמול / משימות גלויות / מסך סיום', 'תצוגת DEV — כותרות קטגוריות'],
-  ['hardcoded: renderDevView waitRounds label',  'המתנה: {n} סבבים',                  'תצוגת DEV — כמה סבבי המתנה מוגדרים לתחנה'],
+  ['hardcoded: nav-content button',               '📋 תוכן',                                         'נאב-בר — כפתור ניווט (מופיע רק ב-DEV mode)'],
+  ['hardcoded: DEV UE results header',           '⚙ כל התוצאות האפשריות (DEV MODE)',               'חלון בלת"מ — כותרת קטע בחירת תוצאה ידנית'],
+  ['hardcoded: DEV UE select button',            '⚡ בחר',                                          'חלון בלת"מ — כפתור בחירת תוצאה ספציפית'],
+  ['hardcoded: DEV task error marker',           '⚠️ טעות מוטמנת',                                  'תיק מובייל — תג על משימה שיש בה טעות מוטמנת'],
+  ['hardcoded: DEV station hint prefix',         '📍 תחנה:',                                        'תיק מובייל — תווית הינט לפיתוח'],
+  ['hardcoded: renderDevView title',             '📋 סקירת תוכן — מצב פיתוח',                       'תצוגת DEV — כותרת ראשית'],
+  ['hardcoded: renderDevView incomplete badge',  '⚠ להשלמה',                                        'תצוגת DEV — תג על תחנה עם שדות חסרים'],
+  ['hardcoded: renderDevView complete badge',    '✓ הכל מלא',                                       'תצוגת DEV — תג על תחנה שלמה'],
+  ['hardcoded: renderDevView section headers',   'תחנות מקצועיות / ⚡ תחנות בלת"מ / מודל תגמול', 'תצוגת DEV — כותרות קטגוריות'],
 ]));
+ch.push(gap());
 
-// ── 24–27. תוכן תיק מובייל — לפי קבוצה ─────────────────
-
+// ── 24–27. Mobile folder content per group (dynamic) ─────
 function taskRows(tid, t) {
   const cls = t.classification === 'top10' ? 'Top 10' : 'שוטפת';
   return [
@@ -542,15 +485,15 @@ function taskRows(tid, t) {
     [tid + '.companyGoal',       t.companyGoal,       'תיק מובייל — שדה "מטרת חברה"'],
     [tid + '.goal',              t.goal,              'תיק מובייל — שדה "יעד"'],
     [tid + '.outcomeMetric',     t.outcomeMetric,     'תיק מובייל — שדה "מדד תוצאה"'],
-    [tid + '.classification',    cls,                 'תיק מובייל — שדה "סיווג" (Top 10 / שוטפת)'],
+    [tid + '.classification',    cls,                 'תיק מובייל — שדה "סיווג"'],
     [tid + '.taskDescription',   t.taskDescription,   'תיק מובייל — שדה "תיאור משימה"'],
     [tid + '.annualAchievement', t.annualAchievement, 'תיק מובייל — שדה "הישג שנתי נדרש"'],
     [tid + '.outputMetricType',  t.outputMetricType,  'תיק מובייל — שדה "סוג מדד תפוקה"'],
-    [tid + '.milestones.Q1',     t.milestones.Q1,     'תיק מובייל — אבן דרך Q1 (רבעון 1)'],
-    [tid + '.milestones.Q2',     t.milestones.Q2,     'תיק מובייל — אבן דרך Q2 (רבעון 2)'],
-    [tid + '.milestones.Q3',     t.milestones.Q3,     'תיק מובייל — אבן דרך Q3 (רבעון 3)'],
-    [tid + '.milestones.Q4',     t.milestones.Q4,     'תיק מובייל — אבן דרך Q4 (רבעון 4)'],
-    [tid + '.devHint',           t.devHint,           'DEV MODE — רמז "⚠️ טעות מוטמנת" (לא נראה למשתתפים)'],
+    [tid + '.milestones.Q1',     t.milestones ? t.milestones.Q1 : '—', 'תיק מובייל — אבן דרך Q1'],
+    [tid + '.milestones.Q2',     t.milestones ? t.milestones.Q2 : '—', 'תיק מובייל — אבן דרך Q2'],
+    [tid + '.milestones.Q3',     t.milestones ? t.milestones.Q3 : '—', 'תיק מובייל — אבן דרך Q3'],
+    [tid + '.milestones.Q4',     t.milestones ? t.milestones.Q4 : '—', 'תיק מובייל — אבן דרך Q4'],
+    [tid + '.devHint',           t.devHint || '—',    'DEV MODE — רמז "⚠️ טעות מוטמנת"'],
   ];
 }
 
@@ -562,8 +505,8 @@ function compRows(gid, m) {
     [gid + '.comp.weight',               m.weight,               'תיק מובייל — שדה "משקל"'],
     [gid + '.comp.performanceThresholds',m.performanceThresholds,'תיק מובייל — שדה "ספי ביצוע"'],
     [gid + '.comp.dataSource',           m.dataSource,           'תיק מובייל — שדה "מקור נתונים"'],
-    [gid + '.comp.notes',                m.notes,                'תיק מובייל — הערת DEV (לא נראית למשתתפים)'],
-    [gid + '.comp.devHint',              m.devHint,              'DEV MODE — רמז "⚠️ טעות מוטמנת" במודל תגמול'],
+    [gid + '.comp.notes',                m.notes || '—',         'תיק מובייל — הערת DEV'],
+    [gid + '.comp.devHint',              m.devHint || '—',       'DEV MODE — רמז "⚠️ טעות מוטמנת" במודל תגמול'],
   ];
 }
 
@@ -578,13 +521,12 @@ const GROUPS_CONTENT = Object.keys(GC.visibleTasks).map(gid => ({
   gid,
   label: GROUP_LABELS[gid] || gid,
   tasks: GC.visibleTasks[gid],
-  comp: GC.compensationModels[gid],
+  comp:  GC.compensationModels[gid],
 }));
-
 
 GROUPS_CONTENT.forEach((g, gi) => {
   const sNum = 24 + gi;
-  ch.push(h1(`${sNum}. תוכן תיק מובייל — ${g.label}`), note(`מקור: moadilim-poc.html → const GC → visibleTasks.${g.gid} + compensationModels.${g.gid}`));
+  ch.push(h1(`${sNum}. תוכן תיק מובייל — ${g.label}`), note(`מקור: GC.visibleTasks.${g.gid} + GC.compensationModels.${g.gid}`));
   ch.push(h2('משימות לבדיקה'));
   g.tasks.forEach((t, ti) => {
     ch.push(h2(`משימה ${ti + 1}: ${t.taskName}`));
@@ -596,95 +538,48 @@ GROUPS_CONTENT.forEach((g, gi) => {
   ch.push(gap());
 });
 
-// ── 28. תשובות לפי קבוצה ותחנה ─────────────────────────
-ch.push(h1('28. תשובות לפי קבוצה ותחנה'), note('מקור: gameContent.json → stationQuestions[].answersByGroup — מוצגות בכרטיס התשובה אחרי לחיצת "חשפו תשובה"'));
-
-const ANSWERS_BY_STATION = [
-  { qid: 'q_company_goal', stationName: 'מטרת חברה ויעד', answers: [
-    { g: 'קבוצה 1', taskName: 'שדרוג סלון נוסעים', whatIsWrong: 'המשימה שויכה בטעות למטרה "פיתוח מנופי צמיחה" וליעד עסקי.', correctFix: 'לשייך למטרה: השירות כערך עליון, וליעד: הקניית רמת שירות מיטבית ללקוחות הרכבת.' },
-    { g: 'קבוצה 2', taskName: 'צמצום ימי הכשרות נהגי נוסעים בקורס ישיר', whatIsWrong: 'המשימה שויכה בטעות למטרה "שירות כערך עליון".', correctFix: 'לשייך למטרה "פיתוח ושימור ההון האנושי" וליעד של פיתוח מקצועיות, כשירות ותרבות למידה.' },
-    { g: 'קבוצה 3', taskName: 'היערכות הרכבת בחירום', whatIsWrong: 'היעד שהוגדר הוא "עמידה בציות וברגולציה", אך זה לא היעד המדויק.', correctFix: 'לשייך ליעד "מימוש מיטבי של התוכנית להפחתת סיכונים".' },
-    { g: 'קבוצה 4', taskName: 'הרחבת פעילות מסחרית בתחנות מרכזיות', whatIsWrong: 'המשימה שויכה בטעות למטרה הקשורה לשירות נוסעים בלבד.', correctFix: 'לשייך ל"פיתוח מנופי צמיחה" וליעד של פעילות כלכלית, רווחית ועסקית.' },
-  ]},
-  { qid: 'q_outcome_metric', stationName: 'מדד תוצאה', answers: [
-    { g: 'קבוצה 1', taskName: 'קליטת קרונועים חשמליים מסוג DDEMU', whatIsWrong: '"קליטת 50 קרונועים" הוגדרה כמדד תוצאה.', correctFix: 'זו תפוקה/ביצוע משימה. מדד תוצאה מתאים יותר יהיה קשור לשיעור זמינות או כשירות הצי.' },
-    { g: 'קבוצה 2', taskName: 'הקמת מתחם גיוס חדש', whatIsWrong: '"בניית מתחם גיוס" הוגדרה כמדד תוצאה.', correctFix: 'זו משימה/פעולה. מדד תוצאה צריך לבחון את השפעת המהלך, למשל שיפור חוויית מועמד או קיצור תהליך גיוס.' },
-    { g: 'קבוצה 3', taskName: 'הטמעת בטיחות בכלל החטיבות', whatIsWrong: '"הטמעת בטיחות" הוגדרה כמדד תוצאה.', correctFix: 'זו פעולה רחבה. מדד תוצאה מתאים יכול להיות צמצום ימי היעדרות עקב תאונות עבודה או הפחתת אירועי בטיחות.' },
-    { g: 'קבוצה 4', taskName: 'שיווק והשכרה של שטחי מסחר', whatIsWrong: 'המשימה עצמה הוגדרה כמדד תוצאה.', correctFix: '"שיווק והשכרה" היא פעולה; מדד תוצאה מתאים הוא סך הכנסות מסחר או שיעור תפוסת שטחי מסחר.' },
-  ]},
-  { qid: 'q_top10', stationName: 'Top 10 / שוטפת', answers: [
-    { g: 'קבוצה 1', taskName: 'הגשת דוח רבעוני למנכ"ל', whatIsWrong: 'המשימה סווגה כ-Top 10.', correctFix: 'זו משימה שוטפת / אדמיניסטרטיבית ולא משימה בנתיב הקריטי.' },
-    { g: 'קבוצה 2', taskName: 'הכנת חומרים לדיוני הנהלה בנושא הכשרות', whatIsWrong: 'המשימה סווגה כ-Top 10.', correctFix: 'זו משימה תומכת/שוטפת, אלא אם היא חלק ממהלך אסטרטגי מוגדר.' },
-    { g: 'קבוצה 3', taskName: 'ניטור אוויר בתחנות הרכבת לפי רגולציה', whatIsWrong: 'המשימה סווגה כשוטפת בלבד.', correctFix: 'מאחר שמדובר במשימה רגולטורית ובנתיב קריטי לציות ולבטיחות, ניתן לסווגה כ-Top 10.' },
-    { g: 'קבוצה 4', taskName: 'מעקב יומי אחרי מלאים/נכסים מסחריים', whatIsWrong: 'המשימה סווגה כ-Top 10.', correctFix: 'זו פעילות שוטפת, לא משימה אסטרטגית בנתיב הקריטי.' },
-  ]},
-  { qid: 'q_measurable', stationName: 'ניסוח מדיד', answers: [
-    { g: 'קבוצה 1', taskName: 'שיפור זמינות הצי הנייד', whatIsWrong: 'הניסוח כללי מדי ואינו מגדיר פעולה, היקף או מועד.', correctFix: 'למשל: "קליטת 50 קרונועים חשמליים מסוג DDEMU עד סוף השנה, לפי אבני דרך רבעוניות".' },
-    { g: 'קבוצה 2', taskName: 'הנגשת מידע למועמדים חדשים', whatIsWrong: '"הנגשת מידע" הוא ניסוח עמום ולא מדיד.', correctFix: 'למשל: "הקמת אזור מידע דיגיטלי למועמדים הכולל 5 תכנים מרכזיים עד סוף רבעון 2".' },
-    { g: 'קבוצה 3', taskName: 'הטמעת תרבות בטיחות בכלל החטיבות', whatIsWrong: 'לא ברור מה ייחשב הטמעה, באילו חטיבות, באיזה היקף ומתי.', correctFix: 'למשל: "ביצוע 4 סדנאות בטיחות לחטיבות יעד והטמעת נוהל אחיד עד סוף רבעון 3".' },
-    { g: 'קבוצה 4', taskName: 'קידום מסחר בתחנות', whatIsWrong: 'ניסוח כללי מדי.', correctFix: 'למשל: "השכרת 10 שטחי מסחר חדשים בתחנות מרכזיות עד סוף רבעון 3".' },
-  ]},
-  { qid: 'q_output_metric', stationName: 'מדד תפוקה', answers: [
-    { g: 'קבוצה 1', taskName: 'קליטת קרונועים חשמליים מסוג DDEMU', whatIsWrong: 'סוג מדד התפוקה הוגדר כבינארי.', correctFix: 'כמותי עולה, כי מודדים כמות מצטברת של קרונועים שנקלטו.' },
-    { g: 'קבוצה 2', taskName: 'צמצום ימי הכשרות נהגי נוסעים', whatIsWrong: 'סוג מדד התפוקה הוגדר ככמותי עולה.', correctFix: 'כמותי יורד או אחוז הפחתה, כי שואפים לצמצם ימי הכשרה.' },
-    { g: 'קבוצה 3', taskName: 'צמצום ימי היעדרות עקב תאונת עבודה', whatIsWrong: 'סוג מדד התפוקה הוגדר ככמותי עולה.', correctFix: 'כמותי יורד, כי שואפים להפחית מספר ימים/מקרים.' },
-    { g: 'קבוצה 4', taskName: 'הרחבת פעילות מסחרית בתחנות', whatIsWrong: 'סוג מדד התפוקה הוגדר כבינארי.', correctFix: 'כמותי עולה, למשל מספר שטחי מסחר שהושכרו או היקף שטח מסחרי פעיל.' },
-  ]},
-  { qid: 'q_milestones', stationName: 'אבני דרך רבעוניות', answers: [
-    { g: 'קבוצה 1', taskName: 'קליטת קרונועים DDEMU', whatIsWrong: 'כל אבני הדרך מרוכזות ברבעון 4.', correctFix: 'לפרוס לאורך השנה: Q1: 10 קרונועים, Q2: 10, Q3: 10, Q4: 20.' },
-    { g: 'קבוצה 2', taskName: 'הנגשת מידע למועמדים', whatIsWrong: 'כל העבודה הוגדרה לרבעון 4.', correctFix: 'Q1: אפיון תכנים, Q2: כתיבה והפקה, Q3: העלאה לאוויר, Q4: בדיקה ושיפור.' },
-    { g: 'קבוצה 3', taskName: 'ניטור אוויר בתחנות', whatIsWrong: 'אבני הדרך מתחילות מאוחר מדי, רק Q3–Q4.', correctFix: 'Q1: אפיון צרכים ותקציב, Q2: רכש/התקשרות, Q3: התקנה, Q4: בדיקה והטמעה.' },
-    { g: 'קבוצה 4', taskName: 'הרחבת פעילות מסחרית בתחנות', whatIsWrong: 'כל ההשכרות מתוכננות ל-Q4.', correctFix: 'Q1: איתור שטחים, Q2: מכרז/שיווק, Q3: חתימה, Q4: הפעלה.' },
-  ]},
-  { qid: 'q_reward_metric', stationName: 'מדד תגמול', answers: [
-    { g: 'קבוצה 1', taskName: 'זמינות וכשירות צי נייד', whatIsWrong: 'המדד הוגדר "שיפור זמינות הצי" והנוסחה "לפי עמידה ביעד" – שניהם עמומים.', correctFix: 'להגדיר נוסחה ברורה: זמינות בפועל / יעד זמינות שנתי × 100, כולל מקור נתונים.' },
-    { g: 'קבוצה 2', taskName: 'תהליכי גיוס והכשרות', whatIsWrong: 'המדד "שיפור תהליכי גיוס" עמום, והנוסחה "מספר מועמדים שטופלו" אינה מודדת שיפור.', correctFix: 'למשל: "קיצור משך תהליך הגיוס הממוצע", עם נוסחה: משך תהליך בפועל / יעד שנתי × 100.' },
-    { g: 'קבוצה 3', taskName: 'בטיחות', whatIsWrong: 'המדד "שיפור בטיחות" כללי מדי, והנוסחה אינה מבהירה כיוון מדידה.', correctFix: 'למשל: "צמצום ימי היעדרות עקב תאונת עבודה", עם נוסחה ברורה ומקור נתונים.' },
-    { g: 'קבוצה 4', taskName: 'הכנסות מסחר', whatIsWrong: 'הנוסחה "הכנסות בפועל" חלקית – לא ברור ביחס למה נמדדת הצלחה.', correctFix: 'הכנסות מסחר בפועל / יעד הכנסות שנתי × 100.' },
-  ]},
-  { qid: 'q_weight', stationName: 'משקל וספי ביצוע', answers: [
-    { g: 'קבוצה 1', taskName: 'זמינות צי', whatIsWrong: 'המשקולות במדדים מסתכמות ל-105 במקום 100.', correctFix: 'לעדכן את המשקולות כך שסך כל המדדים יהיה 100.' },
-    { g: 'קבוצה 2', taskName: 'גיוס והכשרות', whatIsWrong: 'המשקלים 30, 30, 25, 20 מסתכמים ל-105.', correctFix: 'לתקן כך שסך המשקולות יהיה 100.' },
-    { g: 'קבוצה 3', taskName: 'בטיחות', whatIsWrong: 'ספי הביצוע לא מאתגרים: 100 = עד 200 אירועים, 70 = עד 250 אירועים, ללא הצדקה.', correctFix: 'להגדיר ספים ריאליים, מאתגרים וברורים, המבוססים על יעד ומקור נתונים.' },
-    { g: 'קבוצה 4', taskName: 'הכנסות מסחר', whatIsWrong: 'הספים צפופים מדי: 100 = 5 מיליון, 70 = 4.9 מיליון, 0 = 4.8 מיליון.', correctFix: 'להגדיר מדרגות ביצוע מובחנות, ריאליות ומאתגרות.' },
-  ]},
-];
-
-ANSWERS_BY_STATION.forEach(s => {
-  ch.push(h2('תחנת ' + s.stationName));
-  ch.push(makeTable(s.answers.flatMap(a => [
-    [s.qid + '.answersByGroup.' + a.g + '.taskName',    a.taskName,    'כרטיס תשובה — שדה "משימה:"'],
-    [s.qid + '.answersByGroup.' + a.g + '.whatIsWrong', a.whatIsWrong, 'כרטיס תשובה — שדה "מה לא תקין:"'],
-    [s.qid + '.answersByGroup.' + a.g + '.correctFix',  a.correctFix,  'כרטיס תשובה — שדה "תיקון נכון:"'],
-  ])));
+// ── 28. Answers per group/station (dynamic) ───────────────
+ch.push(h1('28. תשובות לפי קבוצה ותחנה'), note('מקור: GC.stationQuestions[].answersByGroup'));
+(GC.stationQuestions || []).forEach(q => {
+  const s = GC.stations.find(x => x.id === q.stationId);
+  ch.push(h2('תחנת ' + (s ? s.name : q.stationId)));
+  const rows = (GC.groups || []).flatMap(group => {
+    const ans = q.answersByGroup[group.id];
+    if (!ans) return [];
+    const prefix = q.id + '.answersByGroup.' + group.id;
+    return [
+      [prefix + '.taskName',    ans.taskName,    'כרטיס תשובה — ' + group.label + ' — שדה "משימה:"'],
+      [prefix + '.whatIsWrong', ans.whatIsWrong, 'כרטיס תשובה — ' + group.label + ' — שדה "מה לא תקין:"'],
+      [prefix + '.correctFix',  ans.correctFix,  'כרטיס תשובה — ' + group.label + ' — שדה "תיקון נכון:"'],
+    ];
+  });
+  if (rows.length) ch.push(makeTable(rows));
   ch.push(gap());
 });
 
-// ── 29. אירועי בלת"מ ─────────────────────────────────────
-ch.push(h1('29. אירועי גלגל הבלת"מ'), note('מקור: moadilim-poc.html → const GC → unexpectedEvents — מוצג בחלון הגלגל אחרי סיבוב'));
+// ── 29. Unexpected events (dynamic) ──────────────────────
+ch.push(h1('29. אירועי גלגל הבלת"מ'), note('מקור: GC.unexpectedEvents'));
 
 const UE_SET_NAMES = {
-  ue_set_aug:   'סט אוגוסט',
-  ue_set_sep:   'סט ספטמבר',
-  ue_set_oct:   'סט אוקטובר',
-  ue_set_nov:   'סט נובמבר',
-  ue_set_comp:  'סט דצמבר (מודל תגמול)',
-  ue_set_comp2: 'סט תגמול 2',
+  ue_set_aug:  'סט אוגוסט',
+  ue_set_sep:  'סט ספטמבר',
+  ue_set_oct:  'סט אוקטובר',
+  ue_set_nov:  'סט נובמבר',
+  ue_set_comp: 'סט נובמבר (מודל תגמול)',
 };
 
 Object.entries(GC.unexpectedEvents).forEach(([setId, events]) => {
   const name = UE_SET_NAMES[setId] || setId;
   ch.push(h2(name + ' (' + setId + ')'));
   ch.push(makeTable(events.flatMap((e, i) => [
-    [setId + '[' + i + '].label',       e.label,                  'חלון גלגל הבלת"מ — תווית תוצאה על הגלגל'],
-    [setId + '[' + i + '].description', e.description,            'חלון גלגל הבלת"מ — תיאור מה קרה (מוצג אחרי הסיבוב)'],
-    [setId + '[' + i + '].waitRounds',  String(e.waitRounds),     'חלון גלגל הבלת"מ — מספר סבבי המתנה (0 = ממשיכים, 1 = מחכים סבב)'],
+    [setId + '[' + i + '].label',       e.label,              'חלון גלגל הבלת"מ — תווית תוצאה על הגלגל'],
+    [setId + '[' + i + '].description', e.description,        'חלון גלגל הבלת"מ — תיאור מה קרה (אחרי הסיבוב)'],
+    [setId + '[' + i + '].waitRounds',  String(e.waitRounds), 'חלון גלגל הבלת"מ — סבבי המתנה (0=ממשיכים, 1=מחכים)'],
   ])));
   ch.push(gap());
 });
 
-// ════════════════════════════════════════════════════════
-
+// ════════════════════════════════════════════════════════════
 const doc = new Document({
   styles: {
     default: { document: { run: { font: 'Arial', size: 22, color: '2a2a2a' } } },
