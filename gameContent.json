@@ -42,7 +42,7 @@
     {
       "id": "station_company_goal",
       "name": "מטרת חברה ויעד",
-      "month": "יוני",
+      "month": "יולי",
       "type": "professional",
       "segment": "workplan",
       "order": 1,
@@ -53,27 +53,14 @@
       "questionId": "q_company_goal"
     },
     {
-      "id": "station_unexpected_aug",
-      "name": "גלגל הבלת\"מ",
-      "month": "יוני",
-      "type": "unexpected_event",
-      "segment": "workplan",
-      "order": 2,
-      "boardPosition": {
-        "x": 64,
-        "y": 80
-      },
-      "unexpectedEventSetId": "ue_set_aug"
-    },
-    {
       "id": "station_outcome_metric",
       "name": "מדד תוצאה",
       "month": "יולי",
       "type": "professional",
       "segment": "workplan",
-      "order": 3,
+      "order": 2,
       "boardPosition": {
-        "x": 50,
+        "x": 64,
         "y": 80
       },
       "questionId": "q_outcome_metric"
@@ -84,12 +71,25 @@
       "month": "אוגוסט",
       "type": "professional",
       "segment": "workplan",
+      "order": 3,
+      "boardPosition": {
+        "x": 50,
+        "y": 80
+      },
+      "questionId": "q_top10"
+    },
+    {
+      "id": "station_unexpected_aug",
+      "name": "גלגל הבלת\"מ",
+      "month": "אוגוסט",
+      "type": "unexpected_event",
+      "segment": "workplan",
       "order": 4,
       "boardPosition": {
         "x": 36,
         "y": 80
       },
-      "questionId": "q_top10"
+      "unexpectedEventSetId": "ue_set_aug"
     },
     {
       "id": "station_measurable",
@@ -105,30 +105,43 @@
       "questionId": "q_measurable"
     },
     {
-      "id": "station_unexpected_sep",
-      "name": "גלגל הבלת\"מ",
+      "id": "station_output_metric",
+      "name": "מדד תפוקה",
       "month": "ספטמבר",
-      "type": "unexpected_event",
+      "type": "professional",
       "segment": "workplan",
       "order": 6,
       "boardPosition": {
         "x": 8,
         "y": 80
       },
-      "unexpectedEventSetId": "ue_set_sep"
+      "questionId": "q_output_metric"
     },
     {
-      "id": "station_output_metric",
-      "name": "מדד תפוקה",
-      "month": "אוקטובר",
-      "type": "professional",
+      "id": "station_unexpected_sep",
+      "name": "גלגל הבלת\"מ",
+      "month": "ספטמבר",
+      "type": "unexpected_event",
       "segment": "workplan",
       "order": 7,
       "boardPosition": {
         "x": 8,
         "y": 48
       },
-      "questionId": "q_output_metric"
+      "unexpectedEventSetId": "ue_set_sep"
+    },
+    {
+      "id": "station_milestones",
+      "name": "אבני דרך רבעוניות",
+      "month": "אוקטובר",
+      "type": "professional",
+      "segment": "workplan",
+      "order": 8,
+      "boardPosition": {
+        "x": 22,
+        "y": 48
+      },
+      "questionId": "q_milestones"
     },
     {
       "id": "station_unexpected_oct",
@@ -136,48 +149,22 @@
       "month": "אוקטובר",
       "type": "unexpected_event",
       "segment": "workplan",
-      "order": 8,
-      "boardPosition": {
-        "x": 22,
-        "y": 48
-      },
-      "unexpectedEventSetId": "ue_set_oct"
-    },
-    {
-      "id": "station_milestones",
-      "name": "אבני דרך רבעוניות",
-      "month": "נובמבר",
-      "type": "professional",
-      "segment": "workplan",
       "order": 9,
       "boardPosition": {
         "x": 36,
         "y": 48
       },
-      "questionId": "q_milestones"
-    },
-    {
-      "id": "station_unexpected_nov",
-      "name": "גלגל הבלת\"מ",
-      "month": "נובמבר",
-      "type": "unexpected_event",
-      "segment": "workplan",
-      "order": 10,
-      "boardPosition": {
-        "x": 50,
-        "y": 48
-      },
-      "unexpectedEventSetId": "ue_set_nov"
+      "unexpectedEventSetId": "ue_set_oct"
     },
     {
       "id": "station_reward_metric",
       "name": "מדד תגמול",
-      "month": "דצמבר",
+      "month": "נובמבר",
       "type": "professional",
       "segment": "compensation",
-      "order": 11,
+      "order": 10,
       "boardPosition": {
-        "x": 64,
+        "x": 50,
         "y": 48
       },
       "questionId": "q_reward_metric"
@@ -185,12 +172,12 @@
     {
       "id": "station_unexpected_comp",
       "name": "גלגל הבלת\"מ",
-      "month": "דצמבר",
+      "month": "נובמבר",
       "type": "unexpected_event",
       "segment": "compensation",
-      "order": 12,
+      "order": 11,
       "boardPosition": {
-        "x": 78,
+        "x": 64,
         "y": 48
       },
       "unexpectedEventSetId": "ue_set_comp"
@@ -198,12 +185,12 @@
     {
       "id": "station_weight",
       "name": "משקל וספי ביצוע",
-      "month": "ינואר",
+      "month": "דצמבר",
       "type": "professional",
       "segment": "compensation",
-      "order": 13,
+      "order": 12,
       "boardPosition": {
-        "x": 92,
+        "x": 78,
         "y": 48
       },
       "questionId": "q_weight"
@@ -214,10 +201,10 @@
       "month": "ינואר",
       "type": "transition",
       "segment": "compensation",
-      "order": 14,
+      "order": 13,
       "boardPosition": {
         "x": 92,
-        "y": 16
+        "y": 48
       },
       "transitionMessageId": "transition_model_approved"
     },
@@ -227,9 +214,9 @@
       "month": "ינואר",
       "type": "reflection",
       "segment": "reflection",
-      "order": 15,
+      "order": 14,
       "boardPosition": {
-        "x": 78,
+        "x": 92,
         "y": 16
       }
     }
@@ -238,7 +225,7 @@
     {
       "id": "gate_workplan_approved",
       "name": "אישור תכנית העבודה",
-      "afterOrder": 10
+      "afterOrder": 9
     }
   ],
   "stationQuestions": [
