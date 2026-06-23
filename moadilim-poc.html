@@ -2078,7 +2078,7 @@ function renderAnswerKeyView() {
         <span style="font-size:12px;font-weight:800;color:#9a6a00;background:#f7e9c6;border-radius:7px;padding:4px 10px;white-space:nowrap;flex-shrink:0">עיקרון מקצועי</span>
         <p style="font-size:14px;font-weight:500;line-height:1.5;color:#5a5436">${aEsc(b.principle)}</p>
       </div>
-      <div style="padding:18px 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px">
+      <div style="padding:14px 16px;display:flex;flex-direction:column;gap:12px">
         ${b.answers.map(a=>`
           <div style="border:1.5px solid #ececf3;border-radius:14px;overflow:hidden;display:flex;flex-direction:column">
             <div style="display:flex;align-items:center;gap:9px;padding:9px 14px;background:${a.color}">
@@ -2105,22 +2105,23 @@ function renderAnswerKeyView() {
       </div>
     </div>`).join('');
   return `
-    <div style="position:fixed;inset:0;z-index:850;overflow:auto;background:#eef0f4;font-family:Heebo,Arial,sans-serif;color:#1b1c4e;direction:rtl">
-      <div style="position:sticky;top:0;z-index:5;background:#221f64;color:#fff;padding:16px 30px;display:flex;align-items:center;gap:18px;box-shadow:0 4px 18px rgba(34,31,100,.22)">
-        <button onclick="answerKeyOpen=false;renderApp()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#fff;padding:8px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">← חזרה ללוח</button>
-        <img src="assets/logo-game.png" alt="מסילות ותכנונים" style="height:46px;width:auto">
-        <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:22px;font-weight:900;line-height:1">מפתח תשובות למנחה</span><span style="font-size:13px;font-weight:500;color:#b9bce0">כל התחנות והתשובות — לעיון המנחה בלבד</span></div>
-        <div style="flex:1"></div>
-        <span style="font-size:13px;font-weight:800;background:#f4c40f;color:#221f64;border-radius:999px;padding:6px 15px;white-space:nowrap">${aEsc(blocks.length+' תחנות · '+GC.groups.length+' קבוצות')}</span>
+    <div style="width:100%;min-height:100vh;background:#eef0f4;font-family:Heebo,Arial,sans-serif;color:#1b1c4e;direction:rtl">
+      <div style="position:sticky;top:0;z-index:5;background:#221f64;color:#fff;padding:14px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 18px rgba(34,31,100,.22)">
+        <img src="assets/logo-game.png" alt="מסילות ותכנונים" style="height:46px;width:auto;flex-shrink:0">
+        <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
+          <span style="font-size:18px;font-weight:900;line-height:1">מפתח תשובות למנחה</span>
+          <span style="font-size:11px;font-weight:500;color:#b9bce0">לעיון המנחה בלבד</span>
+        </div>
+        <span style="font-size:11px;font-weight:800;background:#f4c40f;color:#221f64;border-radius:999px;padding:5px 12px;white-space:nowrap;flex-shrink:0">${aEsc(blocks.length+' תח׳')}</span>
       </div>
-      <div style="max-width:1340px;margin:0 auto;padding:26px 26px 90px;display:flex;flex-direction:column;gap:20px">
+      <div style="padding:18px 16px 80px;display:flex;flex-direction:column;gap:18px">
         ${blocksHtml}
-        <div style="display:flex;align-items:center;gap:12px;margin-top:14px">
+        <div style="display:flex;align-items:center;gap:12px;margin-top:6px">
           <span style="height:3px;flex:1;background:#cdd2de;border-radius:3px"></span>
-          <span style="font-size:20px;font-weight:900;color:#221f64;white-space:nowrap">מודל התגמול — מפתח</span>
+          <span style="font-size:17px;font-weight:900;color:#221f64;white-space:nowrap">מודל התגמול — מפתח</span>
           <span style="height:3px;flex:1;background:#cdd2de;border-radius:3px"></span>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px">${rewardHtml}</div>
+        <div style="display:flex;flex-direction:column;gap:16px">${rewardHtml}</div>
       </div>
     </div>`;
 }
@@ -2174,6 +2175,8 @@ function renderApp() {
     renderDevView(app);
   } else if (currentView === 'devContent') {
     app.innerHTML = renderDevContentView();
+  } else if (currentView === 'answerKey') {
+    app.innerHTML = renderAnswerKeyView();
   } else {
     renderMobile(app, currentGroup);
   }
@@ -2433,8 +2436,6 @@ function renderFacilitator(app) {
       <div style="position:absolute;bottom:166px;left:28px;z-index:50;display:flex;flex-direction:column-reverse;align-items:center;gap:12px">
         <button onclick="toggleBoardPhones()" title="פתיחת תיקי הקבוצות"
           style="width:56px;height:56px;border-radius:50%;border:2px solid #cfe9f7;background:${boardPhonesOpen?'#cfeefc':'#ffffff'};color:#0a6aa0;font-size:23px;cursor:pointer;box-shadow:0 5px 16px rgba(34,31,100,.22);display:flex;align-items:center;justify-content:center">🔍</button>
-        <button onclick="answerKeyOpen=true;renderApp()" title="מפתח תשובות למנחה"
-          style="width:56px;height:56px;border-radius:50%;border:2px solid #d0d4e8;background:#fff;color:#221f64;font-size:20px;cursor:pointer;box-shadow:0 5px 16px rgba(34,31,100,.22);display:flex;align-items:center;justify-content:center">📋</button>
         ${bPhonesHtml}
       </div>
     </div>
@@ -2456,10 +2457,6 @@ function renderFacilitator(app) {
     html += renderCommitmentOverlay();
   }
 
-  // Answer key overlay
-  if (answerKeyOpen) {
-    html += renderAnswerKeyView();
-  }
 
   // Check round complete
   const allPlayedOrWaiting = GC.groups.every(g => {
@@ -4036,13 +4033,16 @@ document.getElementById('nav').style.display = 'none';
   } else if (view === 'devContent') {
     currentView = 'devContent';
     gameStarted = true;
+  } else if (view === 'answerKey') {
+    currentView = 'answerKey';
+    gameStarted = true;
   } else if (view === 'facilitator') {
     currentView = 'facilitator';
   }
 })();
 
 // Facilitator loading the page → reset Firebase to pre-game (unlocks all mobile folders)
-if (currentView !== 'mobile') pushGameState();
+if (currentView !== 'mobile' && currentView !== 'answerKey') pushGameState();
 
 renderApp();
 </script>
