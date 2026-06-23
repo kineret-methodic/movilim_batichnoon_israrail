@@ -10,6 +10,7 @@
   html,body{height:100%;direction:rtl}
   body{font-family:'Heebo','Arial',sans-serif;background:#D6D6D6;color:#1A1C50;-webkit-font-smoothing:antialiased}
   @keyframes pulseRing{0%{box-shadow:0 0 0 0 rgba(0,174,255,.5)}70%{box-shadow:0 0 0 18px rgba(0,174,255,0)}100%{box-shadow:0 0 0 0 rgba(0,174,255,0)}}
+  @keyframes pulseTeal{0%{box-shadow:0 0 0 0 rgba(0,174,255,.5)}70%{box-shadow:0 0 0 14px rgba(0,174,255,0)}100%{box-shadow:0 0 0 0 rgba(0,174,255,0)}}
 
   /* ── Nav bar ── */
   #nav{position:fixed;top:0;right:0;left:0;background:#1E1F56;
@@ -257,8 +258,8 @@
   @keyframes wheelSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 
   .wheel-css{width:80px;height:80px;border-radius:50%;display:inline-block;
-    background:conic-gradient(#C8102E 0deg 60deg,#FFD700 60deg 120deg,#1E1F56 120deg 180deg,
-      #E07820 180deg 240deg,#2A6A3A 240deg 300deg,#8B2090 300deg 360deg);
+    background:conic-gradient(#ff7a4d 0deg 72deg,#2dc7b8 72deg 144deg,#ffc233 144deg 216deg,
+      #7b6ef6 216deg 288deg,#ff6fa5 288deg 360deg);
     animation:wheelSpin 2.4s linear infinite;position:relative;box-shadow:0 3px 14px rgba(0,0,0,.22)}
   .wheel-css::after{content:'';position:absolute;inset:30%;border-radius:50%;background:#fff;
     box-shadow:inset 0 1px 4px rgba(0,0,0,.2)}
@@ -1872,7 +1873,7 @@ function launchConfetti() {
   canvas.height = window.innerHeight;
   document.body.appendChild(canvas);
   const ctx = canvas.getContext('2d');
-  const colors = ['#00aeff','#1abe9b','#f4c40f','#e84d3d','#9b59b6','#2ecc71','#e67e22','#fff'];
+  const colors = ['#00aeff','#1abe9b','#f4c40f','#7b5fd4','#e84d3d','#221f64'];
   const pieces = Array.from({length: 150}, () => ({
     x: Math.random() * canvas.width,
     y: Math.random() * canvas.height - canvas.height,
@@ -2071,7 +2072,7 @@ function renderFacilitator(app) {
     { bg:'#00aeff', fg:'#fff',    tint:'#e8f7ff' },
     { bg:'#1abe9b', fg:'#fff',    tint:'#e6f7f2' },
     { bg:'#f4c40f', fg:'#221f64', tint:'#fdf6df' },
-    { bg:'#6B3FA0', fg:'#fff',    tint:'#f3edf9' },
+    { bg:'#7b5fd4', fg:'#fff',    tint:'#f1ecfb' },
   ];
 
   // Station color by type/id
@@ -2395,7 +2396,7 @@ function renderDevContentView() {
   const sorted = [...GC.stations].sort((a, b) => a.order - b.order);
   const typeBadge = {
     professional: {label: 'מקצועית', bg: '#1E1F56', color: '#fff'},
-    unexpected_event: {label: 'בלת"מ', bg: '#E07820', color: '#fff'},
+    unexpected_event: {label: 'בלת"מ', bg: '#8a2433', color: '#fff'},
     transition: {label: 'מעבר', bg: '#5A5EAA', color: '#fff'},
     reflection: {label: 'רפלקציה', bg: '#8A70C0', color: '#fff'},
   };
@@ -2560,7 +2561,7 @@ function renderStationModal() {
     : '#221f64';
   const GP_Q = [
     { bg:'#00aeff', fg:'#fff' }, { bg:'#1abe9b', fg:'#fff' },
-    { bg:'#f4c40f', fg:'#221f64' }, { bg:'#6B3FA0', fg:'#fff' },
+    { bg:'#f4c40f', fg:'#221f64' }, { bg:'#7b5fd4', fg:'#fff' },
   ];
   const gpIdx = GC.groups.indexOf(currentGroup);
   const gp = GP_Q[gpIdx] || GP_Q[0];
@@ -2836,11 +2837,11 @@ function renderStationModal() {
       const noDelay = activeUEResult.waitRounds === 0;
       ueContent = `
         ${ueGroupBadge}
-        <div style="background:#FFF3E0;border:2px solid #E07820;border-radius:12px;
+        <div style="background:#fbf2f3;border:2px solid #8a2433;border-radius:12px;
           padding:22px 20px;margin-bottom:20px;max-width:480px">
-          <div style="font-size:12px;color:#A05010;margin-bottom:8px;font-weight:600;letter-spacing:.04em">⚡ תוצאת הגלגל</div>
-          <div style="font-size:22px;font-weight:800;color:#7A3A00;margin-bottom:10px">${activeUEResult.label}</div>
-          <p style="font-size:15px;color:#5A3000;line-height:1.65;margin:0 0 14px">${activeUEResult.description}</p>
+          <div style="font-size:12px;color:#8a2433;margin-bottom:8px;font-weight:600;letter-spacing:.04em">⚡ תוצאת הגלגל</div>
+          <div style="font-size:22px;font-weight:800;color:#3d1018;margin-bottom:10px">${activeUEResult.label}</div>
+          <p style="font-size:15px;color:#3d1018;line-height:1.65;margin:0 0 14px">${activeUEResult.description}</p>
           ${noDelay
             ? `<div style="display:inline-block;background:#E8F5EE;border:1px solid #A8D8B8;border-radius:6px;padding:6px 16px;font-size:13px;font-weight:700;color:#1A6A3A">✓ ממשיכים קדימה — אין עיכוב</div>`
             : `<div style="display:inline-block;background:#FEE8EC;border:1px solid #F0A0B0;border-radius:6px;padding:6px 16px;font-size:13px;font-weight:700;color:#A0001A">⏸ הקבוצה ממתינה סבב אחד</div>`}
@@ -2872,19 +2873,22 @@ function renderStationModal() {
                     ? `<span style="background:#E8F5EE;border:1px solid #A8D8B8;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;color:#1A6A3A">✓ אין עיכוב</span>`
                     : `<span style="background:#FEE8EC;border:1px solid #F0A0B0;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;color:#A0001A">⏸ המתנה סבב</span>`}
                   <button onclick="devSelectUEResult('${currentGroup.id}','${station.unexpectedEventSetId}',${i})"
-                    style="background:#E07820;color:#fff;border:none;border-radius:4px;padding:2px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;margin-right:8px">⚡ בחר</button>
+                    style="background:#8a2433;color:#fff;border:none;border-radius:4px;padding:2px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;margin-right:8px">⚡ בחר</button>
                 </div>
               </div>`).join('')}
           </div>`
         : '';
       ueContent = `
         ${ueGroupBadge}
-        <div class="wheel-css" style="display:block;margin:0 auto 24px"></div>
-        <button onclick="spinWheel('${currentGroup.id}','${station.unexpectedEventSetId}')"
-          style="background:#E07820;color:#fff;border:none;border-radius:10px;
-            padding:16px 40px;font-size:18px;font-weight:700;cursor:pointer;font-family:inherit;
-            box-shadow:0 4px 16px rgba(224,120,32,.35)">
-          ⚡ ${copy.buttons.spinWheel}</button>
+        <div style="background:#fbf2f3;border:6px solid #8a2433;border-radius:18px;padding:32px 40px;display:flex;flex-direction:column;align-items:center;gap:24px;position:relative">
+          <div style="position:absolute;inset:8px;border:2px solid #d8b3b9;border-radius:11px;pointer-events:none"></div>
+          <div class="wheel-css" style="display:block;position:relative;z-index:1"></div>
+          <button onclick="spinWheel('${currentGroup.id}','${station.unexpectedEventSetId}')"
+            style="background:#8a2433;color:#fff;border:none;border-radius:10px;
+              padding:16px 40px;font-size:18px;font-weight:700;cursor:pointer;font-family:inherit;
+              box-shadow:0 4px 16px rgba(138,36,51,.35);position:relative;z-index:1">
+            ⚡ ${copy.buttons.spinWheel}</button>
+        </div>
         ${devUEList}`;
     }
     mainHtml = `
@@ -3300,7 +3304,7 @@ function renderDevView(app) {
 
   // ── 5. End screen ────────────────────────────────────
   const es = GC.uiCopy.endScreen;
-  body += `<h3 style="font-size:12px;font-weight:700;color:#fff;background:#6B3FA0;padding:6px 12px;border-radius:6px;margin:16px 0 10px;letter-spacing:.04em">מסך סיום</h3>
+  body += `<h3 style="font-size:12px;font-weight:700;color:#fff;background:#7b5fd4;padding:6px 12px;border-radius:6px;margin:16px 0 10px;letter-spacing:.04em">מסך סיום</h3>
     <div style="border:1px solid #D0C0F0;border-radius:8px;padding:10px 12px;font-size:11px;margin-bottom:32px;display:flex;flex-direction:column;gap:3px">
       <div><span style="color:#8A90C0">שאלת התחייבות: </span>${es.commitmentQuestion}</div>
       <div><span style="color:#8A90C0">Mentimeter URL: </span>${fm(es.mentimeterUrl)}</div>
@@ -3327,7 +3331,7 @@ const MOB_PAL = [
   { primary:'#00aeff', deep:'#0a6aa0', fg:'#fff',    tint:'#eaf6fd' },
   { primary:'#1abe9b', deep:'#11876e', fg:'#fff',    tint:'#e8f7f2' },
   { primary:'#f4c40f', deep:'#9a7a00', fg:'#221f64', tint:'#fdf7e0' },
-  { primary:'#6B3FA0', deep:'#3A1A60', fg:'#fff',    tint:'#f3edf9' },
+  { primary:'#7b5fd4', deep:'#5b3eb0', fg:'#fff',    tint:'#f1ecfb' },
 ];
 let mobileSplashDone = {};
 
@@ -3420,17 +3424,42 @@ function renderMobile(app, groupId) {
 function renderFolderLocked(wrap, group, pal, currentGroup) {
   const lockKey = group.id + '_' + currentGroup.id;
   if (_lockedSoundKey !== lockKey) { _lockedSoundKey = lockKey; SFX.locked(); }
-  const msg = GC.uiCopy.mobileFolder.lockedMessage
-    .replace('{group}', currentGroup.label);
+  const mf = GC.uiCopy.mobileFolder;
+  const lockedTitle = (mf.lockedMessage || 'תור {group} — המתינו לתורכם')
+    .replace('{group}', currentGroup.label).replace(/^.*—\s*/, '');
+  const activeIdx = GC.groups.indexOf(currentGroup);
+  const activePal = MOB_PAL[activeIdx] || MOB_PAL[0];
+  const dots = GC.groups.map((_, i) => {
+    const dp = MOB_PAL[i] || MOB_PAL[0];
+    return `<span style="width:10px;height:10px;border-radius:50%;background:${dp.primary};opacity:${i === activeIdx ? 1 : 0.3}"></span>`;
+  }).join('');
   wrap.innerHTML = `
-    <div class="splash-bar" style="background:${pal.primary}"></div>
-    <div style="flex:1;display:flex;flex-direction:column;align-items:center;
-      justify-content:center;padding:32px 24px;gap:20px;background:#F5F7FA;min-height:100vh">
-      <div style="font-size:48px">🔒</div>
-      <div style="font-size:17px;font-weight:700;color:#1A2A3A;text-align:center">${msg}</div>
-      <p style="font-size:17px;color:#666;text-align:center;line-height:1.6;max-width:260px">
-        ${GC.uiCopy.mobileFolder.lockedWait}
-      </p>
+    <div style="width:100%;min-height:100vh;background:#e7e9ef;display:flex;justify-content:center">
+      <div style="width:100%;max-width:460px;min-height:100vh;background:#eef0f4;display:flex;flex-direction:column;overflow:hidden">
+        <div style="flex-shrink:0;background:#fff;border-bottom:3px solid ${pal.primary};padding:18px 20px 14px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="background:${pal.primary};color:${pal.fg};font-size:14px;font-weight:800;border-radius:999px;padding:5px 15px">${group.label}</span>
+            <span style="font-size:15px;font-weight:600;color:#5a6075;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${group.divisionName || ''}</span>
+          </div>
+        </div>
+        <div style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:34px 30px;text-align:center">
+          <div style="width:120px;height:120px;border-radius:50%;background:#fff;border:6px solid #5a6d77;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(34,31,100,.10)">
+            <img src="assets/icons/icon-lock.svg" alt="" style="width:58px;height:58px">
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+            <span style="font-size:24px;font-weight:900;color:#1b1c4e;line-height:1.2">${lockedTitle}</span>
+            <p style="font-size:16px;font-weight:500;line-height:1.55;color:#5a6075;max-width:300px">${mf.lockedWait || 'התיק שלכם ייפתח כשיגיע תורכם'}</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;background:#e8f7ff;border:2px solid #00aeff;border-radius:14px;padding:12px 18px;animation:pulseTeal 2s infinite">
+            <span style="width:28px;height:28px;border-radius:50%;background:${activePal.primary};border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;color:${activePal.fg};font-size:13px;font-weight:800">${activeIdx + 1}</span>
+            <span style="font-size:16px;font-weight:800;color:#1b1c4e">${currentGroup.label} עונה כעת</span>
+          </div>
+        </div>
+        <div style="flex-shrink:0;padding:0 24px 30px;display:flex;flex-direction:column;align-items:center;gap:10px">
+          <div style="display:flex;gap:7px">${dots}</div>
+          <span style="font-size:12px;font-weight:600;color:#9aa0b8">התיק ייפתח אוטומטית כשיגיע תורכם</span>
+        </div>
+      </div>
     </div>`;
 }
 
