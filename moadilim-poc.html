@@ -189,7 +189,7 @@
     padding:8px 18px;cursor:pointer;font-size:12px;font-family:inherit}
 
   /* ── Mobile ── */
-  #mobile-wrap{height:calc(100vh - 40px);overflow-y:auto;background:#F5F7FA;
+  #mobile-wrap{height:calc(100vh - 40px);overflow:hidden;position:relative;background:#F5F7FA;
     color:#1A2A3A;max-width:440px;margin:0 auto;font-family:'Heebo','Arial',sans-serif;
     display:flex;flex-direction:column}
   .splash{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -1504,7 +1504,99 @@ const GC = {
       "lockedMessage": "תור {group} — המתינו לתורכם",
       "lockedWait": "התיק שלכם ייפתח כשיגיע תורכם"
     }
-  }
+  },
+  "companyGoals": [
+    {
+      "n": 1,
+      "title": "השירות כערך עליון",
+      "objectives": [
+        { "code": "1.1", "text": "הקניית רמת שירות מיטבית ללקוחות הרכבת" },
+        { "code": "1.2", "text": "שיפור השירות הפנים ארגוני, הממשקים ושיתופי הפעולה" },
+        { "code": "1.3", "text": "שיפור זמינות וכשירות תשתיות הרכבת" },
+        { "code": "1.4", "text": "שיפור זמינות וכשירות הצי הנייד" }
+      ]
+    },
+    {
+      "n": 2,
+      "title": "פיתוח ושימור ההון האנושי",
+      "objectives": [
+        { "code": "2.1", "text": "קידום ושימור מצוינות ארגונית בשיתוף פעולה עם וועד העובדים" },
+        { "code": "2.2", "text": "פיתוח המקצועיות, הכשירות ותרבות הלמידה של עובדי רכבת ישראל באופן אקטיבי וחדשני" },
+        { "code": "2.3", "text": "פיתוח ארגוני של החברה והתאמתה לצרכים בהווה ואתגרי העתיד" },
+        { "code": "2.4", "text": "קידום שוויון, גיוון וייצוג הולם" }
+      ]
+    },
+    {
+      "n": 3,
+      "title": "פיתוח מנופי צמיחה",
+      "objectives": [
+        { "code": "3.1", "text": "פיתוח רשת המסילות באיכות, לו\"ז ותקציב (קווים, תחנות, מתחמים, איתות וחשמול)" },
+        { "code": "3.2", "text": "פיתוח וקידום מתחמי הנדל\"ן, המסחר והתייעלות אנרגטית" },
+        { "code": "3.3", "text": "קיום פעילות עסקית ורווחית בשילוב התייעלות" },
+        { "code": "3.4", "text": "מיצוי פוטנציאל עסקי להובלת מטענים והיערכות עתידית" },
+        { "code": "3.5", "text": "קידום חדשנות טכנולוגית, תהליכית וארגונית לעמידת החברה באתגריה" }
+      ]
+    },
+    {
+      "n": 4,
+      "title": "שיפור רמת הבטיחות וציות לרגולציה בכלל פעילויות החברה",
+      "objectives": [
+        { "code": "4.1", "text": "שיפור והטמעת הבטיחות והאיכות בתרבות הארגונית" },
+        { "code": "4.2", "text": "מימוש מיטבי של התוכנית להפחתת סיכונים" },
+        { "code": "4.3", "text": "עמידה בציות וברגולציה החלה על החברה" }
+      ]
+    }
+  ],
+  "planningGlossary": [
+    {
+      "term": "חזון",
+      "definition": "תמונת העתיד של הארגון.",
+      "example": "\"רכבת ישראל תהיה חוד החנית של התחבורה בישראל\"",
+      "responsible": "דירקטוריון והנהלה"
+    },
+    {
+      "term": "מטרות החברה",
+      "definition": "שאיפה אסטרטגית של הארגון.",
+      "example": "\"פיתוח מנופי צמיחה\"",
+      "responsible": "דירקטוריון והנהלה"
+    },
+    {
+      "term": "יעדים",
+      "definition": "המהלכים הגדולים שנרצה לבצע כדי להשיג את מטרות החברה.",
+      "example": "\"מיצוי פוטנציאל עסקי להובלת מטענים והיערכות עתידית\"",
+      "responsible": null
+    },
+    {
+      "term": "משימה",
+      "definition": "עונה על השאלה מה צריך לעשות כדי להשיג את היעד? — מנוסחת כפעולה, תחומה בזמן ומוגדר לה אחראי לביצוע.",
+      "example": null,
+      "responsible": "באחריות המנהל"
+    },
+    {
+      "term": "מדד תוצאה",
+      "definition": "נתון כמותי/איכותי תוצאתי המשקף את הביצועים — נמדד מול היעד.",
+      "example": "כמות משקל הובלת מטענים בכלל המגזרים",
+      "responsible": null
+    },
+    {
+      "term": "ערך המדד המתוכנן",
+      "definition": "ההישג אותו נרצה להשיג במדד שנבחר.",
+      "example": "7.5 מיליון טון הובלה בשנת 2026",
+      "responsible": null
+    },
+    {
+      "term": "מדד תפוקה והישג נדרש שנתי",
+      "definition": "מטלות מרכזיות שביצוען משמעו השלמת המשימה; מוגדרים באופן מדיד ועם תאריכי יעד לביצוע. סוגים: בינארי, כמותי עולה, כמותי יורד, אחוזים.",
+      "example": null,
+      "responsible": null
+    },
+    {
+      "term": "מדד תגמול",
+      "definition": "מדד המגדיר כיצד מודדים הצלחה של יחידה לצורך תגמול — כולל נוסחה, משקל וספי ביצוע.",
+      "example": null,
+      "responsible": null
+    }
+  ]
 }
 
 const DEV_MODE = new URLSearchParams(window.location.search).get('devmode') === 'true';
@@ -2373,60 +2465,227 @@ function renderStationModal() {
     || isWaiting
     || (station.type === 'unexpected_event' && (activeUEResult !== null || ueAlreadyUsed));
 
-  let content = '';
+  const qEsc = (t) => String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const QICON = {
+    station_start:'flag', station_company_goal:'target', station_outcome_metric:'gauge',
+    station_top10:'top10', station_measurable:'doc', station_output_metric:'clipboard',
+    station_milestones:'milestone', station_deputy_ceo:'lock',
+    station_reward_metric:'wallet', station_weight:'weight',
+    station_end:'trophy', station_reflection:'pin',
+  };
+  const qIconUrl = (s) => 'assets/icons/icon-' + (s.type === 'unexpected_event' ? 'wheel' : (QICON[s.id] || 'gauge')) + '.svg';
+  const stColor = station.type === 'unexpected_event' ? '#e84d3d'
+    : station.id === 'station_start' ? '#1abe9b'
+    : station.id === 'station_reflection' ? '#e0a200'
+    : station.id === 'station_end' ? '#00aeff'
+    : (station.type === 'transition' || station.type === 'reflection') ? '#5a6d77'
+    : '#221f64';
+  const GP_Q = [
+    { bg:'#00aeff', fg:'#fff' }, { bg:'#1abe9b', fg:'#fff' },
+    { bg:'#f4c40f', fg:'#221f64' }, { bg:'#e84d3d', fg:'#fff' },
+  ];
+  const gpIdx = GC.groups.indexOf(currentGroup);
+  const gp = GP_Q[gpIdx] || GP_Q[0];
+  const grpFgSoft = gp.fg === '#fff' ? 'rgba(255,255,255,.85)' : 'rgba(34,31,100,.7)';
+  const CIRC = 590.6;
+  const fmtSec = (sec) => { const m = Math.floor(sec/60), s = sec%60; return m + ':' + String(s).padStart(2,'0'); };
+
+  const closeBtn = canClose ? `
+    <button onclick="closeStationModal()"
+      style="position:absolute;top:22px;left:28px;z-index:10;background:rgba(255,255,255,.85);
+        border:1.5px solid #d0d4e8;border-radius:8px;padding:8px 18px;
+        font-size:15px;font-weight:700;color:#5a6070;cursor:pointer;font-family:inherit">✕</button>` : '';
+
+  const headerHtml = `
+    <div style="display:flex;align-items:center;gap:24px;flex-shrink:0">
+      <div style="flex:1;display:flex;justify-content:flex-start">
+        <div style="background:#221f64;border-radius:40px;padding:8px 20px 8px 14px;display:flex;align-items:center;gap:11px;box-shadow:0 5px 16px rgba(34,31,100,.22)">
+          <span style="background:#f4c40f;color:#221f64;font-weight:800;font-size:13px;border-radius:20px;padding:4px 12px">תור פעיל</span>
+          <span style="color:#fff;font-size:16px;font-weight:700">${qEsc(currentGroup.label + ' · ' + currentGroup.divisionName)}</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+        <img src="assets/logo-mesilot.png" alt="מסילות" style="height:54px;width:auto">
+        <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:38px;width:auto">
+      </div>
+      <div style="flex:1;display:flex;justify-content:flex-end">
+        <img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:26px;width:auto;opacity:.9">
+      </div>
+    </div>`;
+
+  const stationRowHtml = `
+    <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:18px;margin-top:18px">
+      <div style="width:88px;height:88px;border-radius:50%;background:#fff;border:5px solid ${stColor};display:flex;align-items:center;justify-content:center;box-shadow:0 5px 16px rgba(34,31,100,.12);flex-shrink:0">
+        <img src="${qIconUrl(station)}" alt="" style="width:42px;height:42px">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <span style="font-size:14px;font-weight:700;color:#9aa0b8">${qEsc(station.month || '')}</span>
+        <span style="font-size:32px;font-weight:800;line-height:1.05;color:${stColor}">${qEsc(station.name)}</span>
+      </div>
+    </div>`;
+
+  let mainHtml = '';
 
   if (isWaiting && !DEV_MODE) {
-    // Group is waiting — show skip prompt (suppressed in dev mode)
-    const waitColor = COLOR[currentGroup.colorToken].primary;
     const waitReasonText = gst.waitingReason === 'unexpected'
       ? 'בגלל: גלגל הבלת"מ'
       : 'בגלל: תשובה שגויה בסבב הקודם';
-    content = `
-      <div style="text-align:center;padding:16px 0">
-        <div style="display:inline-block;background:${waitColor}18;border:1.5px solid ${waitColor}55;
-          border-radius:8px;padding:6px 20px;margin-bottom:14px;font-size:13px;font-weight:700;color:${waitColor}">
-          ${currentGroup.label} — ${currentGroup.divisionName}
+    mainHtml = `
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;margin-top:32px">
+        <div style="background:#fff;border-radius:22px;border:1px solid #e4e7f1;box-shadow:0 8px 26px rgba(34,31,100,.10);padding:48px 64px;text-align:center;max-width:720px">
+          <p style="font-size:20px;font-weight:600;color:#3a3e78;margin-bottom:10px">${copy.groupCard.waitingMessage}</p>
+          <p style="font-size:16px;color:#8a90c0;margin-bottom:36px">${waitReasonText}</p>
+          <button onclick="skipWaitingGroup('${currentGroup.id}')"
+            style="background:#221f64;color:#fff;border:none;border-radius:12px;
+              padding:16px 40px;font-size:18px;font-weight:700;cursor:pointer;font-family:inherit;
+              box-shadow:0 4px 16px rgba(34,31,100,.25)">${copy.groupCard.skipButton}</button>
         </div>
-        <div style="font-size:22px;font-weight:800;color:#1E1F56;margin-bottom:6px">${station.name}</div>
-        <p style="font-size:14px;color:#3A3E78;margin-bottom:4px">${copy.groupCard.waitingMessage}</p>
-        <p style="font-size:12px;color:#8A90C0;margin-bottom:24px">${waitReasonText}</p>
-        <button onclick="skipWaitingGroup('${currentGroup.id}')"
-          style="background:#1E1F56;color:#fff;border:none;border-radius:8px;
-            padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">
-          ${copy.groupCard.skipButton}
-        </button>
       </div>`;
+
   } else if (question) {
-    content = `
-      <div style="margin-bottom:16px">
-        <p style="font-size:12px;color:#6A70B0;font-style:italic;margin-bottom:8px">
-          ${question.professionalPrinciple}
-        </p>
-        <div style="background:#EEF0FF;border-right:4px solid #1E1F56;border-radius:8px;
-          padding:14px 16px;display:flex;gap:16px;align-items:flex-start">
-          <p style="flex:1;font-size:15px;color:#1A1C50;line-height:1.7;font-weight:500;margin:0">
-            ${question.questionText}
-          </p>
-          <div class="timer-wrap">
-            <div class="timer-display" id="timer-display" style="color:#1E1F56">${question.timerSeconds}</div>
-            <button class="timer-btn" id="timer-btn"
-              style="background:#1A3A2A;border-color:#2A5A3A;color:#A0E0B0"
-              onclick="toggleTimer(${question.timerSeconds})">
-              ${copy.buttons.startTimer}
-            </button>
+    const total = question.timerSeconds;
+    const remaining = timerRemaining;
+    const frac = total > 0 ? remaining / total : 0;
+    const low = remaining <= 10;
+    const timerColor = remaining === 0 ? '#e84d3d' : low ? '#e0a200' : '#221f64';
+    const timerBtnLabel = timerRunning ? 'עצרו'
+      : (timerRemaining > 0 && timerRemaining < total ? 'המשך' : 'הפעילו טיימר');
+    const timerBtnBg = timerRunning ? '#c0392b' : '#1a8c4e';
+    const ans = question.answersByGroup[currentGroup.id];
+    const revealed = revealedGroups.has(currentGroup.id);
+
+    let rightPane = '';
+    if (!revealed) {
+      rightPane = `
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center">
+          <p style="font-size:16px;font-weight:500;color:#7a809a;line-height:1.5">הקבוצה מציגה את תשובתה.<br>חשפו את התשובה הנכונה כשמוכנים.</p>
+          <button onclick="revealGroup('${currentGroup.id}')"
+            style="padding:16px 34px;border-radius:14px;border:none;cursor:pointer;font-family:inherit;
+              font-size:19px;font-weight:800;color:${gp.fg};background:${gp.bg};
+              box-shadow:0 5px 14px rgba(34,31,100,.2)">חשפו תשובה</button>
+        </div>`;
+    } else if (!answered) {
+      rightPane = `
+        <div style="display:flex;flex-direction:column;gap:13px;overflow-y:auto">
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span style="font-size:13px;font-weight:800;color:${gp.bg}">משימה</span>
+            <span style="font-size:17px;font-weight:600;color:#1b1c4e;line-height:1.4">${qEsc(ans ? ans.taskName : '')}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span style="font-size:13px;font-weight:800;color:#c0392b">מה לא תקין</span>
+            <span style="font-size:16px;font-weight:500;color:#3a3f5c;line-height:1.5">${qEsc(ans ? ans.whatIsWrong : '')}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;background:#e9f7ef;border-radius:12px;padding:13px 15px;border:1px solid #bfe6cf">
+            <span style="font-size:13px;font-weight:800;color:#1a7a44">תיקון נכון</span>
+            <span style="font-size:16px;font-weight:600;color:#185c36;line-height:1.5">${qEsc(ans ? ans.correctFix : '')}</span>
+          </div>
+          ${ans && ans.facilitatorNotes ? `
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <span style="font-size:13px;font-weight:700;color:#9370c0">הערת מנחה</span>
+              <span style="font-size:14px;font-weight:500;color:#503880;line-height:1.5">${qEsc(ans.facilitatorNotes)}</span>
+            </div>` : ''}
+          <div style="display:flex;gap:10px;margin-top:4px;flex-shrink:0">
+            <button onclick="doOutcome('${currentGroup.id}','correct')"
+              style="flex:1;padding:14px 8px;border-radius:12px;border:none;cursor:pointer;font-family:inherit;
+                font-size:15px;font-weight:800;color:#fff;background:#1a8c4e;line-height:1.2">
+              נכון<br><span style="font-size:11px;font-weight:600;opacity:.9">התקדמו</span></button>
+            <button onclick="doOutcome('${currentGroup.id}','partial')"
+              style="flex:1;padding:14px 8px;border-radius:12px;border:none;cursor:pointer;font-family:inherit;
+                font-size:15px;font-weight:800;color:#221f64;background:#f4c40f;line-height:1.2">
+              חלקי<br><span style="font-size:11px;font-weight:600;opacity:.8">טעות + המתנה</span></button>
+            <button onclick="doOutcome('${currentGroup.id}','wrong')"
+              style="flex:1;padding:14px 8px;border-radius:12px;border:none;cursor:pointer;font-family:inherit;
+                font-size:15px;font-weight:800;color:#fff;background:#e84d3d;line-height:1.2">
+              שגוי<br><span style="font-size:11px;font-weight:600;opacity:.9">טעות + חזרה</span></button>
+          </div>
+        </div>`;
+    } else {
+      const o = lastOutcome ? lastOutcome.outcome : 'correct';
+      const oColor = o === 'correct' ? '#1a8c4e' : o === 'partial' ? '#e0a200' : '#e84d3d';
+      const oIcon  = o === 'correct' ? '✓' : o === 'partial' ? '!' : '↩';
+      const oMsg   = o === 'correct' ? copy.messages.correctOutcome
+                   : o === 'partial' ? copy.messages.partialOutcome
+                   : ((lastOutcome && lastOutcome.stayed) ? copy.messages.wrongOutcomeStayed : copy.messages.wrongOutcome);
+      rightPane = `
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center">
+          <div style="width:74px;height:74px;border-radius:50%;background:${oColor};display:flex;align-items:center;justify-content:center;color:#fff;font-size:38px;font-weight:800">${oIcon}</div>
+          <p style="font-size:19px;font-weight:700;color:#1b1c4e;line-height:1.5;max-width:380px">${qEsc(oMsg)}</p>
+          <button onclick="dismissOutcomePopup()"
+            style="padding:13px 30px;border-radius:12px;border:2px solid #221f64;background:#fff;
+              cursor:pointer;font-family:inherit;font-size:16px;font-weight:800;color:#221f64">חזרה למסלול</button>
+        </div>`;
+    }
+
+    mainHtml = `
+      <div style="flex:1;min-height:0;display:flex;gap:30px;margin-top:24px;align-items:stretch">
+        <div style="flex:1.45;display:flex;flex-direction:column;gap:22px;min-width:0">
+          <div style="flex:1;background:#fff;border-radius:22px;border:1px solid #e4e7f1;
+            box-shadow:0 8px 26px rgba(34,31,100,.10);padding:38px 44px;
+            display:flex;flex-direction:column;justify-content:center;gap:22px;
+            position:relative;overflow:hidden">
+            <div style="position:absolute;top:0;right:0;width:8px;height:100%;background:${stColor}"></div>
+            <span style="font-size:15px;font-weight:800;letter-spacing:.04em;color:${stColor}">השאלה</span>
+            <p style="font-size:38px;font-weight:700;line-height:1.45;color:#1b1c4e">${qEsc(question.questionText)}</p>
+          </div>
+          <div style="flex-shrink:0;background:#f3f1ea;border-radius:16px;border:1px dashed #c9c2ad;
+            padding:18px 24px;display:flex;gap:14px;align-items:flex-start">
+            <span style="font-size:13px;font-weight:800;color:#9a6a00;background:#f7e9c6;
+              border-radius:8px;padding:5px 12px;white-space:nowrap;flex-shrink:0">עיקרון מקצועי</span>
+            <p style="font-size:17px;font-weight:500;line-height:1.55;color:#5a5436">${qEsc(question.professionalPrinciple)}</p>
           </div>
         </div>
-      </div>
-      ${DEV_MODE
-        ? `<div class="cards-grid">${GC.groups.map(g => renderGroupCardModal(g, question, revealedGroups.has(g.id + '_outcome'), false)).join('')}</div>`
-        : facilitatorPreview
-          ? `<div class="cards-grid">${GC.groups.map(g => renderGroupCardModal(g, question, answered, true)).join('')}</div>`
-          : renderGroupCardModal(currentGroup, question, answered)}`;
+
+        <div style="flex:1;display:flex;flex-direction:column;gap:24px;min-width:0">
+          <div style="flex-shrink:0;background:#fff;border-radius:22px;border:1px solid #e4e7f1;
+            box-shadow:0 8px 26px rgba(34,31,100,.10);padding:26px;
+            display:flex;flex-direction:column;align-items:center;gap:16px">
+            <div style="position:relative;width:212px;height:212px">
+              <svg width="212" height="212" viewBox="0 0 212 212" style="transform:rotate(-90deg)">
+                <circle cx="106" cy="106" r="94" fill="none" stroke="#edeef5" stroke-width="16"></circle>
+                <circle id="timer-ring-arc" cx="106" cy="106" r="94" fill="none"
+                  stroke="${timerColor}" stroke-width="16" stroke-linecap="round"
+                  stroke-dasharray="${CIRC}" stroke-dashoffset="${(CIRC * (1 - frac)).toFixed(1)}"
+                  style="transition:stroke-dashoffset .9s linear,stroke .3s"></circle>
+              </svg>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;
+                align-items:center;justify-content:center;gap:2px">
+                <span id="timer-display"
+                  style="font-size:60px;font-weight:800;font-variant-numeric:tabular-nums;
+                    line-height:1;color:${timerColor}">${fmtSec(remaining)}</span>
+                <span style="font-size:13px;font-weight:600;color:#9aa0b8">דקות:שניות</span>
+              </div>
+            </div>
+            <button id="timer-btn" onclick="toggleTimer(${total})"
+              style="width:100%;padding:13px;border-radius:12px;border:none;cursor:pointer;
+                font-family:inherit;font-size:17px;font-weight:800;color:#fff;background:${timerBtnBg};
+                box-shadow:0 4px 12px rgba(34,31,100,.18)">${timerBtnLabel}</button>
+          </div>
+
+          <div style="flex:1;min-height:0;border-radius:22px;border:2px solid ${gp.bg};
+            background:#fff;box-shadow:0 8px 26px rgba(34,31,100,.10);overflow:hidden;
+            display:flex;flex-direction:column">
+            <div style="background:${gp.bg};padding:14px 20px;display:flex;
+              align-items:center;gap:13px;flex-shrink:0">
+              <div style="width:42px;height:42px;border-radius:50%;background:#fff;
+                display:flex;align-items:center;justify-content:center;
+                color:${gp.bg};font-size:19px;font-weight:800;flex-shrink:0">${gpIdx + 1}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:18px;font-weight:800;color:${gp.fg};line-height:1.1">${qEsc(currentGroup.label)}</div>
+                <div style="font-size:13px;font-weight:500;color:${grpFgSoft};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${qEsc(currentGroup.divisionName)}</div>
+              </div>
+              <span style="font-size:13px;font-weight:800;background:rgba(255,255,255,.92);
+                color:${gp.bg};border-radius:999px;padding:5px 14px;white-space:nowrap">בתורה כעת</span>
+            </div>
+            <div style="flex:1;min-height:0;overflow:auto;padding:20px 22px;
+              display:flex;flex-direction:column;gap:14px">${rightPane}</div>
+          </div>
+        </div>
+      </div>`;
+
   } else if (station.transitionMessageId && GC.transitionMessages[station.transitionMessageId]) {
     const tm = GC.transitionMessages[station.transitionMessageId];
     const trGroupColor = COLOR[currentGroup.colorToken].primary;
     if (station.id === 'station_start') {
-      // Show QR tabs for all groups
       const activeQRGroup = window._activeQRTab || GC.groups[0].id;
       const tabsHtml = GC.groups.map(g => {
         const col = COLOR[g.colorToken];
@@ -2440,106 +2699,92 @@ function renderStationModal() {
       }).join('');
       const activeGroup = GC.groups.find(g => g.id === activeQRGroup);
       const col = COLOR[activeGroup.colorToken];
-      content = `
-        <div style="text-align:center;padding:8px 0 0">
-          <div style="font-size:20px;font-weight:800;color:#1E1F56;margin-bottom:6px">${tm.title}</div>
-          <p style="font-size:13px;color:#3A3E78;line-height:1.7;margin-bottom:20px">${tm.body}</p>
-          <div style="display:flex;gap:8px;justify-content:center;margin-bottom:20px;flex-wrap:wrap">
-            ${tabsHtml}
-          </div>
-          <div style="background:${col.light};border:2px solid ${col.primary};border-radius:16px;
-            padding:24px 20px;display:inline-block;min-width:260px">
-            <div style="font-size:16px;font-weight:800;color:${col.text};margin-bottom:2px">${activeGroup.label}</div>
-            <div style="font-size:12px;color:${col.primary};margin-bottom:16px;font-weight:600">${activeGroup.divisionName}</div>
-            <img src="${QR_CODES[activeGroup.id]}" alt="QR ${activeGroup.label}"
-              style="width:200px;height:200px;border-radius:8px;display:block;margin:0 auto" />
-          </div>
-          <div style="margin-top:24px">
-            <button onclick="activatePhones()"
+      mainHtml = `
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;margin-top:24px">
+          <div style="background:#fff;border-radius:22px;border:1px solid #e4e7f1;
+            box-shadow:0 8px 26px rgba(34,31,100,.10);padding:40px 56px;text-align:center;max-width:800px">
+            <div style="font-size:24px;font-weight:800;color:#1E1F56;margin-bottom:8px">${tm.title}</div>
+            <p style="font-size:15px;color:#3A3E78;line-height:1.7;margin-bottom:24px">${tm.body}</p>
+            <div style="display:flex;gap:8px;justify-content:center;margin-bottom:24px;flex-wrap:wrap">
+              ${tabsHtml}
+            </div>
+            <div style="background:${col.light};border:2px solid ${col.primary};border-radius:16px;
+              padding:24px 20px;display:inline-block;min-width:260px;margin-bottom:28px">
+              <div style="font-size:16px;font-weight:800;color:${col.text};margin-bottom:2px">${activeGroup.label}</div>
+              <div style="font-size:12px;color:${col.primary};margin-bottom:16px;font-weight:600">${activeGroup.divisionName}</div>
+              <img src="${QR_CODES[activeGroup.id]}" alt="QR ${activeGroup.label}"
+                style="width:200px;height:200px;border-radius:8px;display:block;margin:0 auto" />
+            </div>
+            <div>
+              <button onclick="activatePhones()"
                 style="background:#1E1F56;color:#fff;border:none;border-radius:10px;
                   padding:12px 40px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;
-                  box-shadow:0 2px 12px rgba(30,31,86,.25)">
-                מתחילים
-              </button>
+                  box-shadow:0 2px 12px rgba(30,31,86,.25)">מתחילים</button>
+            </div>
           </div>
         </div>`;
     } else {
-      content = `
-        <div style="text-align:center;padding:16px 0">
-          <div style="display:inline-block;background:${trGroupColor}18;border:1.5px solid ${trGroupColor}55;
-            border-radius:8px;padding:6px 20px;margin-bottom:16px;font-size:13px;font-weight:700;color:${trGroupColor}">
-            ${currentGroup.label} — ${currentGroup.divisionName}
+      mainHtml = `
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;margin-top:32px">
+          <div style="background:#fff;border-radius:22px;border:1px solid #e4e7f1;
+            box-shadow:0 8px 26px rgba(34,31,100,.10);padding:48px 64px;text-align:center;max-width:720px">
+            <div style="display:inline-block;background:${trGroupColor}18;border:1.5px solid ${trGroupColor}55;
+              border-radius:8px;padding:6px 20px;margin-bottom:16px;font-size:13px;font-weight:700;color:${trGroupColor}">
+              ${currentGroup.label} — ${currentGroup.divisionName}
+            </div>
+            <div style="font-size:24px;font-weight:800;color:#1E1F56;margin-bottom:12px">${tm.title}</div>
+            <p style="font-size:16px;color:#3A3E78;line-height:1.7;margin-bottom:28px">${tm.body}</p>
+            ${answered
+              ? `<button onclick="dismissOutcomePopup()"
+                  style="background:#fff;color:#221f64;border:2px solid #221f64;border-radius:12px;
+                    padding:14px 32px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit">חזרה למסלול</button>`
+              : `<button onclick="revealedGroups.add('${currentGroup.id}_outcome');${station.id === 'station_end' ? 'launchConfetti();' : ''}renderApp()"
+                  style="background:#1E1F56;color:#fff;border:none;border-radius:12px;
+                    padding:14px 32px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;
+                    box-shadow:0 4px 16px rgba(34,31,100,.25)">${GC.uiCopy.groupCard.approveTransition}</button>`}
           </div>
-          <div style="font-size:20px;font-weight:800;color:#1E1F56;margin-bottom:10px">${tm.title}</div>
-          <p style="font-size:14px;color:#3A3E78;line-height:1.7">${tm.body}</p>
-          ${answered ? `` : `<button onclick="revealedGroups.add('${currentGroup.id}_outcome');${station.id === 'station_end' ? 'launchConfetti();' : ''}renderApp()"
-            style="margin-top:16px;background:#1E1F56;color:#fff;border:none;border-radius:8px;
-              padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
-            ${GC.uiCopy.groupCard.approveTransition}
-          </button>`}
         </div>`;
     }
+
   } else if (station.type === 'unexpected_event') {
     const ueGroupColor = COLOR[currentGroup.colorToken].primary;
     const ueGroupBadge = `
-      <h2 style="font-size:26px;font-weight:900;color:#1E1F56;margin:0 0 14px;text-align:center">גלגל הבלת"מ</h2>
+      <h2 style="font-size:30px;font-weight:900;color:#1E1F56;margin:0 0 16px;text-align:center">גלגל הבלת"מ</h2>
       <div style="display:inline-block;background:${ueGroupColor}18;border:1.5px solid ${ueGroupColor}55;
-            border-radius:8px;padding:6px 20px;margin-bottom:18px;font-size:13px;font-weight:700;color:${ueGroupColor}">
-            ${currentGroup.label} — ${currentGroup.divisionName}
-          </div>`;
+        border-radius:8px;padding:6px 20px;margin-bottom:20px;font-size:13px;font-weight:700;color:${ueGroupColor}">
+        ${currentGroup.label} — ${currentGroup.divisionName}</div>`;
+    let ueContent = '';
     if (activeUEResult) {
       const noDelay = activeUEResult.waitRounds === 0;
-      content = `
-        <div style="text-align:center;padding:16px 0">
-          ${ueGroupBadge}
-          <div style="background:#FFF3E0;border:2px solid #E07820;border-radius:12px;
-            padding:22px 20px;margin-bottom:20px;max-width:440px;margin-left:auto;margin-right:auto">
-            <div style="font-size:12px;color:#A05010;margin-bottom:8px;font-weight:600;letter-spacing:.04em">
-              ⚡ תוצאת הגלגל
-            </div>
-            <div style="font-size:19px;font-weight:800;color:#7A3A00;margin-bottom:10px">
-              ${activeUEResult.label}
-            </div>
-            <p style="font-size:14px;color:#5A3000;line-height:1.65;margin:0 0 14px">
-              ${activeUEResult.description}
-            </p>
-            ${noDelay
-              ? `<div style="display:inline-block;background:#E8F5EE;border:1px solid #A8D8B8;
-                   border-radius:6px;padding:6px 16px;font-size:13px;font-weight:700;color:#1A6A3A">
-                   ✓ ממשיכים קדימה — אין עיכוב
-                 </div>`
-              : `<div style="display:inline-block;background:#FEE8EC;border:1px solid #F0A0B0;
-                   border-radius:6px;padding:6px 16px;font-size:13px;font-weight:700;color:#A0001A">
-                   ⏸ הקבוצה ממתינה סבב אחד
-                 </div>`}
-          </div>
-          <button onclick="doUEOutcome('${currentGroup.id}',${noDelay ? 0 : 1})"
-            style="background:#1E1F56;color:#fff;border:none;border-radius:8px;
-              padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">
-            הבנו, ממשיכים ←
-          </button>
-        </div>`;
+      ueContent = `
+        ${ueGroupBadge}
+        <div style="background:#FFF3E0;border:2px solid #E07820;border-radius:12px;
+          padding:22px 20px;margin-bottom:20px;max-width:480px">
+          <div style="font-size:12px;color:#A05010;margin-bottom:8px;font-weight:600;letter-spacing:.04em">⚡ תוצאת הגלגל</div>
+          <div style="font-size:22px;font-weight:800;color:#7A3A00;margin-bottom:10px">${activeUEResult.label}</div>
+          <p style="font-size:15px;color:#5A3000;line-height:1.65;margin:0 0 14px">${activeUEResult.description}</p>
+          ${noDelay
+            ? `<div style="display:inline-block;background:#E8F5EE;border:1px solid #A8D8B8;border-radius:6px;padding:6px 16px;font-size:13px;font-weight:700;color:#1A6A3A">✓ ממשיכים קדימה — אין עיכוב</div>`
+            : `<div style="display:inline-block;background:#FEE8EC;border:1px solid #F0A0B0;border-radius:6px;padding:6px 16px;font-size:13px;font-weight:700;color:#A0001A">⏸ הקבוצה ממתינה סבב אחד</div>`}
+        </div>
+        <button onclick="doUEOutcome('${currentGroup.id}',${noDelay ? 0 : 1})"
+          style="background:#1E1F56;color:#fff;border:none;border-radius:10px;
+            padding:14px 32px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit">
+          הבנו, ממשיכים ←</button>`;
     } else if (ueAlreadyUsed) {
-      content = `
-        <div style="text-align:center;padding:28px 0">
-          ${ueGroupBadge}
-          <div style="font-size:40px;margin-bottom:12px">⚡</div>
-          <p style="font-size:14px;color:#5A5A8A;line-height:1.6;margin-bottom:20px;
-            max-width:320px;margin-left:auto;margin-right:auto">
-            ${GC.uiCopy.messages.unexpectedAlreadyUsed}
-          </p>
-          <button onclick="doUEOutcome('${currentGroup.id}',0)"
-            style="background:#1E1F56;color:#fff;border:none;border-radius:8px;
-              padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">
-            ממשיכים קדימה ←
-          </button>
-        </div>`;
+      ueContent = `
+        ${ueGroupBadge}
+        <div style="font-size:40px;margin-bottom:16px">⚡</div>
+        <p style="font-size:16px;color:#5A5A8A;line-height:1.6;margin-bottom:24px;max-width:360px;text-align:center">
+          ${GC.uiCopy.messages.unexpectedAlreadyUsed}</p>
+        <button onclick="doUEOutcome('${currentGroup.id}',0)"
+          style="background:#1E1F56;color:#fff;border:none;border-radius:10px;
+            padding:14px 32px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit">
+          ממשיכים קדימה ←</button>`;
     } else {
       const devUEList = DEV_MODE && ueSet && ueSet.length
-        ? `<div style="margin-top:28px;text-align:right">
-            <div style="font-size:11px;color:#C8102E;font-weight:700;letter-spacing:.06em;margin-bottom:10px;text-align:center">
-              ⚙ כל התוצאות האפשריות (DEV MODE)
-            </div>
+        ? `<div style="margin-top:24px;text-align:right;max-width:480px">
+            <div style="font-size:11px;color:#C8102E;font-weight:700;letter-spacing:.06em;margin-bottom:10px;text-align:center">⚙ DEV MODE — כל התוצאות</div>
             ${ueSet.map((r, i) => `
               <div style="background:#FFF8F0;border:1px solid #E8C090;border-radius:8px;padding:10px 14px;margin-bottom:8px">
                 <div style="font-size:12px;font-weight:800;color:#7A3A00;margin-bottom:3px">${i+1}. ${r.label}</div>
@@ -2549,76 +2794,51 @@ function renderStationModal() {
                     ? `<span style="background:#E8F5EE;border:1px solid #A8D8B8;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;color:#1A6A3A">✓ אין עיכוב</span>`
                     : `<span style="background:#FEE8EC;border:1px solid #F0A0B0;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;color:#A0001A">⏸ המתנה סבב</span>`}
                   <button onclick="devSelectUEResult('${currentGroup.id}','${station.unexpectedEventSetId}',${i})"
-                    style="background:#E07820;color:#fff;border:none;border-radius:4px;padding:2px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;margin-right:8px">
-                    ⚡ בחר
-                  </button>
+                    style="background:#E07820;color:#fff;border:none;border-radius:4px;padding:2px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;margin-right:8px">⚡ בחר</button>
                 </div>
               </div>`).join('')}
           </div>`
         : '';
-      content = `
-        <div style="text-align:center;padding:8px 0 12px">
-          ${ueGroupBadge}
-          <div class="wheel-css" style="display:block;margin:0 auto 20px"></div>
-          <button onclick="spinWheel('${currentGroup.id}','${station.unexpectedEventSetId}')"
-            style="background:#E07820;color:#fff;border:none;border-radius:10px;
-              padding:16px 40px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;
-              box-shadow:0 4px 16px rgba(224,120,32,.35)">
-            ⚡ ${copy.buttons.spinWheel}
-          </button>
-          ${devUEList}
-        </div>`;
+      ueContent = `
+        ${ueGroupBadge}
+        <div class="wheel-css" style="display:block;margin:0 auto 24px"></div>
+        <button onclick="spinWheel('${currentGroup.id}','${station.unexpectedEventSetId}')"
+          style="background:#E07820;color:#fff;border:none;border-radius:10px;
+            padding:16px 40px;font-size:18px;font-weight:700;cursor:pointer;font-family:inherit;
+            box-shadow:0 4px 16px rgba(224,120,32,.35)">
+          ⚡ ${copy.buttons.spinWheel}</button>
+        ${devUEList}`;
     }
+    mainHtml = `
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;margin-top:24px">
+        <div style="display:flex;flex-direction:column;align-items:center;background:#fff;
+          border-radius:22px;border:1px solid #e4e7f1;box-shadow:0 8px 26px rgba(34,31,100,.10);
+          padding:40px 56px;text-align:center;max-width:720px;width:100%">
+          ${ueContent}
+        </div>
+      </div>`;
+
   } else {
-    content = `<p style="color:#667;text-align:center">${GC.uiCopy.messages.noStationQuestion}</p>`;
+    mainHtml = `
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;margin-top:32px">
+        <p style="color:#667;font-size:18px;text-align:center">${GC.uiCopy.messages.noStationQuestion}</p>
+      </div>`;
   }
 
   return `
-    <div style="position:fixed;inset:0;background:rgba(30,31,86,.55);z-index:600;
-      display:flex;align-items:center;justify-content:center;padding:20px;direction:rtl"
-      onclick="if(event.target===this && ${canClose ? 'true' : 'false'})goBackToMap()">
-      <div style="background:#F0F2F7;border-radius:14px;width:100%;max-width:700px;
-        max-height:90vh;overflow-y:auto;padding:24px;box-shadow:0 8px 32px rgba(30,31,86,.3)">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-          ${station.type === 'unexpected_event' || station.id === 'station_start' || station.id === 'station_end' || isWaiting
-            ? `<div style="flex:1"></div>`
-            : `<div style="flex:1">
-                <div style="font-size:11px;color:#8A90C0">${station.month || ''}</div>
-                <h2 style="font-size:20px;font-weight:800;color:#1E1F56;margin:0">${station.name}</h2>
-              </div>`}
-          ${canClose ? `` : `<span style="font-size:11px;color:#8A90C0">${GC.uiCopy.groupCard.mustAnswerFirst}</span>`}
-          <button onclick="closeStationModal()"
-            style="background:none;border:1.5px solid #C0C4E0;border-radius:6px;
-              width:32px;height:32px;font-size:16px;cursor:pointer;color:#6A70A0;
-              display:flex;align-items:center;justify-content:center;flex-shrink:0"
-            title="סגירה ללא מעבר תור">✕</button>
+    <div id="board-fitwrap" style="width:100vw;height:100vh;overflow:hidden;background:#dfe2e8;
+      display:flex;align-items:center;justify-content:center">
+      <div id="gameboard" style="width:1920px;height:1080px;flex:none;transform-origin:center center;
+        position:relative;overflow:hidden;background:#eef0f4 url('assets/board-bg.png') center/cover no-repeat">
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;
+          padding:34px 56px 40px;font-family:Heebo,Arial,sans-serif;direction:rtl;color:#221f64">
+          ${closeBtn}
+          ${headerHtml}
+          ${stationRowHtml}
+          ${mainHtml}
         </div>
-        ${content}
       </div>
-    </div>
-    ${outcomePopupVisible && lastOutcome ? (() => {
-      const g   = GC.groups.find(x => x.id === lastOutcome.groupId);
-      const col = COLOR[g.colorToken];
-      const o   = lastOutcome.outcome;
-      const icon  = o === 'correct' ? '✅' : o === 'partial' ? '⚠️' : '❌';
-      const title = o === 'correct' ? 'תשובה נכונה!'
-                  : o === 'partial' ? 'תשובה חלקית'
-                  : 'תשובה שגויה';
-      const pts   = o === 'correct' ? '+10' : o === 'partial' ? '+5' : '+0';
-      const ptsColor = o === 'correct' ? '#1A7A40' : o === 'partial' ? '#8A6A00' : '#A0001A';
-      const next  = o === 'wrong' ? 'מתקדמים לתחנה הבאה — ממתינים סבב אחד ⏳'
-                  : 'מתקדמים לתחנה הבאה 🚀';
-      return `<div class="outcome-popup-overlay" onclick="if(event.target===this)dismissOutcomePopup()">
-        <div class="outcome-popup" style="border-top:6px solid ${col.primary}">
-          <div class="outcome-popup-icon">${icon}</div>
-          <div class="outcome-popup-title" style="color:${col.primary}">${g.label} — ${g.divisionName}</div>
-          <div class="outcome-popup-title">${title}</div>
-          <div class="outcome-popup-points" style="color:${ptsColor}">${pts} נקודות</div>
-          <div class="outcome-popup-msg">${next}</div>
-          <button class="outcome-popup-btn" onclick="dismissOutcomePopup()">הבנו, ממשיכים ←</button>
-        </div>
-      </div>`;
-    })() : ''}`;
+    </div>`;
 }
 
 function renderGroupCardModal(group, question, answered, devMode) {
@@ -2874,13 +3094,20 @@ function toggleTimer(totalSecs) {
       if (timerRemaining <= 0) { timerRemaining = 0; stopTimer(); }
       const d = document.getElementById('timer-display');
       const b = document.getElementById('timer-btn');
+      const arc = document.getElementById('timer-ring-arc');
+      const tColor = timerRemaining === 0 ? '#e84d3d' : timerRemaining <= 10 ? '#e0a200' : '#221f64';
       if (d) {
-        d.textContent = timerRemaining;
-        d.style.color = timerRemaining > 30 ? '#1E6A3A' : timerRemaining > 15 ? '#B07800' : '#C8102E';
+        const m = Math.floor(timerRemaining/60), s = timerRemaining%60;
+        d.textContent = m + ':' + String(s).padStart(2,'0');
+        d.style.color = tColor;
+      }
+      if (arc) {
+        arc.setAttribute('stroke-dashoffset', (590.6 * (1 - timerRemaining / totalSecs)).toFixed(1));
+        arc.setAttribute('stroke', tColor);
       }
       if (b && timerRemaining === 0) {
-        b.textContent = GC.uiCopy.buttons.startTimer;
-        b.style.background = '#1A3A2A';
+        b.textContent = 'הפעילו טיימר';
+        b.style.background = '#1a8c4e';
       }
     }, 1000);
     renderApp();
@@ -3012,16 +3239,24 @@ function renderDevView(app) {
 }
 
 // ── Mobile ──────────────────────────────────────────────
+const MOB_PAL = [
+  { primary:'#00aeff', deep:'#0a6aa0', fg:'#fff',    tint:'#eaf6fd' },
+  { primary:'#1abe9b', deep:'#11876e', fg:'#fff',    tint:'#e8f7f2' },
+  { primary:'#f4c40f', deep:'#9a7a00', fg:'#221f64', tint:'#fdf7e0' },
+  { primary:'#e84d3d', deep:'#c0392b', fg:'#fff',    tint:'#fdeeeb' },
+];
 let mobileSplashDone = {};
 
 function renderMobile(app, groupId) {
   const group = GC.groups.find(g => g.id === groupId) || GC.groups[0];
-  const col = COLOR[group.colorToken];
+  const gpIdx = GC.groups.indexOf(group);
+  const pal = MOB_PAL[gpIdx] || MOB_PAL[0];
 
   if (gameOver && winnerId) {
     const isWinner = group.id === winnerId;
     const winnerGroup = GC.groups.find(g => g.id === winnerId);
-    const winnerCol = COLOR[winnerGroup.colorToken];
+    const winnerIdx = GC.groups.indexOf(winnerGroup);
+    const winnerPal = MOB_PAL[winnerIdx] || MOB_PAL[0];
     const ranked = [...GC.groups].sort((a, b) => {
       const ga = gameState[a.id] || {}, gb = gameState[b.id] || {};
       if ((ga.finishedRound||99) !== (gb.finishedRound||99)) return (ga.finishedRound||99) - (gb.finishedRound||99);
@@ -3031,24 +3266,24 @@ function renderMobile(app, groupId) {
     const medals = ['🥇', '🥈', '🥉', '4️⃣'];
     const rows = ranked.map((g, i) => {
       const gst = gameState[g.id] || {};
-      const gc = COLOR[g.colorToken];
+      const gpal = MOB_PAL[GC.groups.indexOf(g)] || MOB_PAL[0];
       const isMe = g.id === group.id;
       return `<div style="display:flex;align-items:center;gap:10px;padding:9px 14px;
-          background:${isMe ? gc.light : '#F8F9FC'};border-radius:8px;
-          border:1.5px solid ${isMe ? gc.primary : '#E0E4F0'}">
+          background:${isMe ? gpal.tint : '#F8F9FC'};border-radius:8px;
+          border:1.5px solid ${isMe ? gpal.primary : '#E0E4F0'}">
         <span style="font-size:18px;min-width:28px">${medals[i]}</span>
         <div style="flex:1;font-size:13px;font-weight:700;color:#1E1F56">${g.label}</div>
-        <div style="font-size:13px;font-weight:800;color:${gc.primary}">${gst.points||0} נק'</div>
+        <div style="font-size:13px;font-weight:800;color:${gpal.primary}">${gst.points||0} נק'</div>
       </div>`;
     }).join('');
-    app.innerHTML = `<div dir="rtl" style="min-height:100vh;background:${isWinner ? winnerCol.light : '#F5F7FA'};
+    app.innerHTML = `<div dir="rtl" style="min-height:100vh;background:${isWinner ? winnerPal.tint : '#F5F7FA'};
       display:flex;flex-direction:column;align-items:center;justify-content:center;
       padding:32px 24px;text-align:center">
       <div style="font-size:72px;line-height:1;margin-bottom:12px">${isWinner ? '🏆' : medals[myRank-1]}</div>
       <div style="font-size:28px;font-weight:900;color:#1E1F56;margin-bottom:6px">
         ${isWinner ? 'ניצחנו!' : 'כל הכבוד!'}
       </div>
-      <div style="display:inline-block;background:${col.primary};color:#fff;
+      <div style="display:inline-block;background:${pal.primary};color:${pal.fg};
         border-radius:10px;padding:6px 20px;font-size:14px;font-weight:700;margin-bottom:6px">
         ${group.label} — ${group.divisionName}
       </div>
@@ -3070,15 +3305,12 @@ function renderMobile(app, groupId) {
 
   // כפתור חזרה ללוח — גלוי רק למנחה (facilitatorPreview)
   if (facilitatorPreview || DEV_MODE) {
-    const backBar = document.createElement('div');
-    backBar.style.cssText = 'position:fixed;top:0;right:0;left:0;z-index:9999;background:rgba(30,31,86,.92);padding:6px 12px;display:flex;gap:8px;align-items:center';
-    backBar.innerHTML = `<button onclick="currentView='facilitator';renderApp()"
-      style="background:#F5C800;color:#000;border:none;border-radius:6px;
-        padding:5px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
-      ← חזרה ללוח
-    </button>
-    <span style="color:#A0A8D8;font-size:12px">${group.label} · ${group.divisionName}</span>`;
-    document.getElementById('app').prepend(backBar);
+    const backBtn = document.createElement('button');
+    backBtn.onclick = () => { currentView = 'facilitator'; renderApp(); };
+    backBtn.title = `${group.label} · ${group.divisionName} — חזרה ללוח`;
+    backBtn.style.cssText = 'position:fixed;top:50%;left:8px;transform:translateY(-50%);z-index:9999;background:rgba(30,31,86,.88);border:none;border-radius:20px;width:36px;height:60px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.35);font-size:18px;color:#fff';
+    backBtn.innerHTML = '🏠';
+    document.getElementById('app').prepend(backBtn);
   }
 
   // Lock folder if another group is currently playing
@@ -3086,22 +3318,26 @@ function renderMobile(app, groupId) {
   const isLocked = !DEV_MODE && !facilitatorPreview && gameStarted && group.id !== currentGroup.id;
 
   if (isLocked) {
-    renderFolderLocked(wrap, group, col, currentGroup);
+    renderFolderLocked(wrap, group, pal, currentGroup);
     return;
   }
 
   if (!mobileSplashDone[groupId]) {
-    renderSplash(wrap, group, col);
+    renderSplash(wrap, group, pal);
+  } else if (refOpen) {
+    const goals = GC.companyGoals || [];
+    const glossary = GC.planningGlossary || [];
+    renderReferenceScreen(wrap, pal, goals, glossary);
   } else {
-    renderFolder(wrap, group, col);
+    renderFolder(wrap, group, pal);
   }
 }
 
-function renderFolderLocked(wrap, group, col, currentGroup) {
+function renderFolderLocked(wrap, group, pal, currentGroup) {
   const msg = GC.uiCopy.mobileFolder.lockedMessage
     .replace('{group}', currentGroup.label);
   wrap.innerHTML = `
-    <div class="splash-bar" style="background:${col.primary}"></div>
+    <div class="splash-bar" style="background:${pal.primary}"></div>
     <div style="flex:1;display:flex;flex-direction:column;align-items:center;
       justify-content:center;padding:32px 24px;gap:20px;background:#F5F7FA;min-height:100vh">
       <div style="font-size:48px">🔒</div>
@@ -3112,24 +3348,24 @@ function renderFolderLocked(wrap, group, col, currentGroup) {
     </div>`;
 }
 
-function renderSplash(wrap, group, col) {
+function renderSplash(wrap, group, pal) {
   const copy = GC.uiCopy;
   wrap.innerHTML = `
-    <div class="splash-bar" style="background:${col.primary}"></div>
+    <div class="splash-bar" style="background:${pal.primary}"></div>
     <div class="splash">
       <div class="splash-logo">
         <div class="splash-logo-line"></div>
-        <span class="splash-logo-text" style="color:${col.primary}">${copy.appTitle}</span>
+        <span class="splash-logo-text" style="color:${pal.primary}">${copy.appTitle}</span>
         <div class="splash-logo-line"></div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
-        <span class="splash-badge" style="background:${col.primary}">${group.label}</span>
+        <span class="splash-badge" style="background:${pal.primary}">${group.label}</span>
         <span class="splash-div">${group.divisionName}</span>
       </div>
       <div class="splash-intro-card">
         <p>${copy.messages.mobileIntro}</p>
       </div>
-      <button class="splash-btn" style="background:${col.primary}"
+      <button class="splash-btn" style="background:${pal.primary}"
         onclick="startFolder('${group.id}')">
         ${copy.buttons.openFolder}
       </button>
@@ -3144,138 +3380,143 @@ function startFolder(groupId) {
 let activeTab = {};
 let openTasks = {};
 let reminderOpen = {};
+let refOpen = false, refTab = 'goals', openGoals = {};
 
-function renderFolder(wrap, group, col) {
-  const copy = GC.uiCopy;
+function renderFolder(wrap, group, pal) {
   const gid = group.id;
   const tab = activeTab[gid] || 'tasks';
   const tasks = GC.visibleTasks[gid] || [];
   const comp = GC.compensationModels[gid];
-  const reminders = GC.reminderDefinitions;
+
+  const content = tab === 'tasks' ? renderTasksList(tasks, pal, gid) : renderCompCard(comp, pal, gid);
 
   wrap.innerHTML = `
-    <div class="m-header" style="border-bottom:3px solid ${col.primary}">
-      <div class="m-header-top">
-        <span class="m-badge" style="background:${col.primary}">${group.label}</span>
-        <span class="m-div-name">${group.divisionName}</span>
+    <div style="flex-shrink:0;background:#fff;border-bottom:3px solid ${pal.primary};padding:18px 20px 14px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="background:${pal.primary};color:${pal.fg};font-size:14px;font-weight:800;border-radius:999px;padding:5px 15px">${group.label}</span>
+        <span style="font-size:15px;font-weight:600;color:#5a6075">${group.divisionName}</span>
       </div>
-      <div class="m-title">${copy.appTitle}</div>
+      <div style="display:flex;align-items:center;gap:9px;margin-top:12px">
+        <img src="assets/logo-mesilot.png" alt="מסילות" style="height:30px;width:auto">
+        <img src="assets/logo-vetichnunim.png" alt="ותכנונים" style="height:22px;width:auto;margin-top:3px">
+      </div>
     </div>
-    <div class="m-tabs">
-      <button class="m-tab" style="border-bottom:3px solid ${tab==='tasks' ? col.primary : 'transparent'};
-        color:${tab==='tasks' ? col.text : '#666'};font-weight:${tab==='tasks' ? 700:400}"
-        onclick="switchTab('${gid}','tasks')">${copy.tabs.reviewTasks}</button>
-      <button class="m-tab" style="border-bottom:3px solid ${tab==='compensation' ? col.primary : 'transparent'};
-        color:${tab==='compensation' ? col.text : '#666'};font-weight:${tab==='compensation' ? 700:400}"
-        onclick="switchTab('${gid}','compensation')">${copy.tabs.compensationModel}</button>
+    <div style="flex-shrink:0;display:flex;background:#fff;border-bottom:1px solid #eceef4">
+      <button onclick="switchTab('${gid}','tasks')" style="flex:1;padding:14px 8px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:15px;font-weight:${tab==='tasks'?'800':'500'};color:${tab==='tasks'?pal.deep:'#8990a8'};border-bottom:3px solid ${tab==='tasks'?pal.primary:'transparent'}">משימות לבדיקה</button>
+      <button onclick="switchTab('${gid}','compensation')" style="flex:1;padding:14px 8px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:15px;font-weight:${tab==='compensation'?'800':'500'};color:${tab==='compensation'?pal.deep:'#8990a8'};border-bottom:3px solid ${tab==='compensation'?pal.primary:'transparent'}">מודל תגמול לבדיקה</button>
     </div>
-    <div class="m-content">
-      ${tab === 'tasks' ? renderTasksList(tasks, col, gid) : renderCompCard(comp, col, gid)}
-    </div>
-    <div class="reminder-bar">
-      <button class="reminder-btn" style="color:${col.primary};border-color:${col.primary}"
-        onclick="toggleReminder('${gid}')">${copy.buttons.needReminder}</button>
-    </div>
-    ${reminderOpen[gid] ? renderReminderDrawer(reminders, col, gid) : ''}`;
+    <div style="flex:1;min-height:0;overflow:auto;padding:16px 16px 16px">${content}</div>
+    <div style="flex-shrink:0;background:#fff;padding:12px 16px 16px;border-top:1px solid #eceef4">
+      <button onclick="openRef()" style="width:100%;padding:16px;border-radius:14px;border:none;cursor:pointer;font-family:inherit;font-size:17px;font-weight:800;color:${pal.fg};background:${pal.primary};box-shadow:0 5px 16px rgba(34,31,100,.22);display:flex;align-items:center;justify-content:center;gap:10px">
+        <span style="font-size:20px">📖</span>חומרי עזר · צריכים תזכורת?
+      </button>
+    </div>`;
 }
 
-function renderTasksList(tasks, col, gid) {
+function renderTasksList(tasks, pal, gid) {
   if (!tasks || tasks.length === 0) {
     return `<div style="padding:20px 4px;color:#8A9AAA;font-size:13px;line-height:1.6">
       ${GC.uiCopy.messages.mobileTasksFallback}
     </div>`;
   }
-  return `<div class="task-list">
-    ${tasks.map(t => renderTaskCard(t, col, gid)).join('')}
+  return `<div style="display:flex;flex-direction:column;gap:12px">
+    ${tasks.map(t => renderTaskCard(t, pal, gid)).join('')}
   </div>`;
 }
 
-function renderTaskCard(task, col, gid) {
+function renderTaskCard(task, pal, gid) {
   const open = !!(openTasks[gid] && openTasks[gid][task.taskId]);
-  // Dev: set of intentionally-wrong field names for this task
   const errs = (DEV_MODE && task.devErrors) ? new Set(task.devErrors) : new Set();
-  // Wrap a value: orange+⚠️ if intentional error, red if יושלם placeholder, else plain
   const dv = (v, field) => {
     if (errs.has(field)) return `<span style="background:#FFF3CD;color:#7A5000;font-weight:700;padding:0 4px;border-radius:3px;border-bottom:2px solid #E07000">⚠️ ${v}</span>`;
     return devStyleVal(v);
   };
   const classLabel = task.classification === 'top10' ? GC.uiCopy.classificationLabels.top10 : GC.uiCopy.classificationLabels.routine;
+  const isTop10 = task.classification === 'top10';
+  const tagBg = isTop10 ? pal.primary : '#eef0f5', tagFg = isTop10 ? pal.fg : '#7a809a';
   const nameDisplay = errs.has('taskName')
     ? `<span style="background:#FFF3CD;color:#7A5000;font-weight:700;padding:0 4px;border-radius:3px;border-bottom:2px solid #E07000">⚠️ ${task.taskName}</span>`
     : task.taskName;
   const milestonesErr = errs.has('milestones');
+  const msWrapStyle = `display:flex;flex-direction:column;gap:9px${milestonesErr ? ';border:1.5px solid #E07000;border-radius:6px;padding:6px;background:#FFFBF0' : ''}`;
+
+  const detail = open ? `
+    <div style="padding:4px 16px 18px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <span style="font-size:12px;font-weight:800;letter-spacing:.03em;color:${pal.primary}">${GC.uiCopy.taskSections.strategic}</span>
+        <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.companyGoal}</span><span class="f-val">${dv(task.companyGoal,'companyGoal')}</span></div>
+        <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.goal}</span><span class="f-val">${dv(task.goal,'goal')}</span></div>
+        <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.outcomeMetric}</span><span class="f-val">${dv(task.outcomeMetric,'outcomeMetric')}</span></div>
+        <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.classification}</span><span class="f-val">${dv(classLabel,'classification')}</span></div>
+      </div>
+      <div style="height:1px;background:#eef0f5"></div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <span style="font-size:12px;font-weight:800;letter-spacing:.03em;color:${pal.primary}">${GC.uiCopy.taskSections.details}</span>
+        <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.taskDescription}</span><span class="f-val">${dv(task.taskDescription,'taskDescription')}</span></div>
+        <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.annualAchievement}</span><span class="f-val">${dv(task.annualAchievement,'annualAchievement')}</span></div>
+        <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.outputMetricType}</span><span class="f-val">${dv(task.outputMetricType,'outputMetricType')}</span></div>
+      </div>
+      <div style="height:1px;background:#eef0f5"></div>
+      <div style="${msWrapStyle}">
+        <span style="font-size:12px;font-weight:800;letter-spacing:.03em;color:${pal.primary}">${GC.uiCopy.taskSections.planning}${milestonesErr ? ' <span style="color:#E07000;font-size:13px">⚠️</span>' : ''}</span>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          ${['Q1','Q2','Q3','Q4'].map(q => {
+            const qVal = milestonesErr
+              ? `<span style="background:#FFF3CD;color:#7A5000;font-weight:700;padding:0 2px;border-radius:3px">⚠️ ${task.milestones[q]}</span>`
+              : devStyleVal(task.milestones[q]);
+            return `<div style="background:#f6f7fb;border-radius:10px;padding:9px 11px;display:flex;flex-direction:column;gap:3px">
+              <span style="font-size:11px;font-weight:800;color:#fff;background:${milestonesErr ? '#e07000' : pal.primary};border-radius:6px;padding:1px 8px;align-self:flex-start">${q}</span>
+              <span style="font-size:12.5px;font-weight:600;color:#2e3450;line-height:1.4">${qVal}</span>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+      ${DEV_MODE && task.devHint ? (() => {
+        const FIELD_TO_QID = {
+          taskName: 'q_measurable', companyGoal: 'q_company_goal', goal: 'q_company_goal',
+          outcomeMetric: 'q_outcome_metric', classification: 'q_top10',
+          annualAchievement: 'q_measurable', outputMetricType: 'q_output_metric',
+          milestones: 'q_milestones'
+        };
+        const QID_LABELS = {
+          q_company_goal: 'מטרת חברה ויעד',
+          q_outcome_metric: 'מדד תוצאה',
+          q_top10: 'Top 10 / שוטפת',
+          q_measurable: 'ניסוח מדיד',
+          q_output_metric: 'מדד תפוקה',
+          q_milestones: 'אבני דרך רבעוניות'
+        };
+        const uniqueQids = [...new Set((task.devErrors || []).map(f => FIELD_TO_QID[f]).filter(Boolean))];
+        const stationsHtml = uniqueQids.map(qid => {
+          const q = GC.stationQuestions.find(sq => sq.id === qid);
+          if (!q) return '';
+          const ans = q.answersByGroup ? q.answersByGroup[gid] : null;
+          return `<div style="margin-top:6px;padding:6px 8px;background:#FFF8E1;border-radius:4px;border-right:2px solid #C8920A">
+            <div style="font-weight:700;color:#5D4000;margin-bottom:3px">📍 תחנה: ${QID_LABELS[qid] || qid}</div>
+            <div style="color:#6B4D00;margin-bottom:2px"><strong>שאלה:</strong> ${q.questionText}</div>
+            ${ans ? `<div style="color:#7A3000;margin-bottom:2px"><strong>מה שגוי:</strong> ${ans.whatIsWrong}</div>
+            <div style="color:#2D5A00"><strong>תיקון:</strong> ${ans.correctFix}</div>` : ''}
+          </div>`;
+        }).join('');
+        return `<div style="margin-top:8px;padding:8px 10px;background:#FFF3CD;border-radius:6px;border-right:3px solid #E0A020;font-size:11px;color:#7A5000;line-height:1.6;direction:rtl">
+          <strong>⚠️ טעות מוטמנת</strong>
+          ${stationsHtml}
+        </div>`;
+      })() : ''}
+    </div>` : '';
+
   return `
-    <div class="t-card" style="border-right:3px solid ${col.primary}">
+    <div style="background:#fff;border-radius:14px;border-right:4px solid ${pal.primary};box-shadow:0 2px 8px rgba(34,31,100,.07);overflow:hidden">
       <button class="t-card-header" onclick="toggleTask('${gid}','${task.taskId}')">
-        <span class="t-card-name">${nameDisplay}</span>
+        <span style="flex:1;font-size:15.5px;font-weight:700;color:#1b1c4e;line-height:1.35">${nameDisplay}</span>
+        <span style="font-size:11px;font-weight:700;border-radius:999px;padding:3px 10px;background:${tagBg};color:${tagFg};white-space:nowrap">${classLabel}</span>
         <span class="chevron" style="transform:rotate(${open?180:0}deg)">▾</span>
       </button>
-      ${open ? `
-        <div class="t-card-body">
-          <div class="t-section">
-            <div class="t-section-title" style="color:${col.primary}">${GC.uiCopy.taskSections.strategic}</div>
-            <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.companyGoal}</span><span class="f-val">${dv(task.companyGoal,'companyGoal')}</span></div>
-            <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.goal}</span><span class="f-val">${dv(task.goal,'goal')}</span></div>
-            <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.outcomeMetric}</span><span class="f-val">${dv(task.outcomeMetric,'outcomeMetric')}</span></div>
-            <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.classification}</span><span class="f-val">${dv(classLabel,'classification')}</span></div>
-          </div>
-          <div class="t-divider"></div>
-          <div class="t-section">
-            <div class="t-section-title" style="color:${col.primary}">${GC.uiCopy.taskSections.details}</div>
-            <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.taskDescription}</span><span class="f-val">${dv(task.taskDescription,'taskDescription')}</span></div>
-            <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.annualAchievement}</span><span class="f-val">${dv(task.annualAchievement,'annualAchievement')}</span></div>
-            <div class="f-row"><span class="f-lbl">${GC.uiCopy.taskFields.outputMetricType}</span><span class="f-val">${dv(task.outputMetricType,'outputMetricType')}</span></div>
-          </div>
-          <div class="t-divider"></div>
-          <div class="t-section"${milestonesErr ? ' style="border:1.5px solid #E07000;border-radius:6px;padding:6px;background:#FFFBF0"' : ''}>
-            <div class="t-section-title" style="color:${col.primary}">${GC.uiCopy.taskSections.planning}${milestonesErr ? ' <span style="color:#E07000;font-size:13px">⚠️</span>' : ''}</div>
-            <div class="milestones-grid">
-              ${['Q1','Q2','Q3','Q4'].map(q => `
-                <div class="m-cell">
-                  <div class="m-q" style="background:${col.primary}">${q}</div>
-                  <div class="m-v">${milestonesErr
-                    ? `<span style="background:#FFF3CD;color:#7A5000;font-weight:700;padding:0 2px;border-radius:3px">⚠️ ${task.milestones[q]}</span>`
-                    : devStyleVal(task.milestones[q])}</div>
-                </div>`).join('')}
-            </div>
-          </div>
-          ${DEV_MODE && task.devHint ? (() => {
-            const FIELD_TO_QID = {
-              taskName: 'q_measurable', companyGoal: 'q_company_goal', goal: 'q_company_goal',
-              outcomeMetric: 'q_outcome_metric', classification: 'q_top10',
-              annualAchievement: 'q_measurable', outputMetricType: 'q_output_metric',
-              milestones: 'q_milestones'
-            };
-            const QID_LABELS = {
-              q_company_goal: 'מטרת חברה ויעד',
-              q_outcome_metric: 'מדד תוצאה',
-              q_top10: 'Top 10 / שוטפת',
-              q_measurable: 'ניסוח מדיד',
-              q_output_metric: 'מדד תפוקה',
-              q_milestones: 'אבני דרך רבעוניות'
-            };
-            const uniqueQids = [...new Set((task.devErrors || []).map(f => FIELD_TO_QID[f]).filter(Boolean))];
-            const stationsHtml = uniqueQids.map(qid => {
-              const q = GC.stationQuestions.find(sq => sq.id === qid);
-              if (!q) return '';
-              const ans = q.answersByGroup ? q.answersByGroup[gid] : null;
-              return `<div style="margin-top:6px;padding:6px 8px;background:#FFF8E1;border-radius:4px;border-right:2px solid #C8920A">
-                <div style="font-weight:700;color:#5D4000;margin-bottom:3px">📍 תחנה: ${QID_LABELS[qid] || qid}</div>
-                <div style="color:#6B4D00;margin-bottom:2px"><strong>שאלה:</strong> ${q.questionText}</div>
-                ${ans ? `<div style="color:#7A3000;margin-bottom:2px"><strong>מה שגוי:</strong> ${ans.whatIsWrong}</div>
-                <div style="color:#2D5A00"><strong>תיקון:</strong> ${ans.correctFix}</div>` : ''}
-              </div>`;
-            }).join('');
-            return `<div style="margin-top:8px;padding:8px 10px;background:#FFF3CD;border-radius:6px;border-right:3px solid #E0A020;font-size:11px;color:#7A5000;line-height:1.6;direction:rtl">
-              <strong>⚠️ טעות מוטמנת</strong>
-              ${stationsHtml}
-            </div>`;
-          })() : ''}
-        </div>` : ''}
+      ${detail}
     </div>`;
 }
 
-function renderCompCard(comp, col, gid) {
+function renderCompCard(comp, pal, gid) {
   if (!comp) return '<p style="color:#888;padding:12px">' + GC.uiCopy.messages.mobileNoCompensation + '</p>';
   const errs = (DEV_MODE && comp.devErrors) ? new Set(comp.devErrors) : new Set();
   const dv = (v, field) => {
@@ -3308,8 +3549,8 @@ function renderCompCard(comp, col, gid) {
       ${stationsHtml}
     </div>`;
   })() : '';
-  return `<div class="comp-card">
-    <div class="comp-title" style="color:${col.primary}">${comp.modelName}</div>
+  return `<div style="background:#fff;border-radius:14px;border-right:4px solid ${pal.primary};box-shadow:0 2px 8px rgba(34,31,100,.07);padding:20px 18px;display:flex;flex-direction:column;gap:14px">
+    <span style="font-size:18px;font-weight:800;color:${pal.primary};line-height:1.3">${comp.modelName}</span>
     <div class="f-row"><span class="f-lbl">${GC.uiCopy.compensationFields.rewardMetric}</span><span class="f-val">${dv(comp.rewardMetric,'rewardMetric')}</span></div>
     <div class="f-row"><span class="f-lbl">${GC.uiCopy.compensationFields.formula}</span><span class="f-val">${dv(comp.formula,'formula')}</span></div>
     <div class="f-row"><span class="f-lbl">${GC.uiCopy.compensationFields.weight}</span><span class="f-val">${dv(comp.weight,'weight')}</span></div>
@@ -3333,6 +3574,60 @@ function renderReminderDrawer(defs, col, gid) {
         </div>`).join('')}
       <button class="drawer-close" style="color:${col.primary};border-color:${col.primary}"
         onclick="toggleReminder('${gid}')">${copy.buttons.cancel}</button>
+    </div>`;
+}
+
+function renderReferenceScreen(wrap, pal, goals, glossary) {
+  let inner = '';
+  if (refTab === 'goals') {
+    inner = `<div style="display:flex;flex-direction:column;gap:11px">
+      <p style="font-size:13px;font-weight:500;color:#7a809a;line-height:1.5;padding:0 2px 2px">מטרות החברה ויעדיה לשנת 2026. הקישו על מטרה כדי לפתוח את היעדים שתחתיה.</p>` +
+      goals.map((g, idx) => {
+        const open = !!openGoals[idx];
+        const objs = open ? `<div style="padding:0 16px 16px 16px;display:flex;flex-direction:column;gap:8px">` +
+          (g.objectives||[]).map(o => `<div style="display:flex;gap:10px;align-items:flex-start;background:${pal.tint};border-radius:10px;padding:11px 13px">
+            <span style="font-size:13px;font-weight:800;color:${pal.primary};flex-shrink:0">${o.code}</span>
+            <span style="font-size:14px;font-weight:500;color:#3a3f5c;line-height:1.5">${o.text}</span></div>`).join('') + `</div>` : '';
+        return `<div style="background:#fff;border-radius:14px;box-shadow:0 2px 8px rgba(34,31,100,.07);overflow:hidden">
+          <button onclick="toggleGoal(${idx})" style="width:100%;display:flex;align-items:center;gap:12px;padding:15px 16px;border:none;background:none;cursor:pointer;font-family:inherit;text-align:right">
+            <span style="width:34px;height:34px;border-radius:50%;background:${pal.primary};color:${pal.fg};display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0">${g.n}</span>
+            <span style="flex:1;font-size:15.5px;font-weight:700;color:#1b1c4e;line-height:1.35">${g.title}</span>
+            <span style="font-size:13px;color:#aab;transform:rotate(${open?180:0}deg);transition:transform .2s">▼</span>
+          </button>${objs}</div>`;
+      }).join('') + `</div>`;
+  } else {
+    inner = `<div style="display:flex;flex-direction:column;gap:12px">
+      <p style="font-size:13px;font-weight:500;color:#7a809a;line-height:1.5;padding:0 2px 2px">מושגים בשפת התכנון — הגדרה, דוגמה וגורם אחראי.</p>` +
+      glossary.map(d => {
+        const ex = d.example ? `<div style="display:flex;gap:9px;align-items:flex-start;background:${pal.tint};border-radius:10px;padding:11px 13px">
+          <span style="font-size:15px;flex-shrink:0">💡</span>
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <span style="font-size:11px;font-weight:800;color:${pal.primary}">דוגמה</span>
+            <span style="font-size:13.5px;font-weight:600;color:#2e3450;line-height:1.5">${d.example}</span></div></div>` : '';
+        const resp = d.responsible ? `<div style="display:flex;align-items:center;gap:7px">
+          <span style="font-size:11.5px;font-weight:700;color:#9aa0b8">גורם אחראי:</span>
+          <span style="font-size:12px;font-weight:700;color:#5a6075;background:#eef0f5;border-radius:999px;padding:3px 12px">${d.responsible}</span></div>` : '';
+        return `<div style="background:#fff;border-radius:14px;box-shadow:0 2px 8px rgba(34,31,100,.07);padding:16px 17px;display:flex;flex-direction:column;gap:10px">
+          <span style="font-size:17px;font-weight:800;color:${pal.primary}">${d.term}</span>
+          <span style="font-size:14px;font-weight:500;color:#3a3f5c;line-height:1.55">${d.definition}</span>${ex}${resp}</div>`;
+      }).join('') + `</div>`;
+  }
+
+  wrap.innerHTML = `
+    <div style="min-height:100vh;background:#f4f5f9;display:flex;flex-direction:column">
+      <div style="flex-shrink:0;background:${pal.primary};padding:16px 18px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <button onclick="closeRef()" style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.92);border:none;border-radius:999px;padding:9px 16px 9px 18px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:800;color:${pal.primary}">
+            <span style="font-size:17px;line-height:1">→</span>חזרה לתיק העבודה
+          </button>
+          <span style="flex:1;text-align:left;font-size:17px;font-weight:800;color:${pal.fg}">חומרי עזר</span>
+        </div>
+        <div style="display:flex;background:rgba(255,255,255,.22);border-radius:12px;padding:4px;gap:4px">
+          <button onclick="setRefTab('goals')" style="flex:1;padding:11px 8px;border:none;border-radius:9px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:800;background:${refTab==='goals'?'#fff':'transparent'};color:${refTab==='goals'?pal.deep:pal.fg}">מטרות ויעדי החברה</button>
+          <button onclick="setRefTab('glossary')" style="flex:1;padding:11px 8px;border:none;border-radius:9px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:800;background:${refTab==='glossary'?'#fff':'transparent'};color:${refTab==='glossary'?pal.deep:pal.fg}">מילון מושגים</button>
+        </div>
+      </div>
+      <div style="flex:1;overflow:auto;padding:16px 16px 28px">${inner}</div>
     </div>`;
 }
 
@@ -3374,6 +3669,10 @@ function toggleTask(gid, taskId) {
   renderApp();
 }
 function toggleReminder(gid) { reminderOpen[gid] = !reminderOpen[gid]; renderApp(); }
+function openRef() { refOpen = true; renderApp(); }
+function closeRef() { refOpen = false; renderApp(); }
+function setRefTab(t) { refTab = t; renderApp(); }
+function toggleGoal(i) { openGoals[i] = !openGoals[i]; renderApp(); }
 
 // ── Init ────────────────────────────────────────────────
 // DEV_MODE active — free navigation enabled via ?devmode=true
