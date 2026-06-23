@@ -1822,6 +1822,40 @@ function renderInstructionsContent() {
   return '';
 }
 
+function renderWelcomeIntro(app) {
+  const w = GC.uiCopy.welcome;
+  const wEsc = (t) => String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const TRACK = [['#1abe9b','flag'],['#221f64','target'],['#221f64','doc'],['#e84d3d','wheel'],['#221f64','milestone'],['#00aeff','trophy']];
+  const trackHtml = TRACK.map(([c, ic], i) => `
+    <div style="display:flex;align-items:center">
+      <div style="width:54px;height:54px;border-radius:50%;background:#fff;border:5px solid ${c};display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(34,31,100,.10)">
+        <img src="assets/icons/icon-${ic}.svg" alt="" style="width:24px;height:24px">
+      </div>
+      ${i < TRACK.length - 1 ? '<span style="width:36px;height:4px;background:#cdd2de;border-radius:3px"></span>' : ''}
+    </div>`).join('');
+  app.innerHTML = `
+    <div id="board-fitwrap" style="flex:1;overflow:hidden;background:#dfe2e8;display:flex;align-items:center;justify-content:center">
+      <div id="gameboard" style="width:1920px;height:1080px;flex:none;transform-origin:center center;position:relative;overflow:hidden;background:#eef0f4 url('assets/board-bg.png') center/cover no-repeat;font-family:Heebo,Arial,sans-serif;direction:rtl">
+        <div style="position:absolute;top:46px;right:64px;z-index:2">
+          <img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:34px;width:auto;opacity:.9">
+        </div>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 80px;gap:30px">
+          <span style="font-size:40px;font-weight:700;color:#4a5070">ברוכים הבאים ל-</span>
+          <img src="assets/logo-game.png" alt="מסילות ותכנונים" style="height:330px;width:auto;filter:drop-shadow(0 10px 26px rgba(34,31,100,.18))">
+          <p style="font-size:23px;font-weight:500;line-height:1.55;color:#4a5070;text-align:center;max-width:1040px">${wEsc(w.intro||'')}</p>
+          <button onclick="showInstructions()" style="padding:21px 60px;border-radius:18px;border:none;cursor:pointer;font-family:inherit;font-size:25px;font-weight:800;color:#fff;background:#1a8c4e;box-shadow:0 8px 22px rgba(26,140,78,.32);margin-top:4px">${wEsc(w.openInstructionsButton||'הנחיות המשחק')}</button>
+          <div style="display:flex;align-items:center;margin-top:26px">${trackHtml}</div>
+        </div>
+      </div>
+    </div>`;
+  fitBoard();
+}
+
+function showInstructions() {
+  welcomeIntroShown = true;
+  renderApp();
+}
+
 function renderWelcome(app) {
   const w = GC.uiCopy.welcome;
   const ACCENT = ['#221f64','#00aeff','#1abe9b','#e84d3d','#e0a200'];
@@ -1894,6 +1928,8 @@ function renderWelcome(app) {
 
 function enterBoard() {
   gameStarted = true;
+  phonesActive = true;
+  pushGameState();
   instructionsOpen = false;
   renderApp();
 }
@@ -2159,10 +2195,13 @@ let activeUEResult = null;
 let facilitatorPreview = false;
 let boardPhonesOpen = false;
 let outcomePopupVisible = false;
+let welcomeIntroShown = false;
+let wheelSpinState = null; // {spinning:bool, finalDeg:number, idx:number, ueSetId:string, groupId:string}
 
 function renderApp() {
   const app = document.getElementById('app');
   if (currentView === 'facilitator' && !gameStarted && !DEV_MODE) {
+    if (!welcomeIntroShown) { renderWelcomeIntro(app); return; }
     renderWelcome(app);
     return;
   }
@@ -3012,28 +3051,32 @@ function renderStationModal() {
 
   } else if (station.type === 'unexpected_event') {
     const ueGroupColor = COLOR[currentGroup.colorToken].primary;
+    const ueGroupIdx = GC.groups.indexOf(currentGroup);
+    const ueGroupFg = ['#fff','#fff','#221f64','#fff'][ueGroupIdx] || '#fff';
     const ueGroupBadge = `
-      <h2 style="font-size:36px;font-weight:900;color:#8a2433;margin:0 0 16px;text-align:center">גלגל הבלת"מ</h2>
-      <div style="display:inline-block;background:${ueGroupColor}18;border:1.5px solid ${ueGroupColor}55;
-        border-radius:8px;padding:6px 20px;margin-bottom:20px;font-size:13px;font-weight:700;color:${ueGroupColor}">
-        ${currentGroup.label} — ${currentGroup.divisionName}</div>`;
+      <span style="font-size:17px;font-weight:700;color:#9c5660">${station.month||''} · בלת"מ</span>
+      <h2 style="font-size:36px;font-weight:800;line-height:1.05;color:#8a2433;margin:4px 0 10px;text-align:center">גלגל הבלת"מ</h2>
+      <span style="display:inline-flex;align-items:center;gap:9px;background:${ueGroupColor};border-radius:999px;padding:5px 18px 5px 7px;margin-bottom:16px">
+        <span style="width:28px;height:28px;border-radius:50%;background:#fff;display:inline-flex;align-items:center;justify-content:center;color:${ueGroupColor};font-size:15px;font-weight:800">${ueGroupIdx+1}</span>
+        <span style="font-size:16px;font-weight:800;color:${ueGroupFg}">${currentGroup.label} · ${currentGroup.divisionName}</span>
+      </span>`;
     let ueContent = '';
     if (activeUEResult) {
       const noDelay = activeUEResult.waitRounds === 0;
+      const wr = activeUEResult.waitRounds;
+      let wTxt, wIc, wBg, wFg;
+      if (typeof wr === 'number' && wr <= 0) { wTxt = 'אין עיכוב — ממשיכים מיד'; wIc = '✓'; wBg = '#dff0e6'; wFg = '#1a7a44'; }
+      else if (typeof wr === 'number') { wTxt = 'ממתינים ' + wr + (wr === 1 ? ' סבב' : ' סבבים'); wIc = '⏳'; wBg = '#fbeccf'; wFg = '#9a6a00'; }
+      else { wTxt = 'ההשפעה תיקבע בתיאום עם המנחה'; wIc = '•'; wBg = '#eef0f5'; wFg = '#7a809a'; }
       ueContent = `
         ${ueGroupBadge}
-        <div style="background:#fbf2f3;border:2px solid #8a2433;border-radius:12px;
-          padding:22px 20px;margin-bottom:20px;max-width:480px">
-          <div style="font-size:12px;color:#8a2433;margin-bottom:8px;font-weight:600;letter-spacing:.04em">⚡ תוצאת הגלגל</div>
-          <div style="font-size:22px;font-weight:800;color:#3d1018;margin-bottom:10px">${activeUEResult.label}</div>
-          <p style="font-size:15px;color:#3d1018;line-height:1.65;margin:0 0 14px">${activeUEResult.description}</p>
-          ${noDelay
-            ? `<div style="display:inline-block;background:#E8F5EE;border:1px solid #A8D8B8;border-radius:6px;padding:6px 16px;font-size:13px;font-weight:700;color:#1A6A3A">✓ ממשיכים קדימה — אין עיכוב</div>`
-            : `<div style="display:inline-block;background:#FEE8EC;border:1px solid #F0A0B0;border-radius:6px;padding:6px 16px;font-size:13px;font-weight:700;color:#A0001A">⏸ הקבוצה ממתינה סבב אחד</div>`}
+        <div style="display:flex;flex-direction:column;align-items:center;gap:13px;width:100%;max-width:480px;background:#fff;border:1.5px solid #d8b3b9;border-radius:18px;padding:22px 26px">
+          <span style="font-size:25px;font-weight:800;color:#1b1c4e;text-align:center;line-height:1.2">${activeUEResult.label}</span>
+          <p style="font-size:17px;font-weight:500;color:#5a6075;line-height:1.5;text-align:center;margin:0">${activeUEResult.description}</p>
+          <span style="display:inline-flex;align-items:center;gap:9px;background:${wBg};color:${wFg};border-radius:12px;padding:11px 20px;font-size:19px;font-weight:800">${wIc} ${wTxt}</span>
         </div>
         <button onclick="doUEOutcome('${currentGroup.id}',${noDelay ? 0 : 1})"
-          style="background:#fff;color:#221f64;border:2px solid #221f64;border-radius:12px;
-            padding:14px 32px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit">
+          style="margin-top:4px;padding:14px 34px;border-radius:13px;border:2px solid #221f64;background:#fff;cursor:pointer;font-family:inherit;font-size:17px;font-weight:800;color:#221f64">
           הבנו, ממשיכים ←</button>`;
     } else if (ueAlreadyUsed) {
       ueContent = `
@@ -3063,16 +3106,28 @@ function renderStationModal() {
               </div>`).join('')}
           </div>`
         : '';
+      const isWheelSpinning = wheelSpinState && wheelSpinState.spinning;
+      const wheelSvgHtml = buildWheelSvg(ueSet);
       ueContent = `
         ${ueGroupBadge}
-        <div style="background:#fbf2f3;border:6px solid #8a2433;border-radius:30px;padding:32px 40px;display:flex;flex-direction:column;align-items:center;gap:24px;position:relative">
-          <div style="position:absolute;inset:14px;border:2px solid #d8b3b9;border-radius:18px;pointer-events:none"></div>
-          <div class="wheel-css" style="display:block;position:relative;z-index:1"></div>
-          <button onclick="spinWheel('${currentGroup.id}','${station.unexpectedEventSetId}')"
-            style="background:#8a2433;color:#fff;border:none;border-radius:10px;
-              padding:16px 40px;font-size:18px;font-weight:700;cursor:pointer;font-family:inherit;
-              box-shadow:0 4px 16px rgba(138,36,51,.35);position:relative;z-index:1">
-            ⚡ ${copy.buttons.spinWheel}</button>
+        <div style="background:#fbf2f3;border:6px solid #8a2433;border-radius:30px;padding:30px 40px 34px;display:flex;flex-direction:column;align-items:center;position:relative;width:100%;max-width:480px">
+          <div style="position:absolute;inset:14px;border:2px solid #d8b3b9;border-radius:20px;pointer-events:none;z-index:0"></div>
+          <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%;gap:14px">
+            <div style="position:relative;width:300px;height:330px;display:flex;align-items:flex-end;justify-content:center;flex-shrink:0">
+              <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:26px solid #221f64;z-index:5;filter:drop-shadow(0 3px 4px rgba(0,0,0,.25))"></div>
+              <div id="ue-wheel-svg" style="width:300px;height:300px;border-radius:50%;will-change:transform">${wheelSvgHtml}</div>
+              <div style="position:absolute;top:calc(50% + 16px);left:50%;transform:translate(-50%,-50%);width:96px;z-index:4;pointer-events:none;display:flex;align-items:center;justify-content:center">
+                <img src="assets/logo-game.png" alt="" style="width:96px;height:auto">
+              </div>
+            </div>
+            <div id="ue-wheel-action" style="width:100%;display:flex;flex-direction:column;align-items:center">
+              ${isWheelSpinning
+                ? `<div style="height:56px;display:flex;align-items:center;justify-content:center"><span style="font-size:18px;font-weight:700;color:#9c5660">הגלגל מסתובב…</span></div>`
+                : `<button onclick="spinWheel('${currentGroup.id}','${station.unexpectedEventSetId}')"
+                    style="width:100%;max-width:300px;padding:17px;border-radius:14px;border:none;cursor:pointer;font-family:inherit;font-size:20px;font-weight:800;color:#fff;background:#8a2433;box-shadow:0 5px 16px rgba(138,36,51,.32)">
+                    ${copy.buttons.spinWheel}</button>`}
+            </div>
+          </div>
         </div>
         ${devUEList}`;
     }
@@ -3936,14 +3991,59 @@ function renderReferenceScreen(wrap, pal, goals, glossary) {
     </div>`;
 }
 
+function buildWheelSvg(ueSet) {
+  const SEGC = [['#ff7a4d','#fff'],['#2dc7b8','#fff'],['#ffc233','#221f64'],['#7b6ef6','#fff'],['#ff6fa5','#fff']];
+  const N = ueSet.length || 1;
+  const SEG = 360 / N;
+  const polar = (cx, cy, r, deg) => { const a = (deg - 90) * Math.PI / 180; return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) }; };
+  const shorten = (t) => { t = String(t || ''); return t.length > 14 ? t.slice(0, 13) + '…' : t; };
+  const segs = ueSet.map((r, i) => {
+    const a0 = i * SEG, a1 = a0 + SEG;
+    const p0 = polar(150, 150, 146, a0), p1 = polar(150, 150, 146, a1);
+    const large = SEG > 180 ? 1 : 0;
+    const d = `M150 150 L${p0.x.toFixed(1)} ${p0.y.toFixed(1)} A146 146 0 ${large} 1 ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Z`;
+    const mid = a0 + SEG / 2, lp = polar(150, 150, 92, mid);
+    const c = SEGC[i % SEGC.length];
+    return `<path d="${d}" fill="${c[0]}" stroke="#fff" stroke-width="3"></path>
+      <g transform="translate(${lp.x.toFixed(1)} ${lp.y.toFixed(1)}) rotate(${mid.toFixed(1)})">
+        <text x="0" y="0" text-anchor="middle" dominant-baseline="middle" fill="${c[1]}" font-family="Heebo,sans-serif" font-size="13" font-weight="800">${shorten(r.label)}</text>
+      </g>`;
+  }).join('');
+  return `<svg width="300" height="300" viewBox="0 0 300 300" style="display:block">
+    <circle cx="150" cy="150" r="146" fill="#fff" stroke="#8a2433" stroke-width="8"></circle>
+    ${segs}
+    <circle cx="150" cy="150" r="54" fill="#fff" stroke="#8a2433" stroke-width="5"></circle>
+  </svg>`;
+}
+
 function spinWheel(groupId, ueSetId) {
+  if (wheelSpinState && wheelSpinState.spinning) return;
   SFX.wheelSpin();
   const ueSet = GC.unexpectedEvents[ueSetId] || [];
-  const idx = Math.floor(Math.random() * ueSet.length);
-  activeUEResult = ueSet[idx];
-  gs(groupId).usedUnexpectedEventIds.push(activeUEResult.resultId);
-  setTimeout(() => activeUEResult.waitRounds === 0 ? SFX.wheelGood() : SFX.wheelBad(), 2300);
+  const N = ueSet.length || 1;
+  const idx = Math.floor(Math.random() * N);
+  const SEG = 360 / N;
+  const target = idx * SEG + SEG / 2;
+  const finalDeg = 360 * 5 + (360 - target);
+  wheelSpinState = { spinning: true, finalDeg, idx, result: ueSet[idx], groupId };
   renderApp();
+  requestAnimationFrame(() => {
+    const el = document.getElementById('ue-wheel-svg');
+    if (!el) return;
+    el.style.transform = 'rotate(0deg)';
+    void el.offsetWidth;
+    el.style.transition = 'transform 3.8s cubic-bezier(.15,.62,.2,1)';
+    el.style.transform = `rotate(${finalDeg}deg)`;
+  });
+  setTimeout(() => {
+    const res = wheelSpinState ? wheelSpinState.result : null;
+    if (!res) return;
+    res.waitRounds === 0 ? SFX.wheelGood() : SFX.wheelBad();
+    activeUEResult = res;
+    gs(groupId).usedUnexpectedEventIds.push(res.resultId);
+    wheelSpinState = null;
+    renderApp();
+  }, 3950);
 }
 
 function devSelectUEResult(groupId, ueSetId, idx) {
