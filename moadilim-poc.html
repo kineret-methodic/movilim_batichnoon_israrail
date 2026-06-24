@@ -2358,7 +2358,7 @@ function renderFacilitator(app) {
     const lockOpacity = locked ? 0.62 : 0;
     const labelColor = locked ? '#a7abc0' : col, monthColor = locked ? '#bcc0d0' : '#9aa0b8';
     const toks = (tokensByOrder[s.order]||[]).map(gi => {
-      const isCur = gi === currentTurnGroupIndex;
+      const isCur = gi === currentTurnGroupIndex && s.id !== 'station_start';
       const sz = isCur ? '44px' : '30px';
       const fs = isCur ? '18px' : '14px';
       const tf = isCur ? 'translateY(-7px)' : 'none';
