@@ -1698,17 +1698,16 @@ let _lockedSoundKey = null;
 // ── Game state ──────────────────────────────────────────
 let gameState = {};
 GC.groups.forEach(g => {
-  // Groups start at order=1 (past the opening transition station)
   gameState[g.id] = {
     groupId: g.id,
-    currentStationOrder: 1,
+    currentStationOrder: 0,
     points: 0,
     waitingOneRound: false,
     waitingReason: null,
     playedThisRound: false,
     finishedRound: null,
     usedUnexpectedEventIds: [],
-    completedStationIds: ['station_start'],
+    completedStationIds: [],
   };
 });
 
@@ -1936,6 +1935,14 @@ function enterBoard() {
 
 function activatePhones() {
   phonesActive = true;
+  GC.groups.forEach(g => {
+    const gst = gs(g.id);
+    if (gst.currentStationOrder === 0) {
+      gst.currentStationOrder = 1;
+      if (!gst.completedStationIds.includes('station_start'))
+        gst.completedStationIds.push('station_start');
+    }
+  });
   pushGameState();
   closeStationModal();
 }
