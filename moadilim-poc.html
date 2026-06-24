@@ -2910,11 +2910,11 @@ function renderStationModal() {
                 <circle cx="86" cy="86" r="70" fill="none" stroke="${timerSoft}" stroke-width="5" stroke-dasharray="4 32.6" stroke-linecap="round"></circle>
                 <g style="transform:rotate(-90deg);transform-origin:center">
                   <circle cx="86" cy="86" r="60" fill="none" stroke="#edeef5" stroke-width="12"></circle>
-                  <circle cx="86" cy="86" r="60" fill="none" stroke="${timerColor}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${QCIRC}" stroke-dashoffset="${(QCIRC*(1-frac)).toFixed(1)}" style="transition:stroke-dashoffset .9s linear,stroke .3s"></circle>
+                  <circle id="timer-ring-arc" cx="86" cy="86" r="60" fill="none" stroke="${timerColor}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${QCIRC}" stroke-dashoffset="${(QCIRC*(1-frac)).toFixed(1)}" style="transition:stroke-dashoffset .9s linear,stroke .3s"></circle>
                 </g>
               </svg>
               <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
-                <span style="font-size:46px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1;color:${timerColor}">${fmtSec(remaining)}</span>
+                <span id="timer-display" style="font-size:46px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1;color:${timerColor}">${fmtSec(remaining)}</span>
               </div>
             </div>
           </div>
@@ -3365,6 +3365,7 @@ function closeStationModal() {
 }
 
 function doOutcome(groupId, outcome) {
+  stopTimer();
   if (outcome === 'correct') SFX.correct();
   else if (outcome === 'partial') SFX.partial();
   else SFX.wrong();
@@ -3430,7 +3431,7 @@ function toggleTimer(totalSecs) {
         d.style.color = tColor;
       }
       if (arc) {
-        arc.setAttribute('stroke-dashoffset', (590.6 * (1 - timerRemaining / totalSecs)).toFixed(1));
+        arc.setAttribute('stroke-dashoffset', (377 * (1 - timerRemaining / totalSecs)).toFixed(1));
         arc.setAttribute('stroke', tColor);
       }
       if (b && timerRemaining === 0) {
