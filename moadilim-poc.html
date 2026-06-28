@@ -2773,9 +2773,9 @@ function renderStationModal() {
   const headerHtml = `
     <div style="display:flex;align-items:center;gap:24px;flex-shrink:0">
       <div style="flex:1;display:flex;justify-content:flex-start">
-        <div style="background:#221f64;border-radius:40px;padding:8px 20px 8px 14px;display:flex;align-items:center;gap:11px;box-shadow:0 5px 16px rgba(34,31,100,.22)">
-          <span style="background:#f4c40f;color:#221f64;font-weight:800;font-size:13px;border-radius:20px;padding:4px 12px">תור פעיל</span>
-          <span style="color:#fff;font-size:16px;font-weight:700">${qEsc(currentGroup.label + ' · ' + currentGroup.divisionName)}</span>
+        <div style="background:${gp.bg};border-radius:40px;padding:11px 30px 11px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 6px 22px rgba(34,31,100,.28)">
+          <span style="background:rgba(255,255,255,.28);color:${gp.fg};font-weight:800;font-size:14px;border-radius:20px;padding:4px 14px;white-space:nowrap">תור פעיל</span>
+          <span style="color:${gp.fg};font-size:20px;font-weight:800">${qEsc(currentGroup.label + ' · ' + currentGroup.divisionName)}</span>
         </div>
       </div>
       <div style="display:flex;align-items:center;justify-content:center">
@@ -2881,9 +2881,9 @@ function renderStationModal() {
             <span style="font-size:16px;font-weight:600;color:#185c36;line-height:1.5">${qEsc(ans ? ans.correctFix : '')}</span>
           </div>
           <div style="display:flex;gap:11px">
-            <button onclick="doOutcome('${currentGroup.id}','correct')" style="flex:1;padding:14px 6px;border-radius:13px;border:none;cursor:pointer;font-family:inherit;font-size:17px;font-weight:800;color:#fff;background:#1a8c4e;line-height:1.3">נכון<br><span style="font-size:13px;font-weight:700;opacity:.95">+10 נק׳ · מתקדמים</span></button>
-            <button onclick="doOutcome('${currentGroup.id}','partial')" style="flex:1;padding:14px 6px;border-radius:13px;border:none;cursor:pointer;font-family:inherit;font-size:17px;font-weight:800;color:#221f64;background:#f4c40f;line-height:1.3">חלקי<br><span style="font-size:13px;font-weight:700;opacity:.85">+5 נק׳ · ממתינים סבב</span></button>
-            <button onclick="doOutcome('${currentGroup.id}','wrong')" style="flex:1;padding:14px 6px;border-radius:13px;border:none;cursor:pointer;font-family:inherit;font-size:17px;font-weight:800;color:#fff;background:#e84d3d;line-height:1.3">שגוי<br><span style="font-size:13px;font-weight:700;opacity:.95">0 נק׳ · חוזרים תחנה</span></button>
+            <button onclick="doOutcome('${currentGroup.id}','correct')" style="flex:1;padding:16px 6px;border-radius:13px;border:none;cursor:pointer;font-family:inherit;font-size:20px;font-weight:800;color:#fff;background:#1a8c4e">נכון</button>
+            <button onclick="doOutcome('${currentGroup.id}','partial')" style="flex:1;padding:16px 6px;border-radius:13px;border:none;cursor:pointer;font-family:inherit;font-size:20px;font-weight:800;color:#221f64;background:#f4c40f">חלקי</button>
+            <button onclick="doOutcome('${currentGroup.id}','wrong')" style="flex:1;padding:16px 6px;border-radius:13px;border:none;cursor:pointer;font-family:inherit;font-size:20px;font-weight:800;color:#fff;background:#e84d3d">שגוי</button>
           </div>
         </div>`;
     } else {
@@ -2910,19 +2910,10 @@ function renderStationModal() {
               <img src="${qIconUrl(station)}" alt="" style="width:52px;height:52px">
             </div>
             <div style="display:flex;flex-direction:column;align-items:center;gap:7px">
-              <span style="font-size:17px;font-weight:700;color:#8a90aa">${qEsc(station.month || '')}</span>
               <span style="font-size:34px;font-weight:800;line-height:1.05;color:${stColor};text-align:center">${qEsc(station.name)}</span>
-              <span style="display:inline-flex;align-items:center;gap:9px;background:${gp.bg};border-radius:999px;padding:5px 18px 5px 7px;margin-top:2px">
-                <span style="width:28px;height:28px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;color:${gp.bg};font-size:15px;font-weight:800">${gpIdx + 1}</span>
-                <span style="font-size:16px;font-weight:800;color:${gp.fg}">${qEsc(currentGroup.label + ' · ' + currentGroup.divisionName)}</span>
-              </span>
             </div>
-            <p style="font-size:29px;font-weight:700;line-height:1.4;color:#1b1c4e;text-align:center;text-wrap:pretty">${qEsc(question.questionText)}</p>
+            ${!answered ? `<p style="font-size:29px;font-weight:700;line-height:1.4;color:#1b1c4e;text-align:center;text-wrap:pretty">${qEsc(question.questionText)}</p>` : ''}
             ${mid}
-            <div style="background:#fff;border-radius:14px;border:1px dashed ${gp.soft};padding:13px 20px;display:flex;gap:12px;align-items:flex-start;width:100%">
-              <span style="font-size:13px;font-weight:800;color:#9a6a00;background:#f7e9c6;border-radius:7px;padding:4px 11px;white-space:nowrap;flex-shrink:0">עיקרון</span>
-              <p style="font-size:15.5px;font-weight:500;line-height:1.5;color:#5a5436;text-align:right">${qEsc(question.professionalPrinciple)}</p>
-            </div>
           </div>
         </div>
       </div>`;
