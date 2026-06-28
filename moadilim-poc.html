@@ -259,6 +259,10 @@
   ::-webkit-scrollbar-track{background:transparent}
   ::-webkit-scrollbar-thumb{background:#C0C4E8;border-radius:3px}
   @keyframes wheelSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+  @keyframes ctaNeon{0%,100%{box-shadow:0 10px 26px rgba(0,0,0,.25),0 0 0 0 rgba(34,210,120,.8),0 0 24px rgba(34,210,120,.6);transform:translateX(-50%) scale(1)}50%{box-shadow:0 10px 26px rgba(0,0,0,.25),0 0 0 22px rgba(34,210,120,0),0 0 46px rgba(34,210,120,.95);transform:translateX(-50%) scale(1.05)}}
+  @keyframes cardSlide{0%{opacity:0;transform:translateX(180px)}100%{opacity:1;transform:translateX(0)}}
+  @keyframes ctaNavy{0%,100%{box-shadow:0 10px 26px rgba(0,0,0,.22),0 0 0 0 rgba(31,78,156,.7),0 0 22px rgba(31,78,156,.5);transform:scale(1)}50%{box-shadow:0 10px 26px rgba(0,0,0,.22),0 0 0 18px rgba(31,78,156,0),0 0 40px rgba(31,78,156,.9);transform:scale(1.06)}}
+  @keyframes ctaNavyWide{0%,100%{box-shadow:0 12px 30px rgba(0,0,0,.22),0 0 0 0 rgba(31,78,156,.6);transform:scale(1)}50%{box-shadow:0 12px 30px rgba(0,0,0,.22),0 0 0 16px rgba(31,78,156,0);transform:scale(1.03)}}
 
   .wheel-css{width:80px;height:80px;border-radius:50%;display:inline-block;
     background:conic-gradient(#ff7a4d 0deg 72deg,#2dc7b8 72deg 144deg,#ffc233 144deg 216deg,
@@ -785,8 +789,8 @@ const GC = {
         "group_2": {
           "groupId": "group_2",
           "taskName": "גיוס והכשרות",
-          "whatIsWrong": "המשקלים מהנדסים: 30% | כלכלנים: 30% | מנהלי פרויקטים: 35% מסתכמים ל־95 במקום 100.",
-          "correctFix": "לתקן כך שסך כל המשקולות יהיה 100% — ולהחליף לקטגוריות רלוונטיות לחטיבת משאבי אנוש.",
+          "whatIsWrong": "המשקלים גיוס: 30% | הכשרות: 30% | שימור: 25% | ניהול ידע: 20% מסתכמים ל־105% במקום 100%.",
+          "correctFix": "לתקן כך שסך כל המשקולות יהיה 100%.",
           "facilitatorNotes": null
         },
         "group_3": {
@@ -1118,10 +1122,10 @@ const GC = {
       "modelName": "תהליכי גיוס והכשרות",
       "rewardMetric": "שיפור תהליכי גיוס",
       "formula": "מספר מועמדים שטופלו",
-      "weight": "מהנדסים: 30% | כלכלנים: 30% | מנהלי פרויקטים: 35% (סה\"כ: 95%)",
+      "weight": "גיוס: 30% | הכשרות: 30% | שימור: 25% | ניהול ידע: 20% (סה\"כ: 105%)",
       "performanceThresholds": "100% = עמידה מלאה ביעד | 80% = חריגה של עד 15% | מתחת ל-65% = אי-עמידה",
       "dataSource": "מערכת HR, מאגר גיוס ומעקב הכשרות",
-      "notes": "המשקולות אינן מסתכמות ל-100 — יש לתקן",
+      "notes": "המשקולות מסתכמות ל-105% במקום 100% — יש לתקן",
       "devErrors": ["rewardMetric", "formula", "weight"],
       "devHint": "טעויות מוטמנות: (1) מדד תגמול שגוי — נכון: 'עמידה ב–SLA לגיוס'. (2) נוסחה שגויה — מונה כמות מועמדים ולא מודדת שיפור; נכון: 'משך תהליך בפועל / יעד שנתי × 100'. (3) משקולות שגויות — קטגוריות לא רלוונטיות לחטיבת משאבי אנוש; יש לעדכן כך שסך כל המשקולות יהיה 100%."
     },
@@ -1141,7 +1145,7 @@ const GC = {
       "rewardMetric": "התקנת מתקנים פוטווולטאים",
       "formula": "הכנסות בפועל",
       "weight": "הכנסות מסחר: 60% | תפוסת שטחים: 30% | התקנת מתקנים פוטווולטאים: 10% (סה\"כ: 100%)",
-      "performanceThresholds": "100% = קבלת אישור התקנה | 70% = מוכנות להתקנה | 0% = לא בוצע",
+      "performanceThresholds": "100% = 5,000,000₪ | 70% = 4,900,000₪ | 0% = 4,800,000₪",
       "dataSource": "מערכת הכנסות, דוחות פיננסיים רבעוניים",
       "notes": "ספי הביצוע אינם מתייחסים להכנסות — יש להתאים למדד הנכון",
       "devErrors": ["formula", "performanceThresholds"],
@@ -1152,7 +1156,7 @@ const GC = {
     "ue_set_aug": [
       {
         "resultId": "ue_aug_1",
-        "label": "אין בלת\"מ — ממשיכים",
+        "label": "אין בלת\"מ - ממשיכים",
         "description": "הפעם הכל שקט. ממשיכים קדימה.",
         "waitRounds": 0
       },
@@ -1172,7 +1176,7 @@ const GC = {
     "ue_set_sep": [
       {
         "resultId": "ue_sep_1",
-        "label": "אין בלת\"מ — ממשיכים",
+        "label": "אין בלת\"מ - ממשיכים",
         "description": "הפעם הכל שקט. ממשיכים קדימה.",
         "waitRounds": 0
       },
@@ -1212,7 +1216,7 @@ const GC = {
     "ue_set_nov": [
       {
         "resultId": "ue_nov_1",
-        "label": "אין בלת\"מ — ממשיכים",
+        "label": "אין בלת\"מ - ממשיכים",
         "description": "הפעם הכל שקט. ממשיכים קדימה.",
         "waitRounds": 0
       },
@@ -1232,7 +1236,7 @@ const GC = {
     "ue_set_comp": [
       {
         "resultId": "ue_comp_1",
-        "label": "אין בלת\"מ — ממשיכים",
+        "label": "אין בלת\"מ - ממשיכים",
         "description": "הפעם הכל שקט. ממשיכים קדימה.",
         "waitRounds": 0
       },
@@ -1252,14 +1256,14 @@ const GC = {
     "ue_set_comp2": [
       {
         "resultId": "ue_comp2_1",
-        "label": "אין בלת\"מ — ממשיכים",
+        "label": "אין בלת\"מ - ממשיכים",
         "description": "הפעם הכל שקט. ממשיכים קדימה.",
         "waitRounds": 0
       },
       {
         "resultId": "ue_comp2_2",
         "label": "שינוי במדיניות תגמול",
-        "description": "הנהלה החליטה על שינוי במדיניות התגמול — יש לעדכן את המודל.",
+        "description": "הנהלה החליטה על שינוי במדיניות התגמול - יש לעדכן את המודל.",
         "waitRounds": 1
       },
       {
@@ -1324,7 +1328,7 @@ const GC = {
       "needReminder": "צריכים תזכורת?",
       "openFolder": "פתחו את תכנית העבודה השנתית",
       "spinWheel": "סובבו גלגל",
-      "backToMap": "חזרה למסלול",
+      "backToMap": "חזרה למסילה",
       "confirmSoftWarning": "המשך בכל זאת",
       "cancel": "ביטול"
     },
@@ -1335,33 +1339,33 @@ const GC = {
     "statusBar": {
       "position": "מיקום",
       "errors": "טעויות",
-      "nextTurn": "תור הבא",
+      "nextTurn": "עצירה הבאה",
       "autoAdvance": "יתקדם אוטומטית",
       "noStation": "-",
-      "played": "שיחקה",
-      "waiting": "ממתינה — תורה דולג",
-      "waitingNext": "ממתינה בסבב הבא",
-      "notYet": "מחכה לתורה",
-      "roundComplete": "סבב הושלם — אפשר להתחיל סבב חדש",
+      "played": "עברה בתחנה",
+      "waiting": "ממתינה - תורה דולג",
+      "waitingNext": "עצירת ביניים - ממתינה לסבב הבא",
+      "notYet": "ממתינה בתחנה",
+      "roundComplete": "סבב הושלם - אפשר לצאת לסבב חדש",
       "activeTurn": "תור פעיל"
     },
     "messages": {
       "mobileIntro": "לפניכם הצצה למשימות נבחרות מתוך תכנית העבודה החטיבתית. במהלך המשחק תעבדו עם המשימות המוצגות כאן, אך זכרו: במציאות תכנית העבודה רחבה יותר, ובלת\"מים יכולים להגיע גם ממשימות ומגורמים שאינם מוצגים בתיק.",
       "softWarning": "שימו לב: לפי מצב המשחק, קבוצה זו עדיין לא הגיעה לתחנה הזו. להמשיך בכל זאת?",
-      "stationCompleted": "תחנה זו כבר הושלמה. בתור הבא הקבוצה מתקדמת חזרה קדימה.",
+      "stationCompleted": "הקבוצה כבר עברה בתחנה זו.",
       "unexpectedAlreadyUsed": "קבוצה זו כבר הפעילה את הבלת\"ם הזה. ממשיכים הלאה.",
-      "partialOutcome": "תשובה חלקית — +5 נקודות. הקבוצה מתקדמת לתחנה הבאה.",
-      "wrongOutcome": "תשובה שגויה — 0 נקודות. הקבוצה מתקדמת לתחנה הבאה וממתינה סבב.",
-      "correctOutcome": "תשובה נכונה — +10 נקודות! הקבוצה מתקדמת לתחנה הבאה.",
+      "partialOutcome": "תשובה חלקית - ממשיכים!",
+      "wrongOutcome": "תשובה שגויה - עצירת ביניים בסבב הבא!",
+      "correctOutcome": "תשובה מלאה - ממשיכים קדימה!",
       "autoAdvanceNotice": "בתור הבא הקבוצה מתקדמת אוטומטית.",
       "mobileTasksFallback": "תיק המשימות לקבוצה זו יושלם בשלב הבא.",
       "mobileNoCompensation": "אין נתוני מודל תגמול.",
       "noGroupAnswer": "אין תשובה ייחודית לקבוצה זו.",
-      "noStationQuestion": "תחנת מעבר — אין שאלה.",
+      "noStationQuestion": "תחנת מעבר - אין שאלה.",
       "wrongOutcomeStayed": "נספרת טעות. הקבוצה נשארת בתחנה הראשונה."
     },
     "endScreen": {
-      "title": "המשחק הסתיים",
+      "title": "הרכבת הגיעה ליעד!",
       "winnerLabel": "הקבוצה המנצחת",
       "commitmentQuestion": "מה הפעולה הראשונה שתעשו ב־72 השעות הקרובות כדי לקדם את תכנית העבודה ואת מודל התגמול בחטיבה שלכם?",
       "mentimeterUrl": "יושלם בתיאום עם הלקוחה",
@@ -1434,12 +1438,12 @@ const GC = {
       "wrong": "{group}: {msg}"
     },
     "boardSections": {
-      "a": "מקטע א — הקמת תכנית עבודה",
-      "aMonths": "יוני — ספטמבר",
+      "a": "מקטע א - הקמת תכנית עבודה",
+      "aMonths": "יוני - ספטמבר",
       "b": "המשך תכנית עבודה ואישורים",
-      "bMonths": "ספטמבר — נובמבר",
+      "bMonths": "ספטמבר - נובמבר",
       "c": "הקמת מודל תגמול",
-      "cMonths": "דצמבר — ינואר"
+      "cMonths": "דצמבר - ינואר"
     },
     "welcome": {
       "title": "ברוכים הבאים למסילות ותכנונים!",
@@ -1455,7 +1459,7 @@ const GC = {
         },
         {
           "title": "ניקוד והתקדמות",
-          "body": "תשובה מלאה: 10 נקודות והתקדמות במסלול.<br>תשובה חלקית: 5 נקודות והתקדמות במסלול.<br>תשובה שגויה: 0 נקודות, התקדמות לתחנה הבאה והמתנה של סבב אחד."
+          "body": "תשובה מלאה: 10 נקודות והתקדמות במסילה.<br>תשובה חלקית: 5 נקודות והתקדמות במסילה.<br>תשובה שגויה: 0 נקודות, התקדמות לתחנה הבאה והמתנה של סבב אחד."
         },
         {
           "title": "גלגל הבלת\"מ",
@@ -1463,18 +1467,18 @@ const GC = {
         },
         {
           "title": "איך מנצחים?",
-          "body": "המטרה: להגיע ראשונים לאישור מודל התגמול.<br><br>במקרה של שוויון, הנקודות קובעות.<br><br>זכרו: מה שמקדם את תכנית העבודה הוא לא הזמן שעובר, אלא הנאמנים שמתכננים נכון.<br><br>בהצלחה, צאו לדרך!"
+          "body": "המטרה: להגיע ראשונים לאישור מודל התגמול.<br><br>במקרה של שוויון, הנקודות קובעות.<br><br>זכרו: מה שמקדם את תכנית העבודה הוא לא הזמן שעובר, אלא הנאמנים שמתכננים נכון.<br><br>יוצאים לדרך - תחנה ראשונה, בבקשה!"
         }
       ],
       "startButton": "התחילו משחק",
       "openInstructionsButton": "הנחיות המשחק",
       "closeInstructionsButton": "חזרה למפה"
     },
-    "turnIndicator": "תור {group} — {division} — תחנת {station}",
+    "turnIndicator": "תור {group} - {division} - תחנת {station}",
     "groupCard": {
-      "waitingMessage": "קבוצה זו ממתינה סבב",
-      "skipButton": "להמשיך עם הקבוצה הבאה",
-      "stationLocked": "תחנה זו לא פעילה בתור הנוכחי",
+      "waitingMessage": "קבוצה זו בעצירת ביניים",
+      "skipButton": "קדימה לקבוצה הבאה",
+      "stationLocked": "התחנה נעולה - לא הגעתם עדיין",
       "clickToOpen": "▶ לחצו",
       "approveTransition": "אישור מעבר",
       "answerRecorded": "התשובה נרשמה.",
@@ -1487,7 +1491,7 @@ const GC = {
       "label": "נקודות"
     },
     "mobileFolder": {
-      "lockedMessage": "תור {group} — המתינו לתורכם",
+      "lockedMessage": "תור {group} - המתינו לתורכם",
       "lockedWait": "התיק שלכם ייפתח כשיגיע תורכם"
     }
   },
@@ -1600,99 +1604,8 @@ const QR_CODES = {
   group_4: 'data:image/png;base64,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',
 };
 
-// ── Sound effects (Web Audio API — no external files) ────
-const SFX = (() => {
-  let _ctx = null;
-  const ac = () => {
-    if (!_ctx) _ctx = new (window.AudioContext || window.webkitAudioContext)();
-    return _ctx;
-  };
-  function tone(freq, type, t0, t1, vol, a) {
-    const o = a.createOscillator(), g = a.createGain();
-    o.type = type || 'sine'; o.frequency.value = freq;
-    o.connect(g); g.connect(a.destination);
-    g.gain.setValueAtTime(vol, t0);
-    g.gain.exponentialRampToValueAtTime(0.001, t1);
-    o.start(t0); o.stop(t1);
-  }
-  return {
-    wheelSpin() {
-      const a = ac(), now = a.currentTime;
-      let t = now, iv = 0.055;
-      while (t < now + 2.2) {
-        const o = a.createOscillator(), g = a.createGain();
-        o.frequency.value = 480 + Math.random() * 320;
-        o.connect(g); g.connect(a.destination);
-        g.gain.setValueAtTime(0.11, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
-        o.start(t); o.stop(t + 0.04);
-        t += iv; iv = Math.min(iv * 1.065, 0.38);
-      }
-    },
-    wheelGood() {
-      const a = ac(), now = a.currentTime;
-      [523, 659, 784, 1047].forEach((f, i) => tone(f, 'sine', now + i * 0.11, now + i * 0.11 + 0.5, 0.28, a));
-    },
-    wheelBad() {
-      const a = ac(), now = a.currentTime;
-      [440, 370, 311].forEach((f, i) => tone(f, 'sawtooth', now + i * 0.16, now + i * 0.16 + 0.5, 0.18, a));
-    },
-    correct() {
-      const a = ac(), now = a.currentTime;
-      tone(880,  'sine', now,        now + 0.7,  0.32, a);
-      tone(1320, 'sine', now + 0.06, now + 0.55, 0.16, a);
-    },
-    partial() {
-      const a = ac(), now = a.currentTime;
-      tone(660, 'sine', now, now + 0.45, 0.22, a);
-    },
-    wrong() {
-      const a = ac(), now = a.currentTime;
-      const o = a.createOscillator(), g = a.createGain();
-      o.type = 'sawtooth';
-      o.frequency.setValueAtTime(180, now);
-      o.frequency.exponentialRampToValueAtTime(70, now + 0.35);
-      o.connect(g); g.connect(a.destination);
-      g.gain.setValueAtTime(0.26, now);
-      g.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-      o.start(now); o.stop(now + 0.35);
-    },
-    whoosh() {
-      const a = ac(), now = a.currentTime;
-      const sz = Math.floor(a.sampleRate * 0.35);
-      const buf = a.createBuffer(1, sz, a.sampleRate);
-      const d = buf.getChannelData(0);
-      for (let i = 0; i < sz; i++) d[i] = Math.random() * 2 - 1;
-      const src = a.createBufferSource(); src.buffer = buf;
-      const flt = a.createBiquadFilter(); flt.type = 'bandpass';
-      flt.frequency.setValueAtTime(300, now);
-      flt.frequency.exponentialRampToValueAtTime(3500, now + 0.25);
-      const g = a.createGain();
-      g.gain.setValueAtTime(0.26, now);
-      g.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-      src.connect(flt); flt.connect(g); g.connect(a.destination);
-      src.start(now); src.stop(now + 0.35);
-    },
-    tick() {
-      const a = ac(), now = a.currentTime;
-      tone(900, 'sine', now, now + 0.04, 0.07, a);
-    },
-    timerWarning() {
-      const a = ac(), now = a.currentTime;
-      [0, 0.5, 1.0, 1.5, 2.0].forEach(d => tone(1200, 'sine', now + d, now + d + 0.22, 0.28, a));
-    },
-    victory() {
-      const a = ac(), now = a.currentTime;
-      [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, 'sine', now + i * 0.1, now + i * 0.1 + 0.95, 0.28, a));
-      tone(131, 'sine', now, now + 1.5, 0.18, a);
-    },
-    locked() {
-      const a = ac(), now = a.currentTime;
-      tone(220, 'sine', now,        now + 0.18, 0.12, a);
-      tone(165, 'sine', now + 0.13, now + 0.3,  0.10, a);
-    },
-  };
-})();
+// ── Sound effects — disabled, pending new sounds ────
+const SFX = { wheelSpin(){}, wheelGood(){}, wheelBad(){}, correct(){}, partial(){}, wrong(){}, whoosh(){}, tick(){}, timerWarning(){}, victory(){}, locked(){} };
 let _lockedSoundKey = null;
 
 // ── Game state ──────────────────────────────────────────
@@ -1824,27 +1737,31 @@ function renderInstructionsContent() {
 function renderWelcomeIntro(app) {
   const w = GC.uiCopy.welcome;
   const wEsc = (t) => String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  const TRACK = [['#1abe9b','flag'],['#221f64','target'],['#221f64','doc'],['#e84d3d','wheel'],['#221f64','milestone'],['#00aeff','trophy']];
-  const trackHtml = TRACK.map(([c, ic], i) => `
-    <div style="display:flex;align-items:center">
-      <div style="width:54px;height:54px;border-radius:50%;background:#fff;border:5px solid ${c};display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(34,31,100,.10)">
-        <img src="assets/icons/icon-${ic}.svg" alt="" style="width:24px;height:24px">
-      </div>
-      ${i < TRACK.length - 1 ? '<span style="width:36px;height:4px;background:#cdd2de;border-radius:3px"></span>' : ''}
-    </div>`).join('');
+  const SET = [
+    {x:585,color:'#e0a200',ic:'trophy'},{x:735,color:'#e84d3d',ic:'wheel'},{x:885,color:'#7b5fd4',ic:'milestone-purple'},
+    {x:1035,color:'#221f64',ic:'doc'},{x:1185,color:'#00aeff',ic:'target'},{x:1335,color:'#1abe9b',ic:'flag'},
+  ];
+  const icons = SET.map((s) => `<div style="position:absolute;left:${s.x}px;top:982px;transform:translate(-50%,-50%);width:92px;height:92px;border-radius:50%;background:#fff;border:5px solid ${s.color};display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(20,40,90,.3)"><img src="assets/icons/icon-${s.ic}.svg" alt="" style="width:42px;height:42px"></div>`).join('');
+  let conn = '';
+  for (let i = 0; i < SET.length - 1; i++) {
+    conn += `<div style="position:absolute;left:${SET[i].x+46}px;top:979px;width:${(SET[i+1].x-SET[i].x)-92}px;height:5px;background:rgba(170,205,236,.85);border-radius:3px"></div>`;
+  }
+  const label = wEsc(w.openInstructionsButton || 'הנחיות המשחק');
+  const intro = wEsc((w.intro || '').replace('השנה: ', 'השנה:\n').replace('הדרך, ', 'הדרך,\n'));
   app.innerHTML = `
-    <div id="board-fitwrap" style="flex:1;overflow:hidden;background:#dfe2e8;display:flex;align-items:center;justify-content:center">
-      <div id="gameboard" style="width:1920px;height:1080px;flex:none;transform-origin:center center;position:relative;overflow:hidden;background:#eef0f4 url('assets/board-bg.png') center/cover no-repeat;font-family:Heebo,Arial,sans-serif;direction:rtl">
-        <div style="position:absolute;top:46px;right:64px;z-index:2">
-          <img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:34px;width:auto;opacity:.9">
-        </div>
-        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 80px;gap:30px">
-          <span style="font-size:40px;font-weight:700;color:#4a5070">ברוכים הבאים ל-</span>
-          <img src="assets/logo-game.png" alt="מסילות ותכנונים" style="height:330px;width:auto;filter:drop-shadow(0 10px 26px rgba(34,31,100,.18))">
-          <p style="font-size:23px;font-weight:500;line-height:1.55;color:#4a5070;text-align:center;max-width:1040px">${wEsc(w.intro||'')}</p>
-          <button onclick="showInstructions()" style="padding:21px 60px;border-radius:18px;border:none;cursor:pointer;font-family:inherit;font-size:25px;font-weight:800;color:#fff;background:#1a8c4e;box-shadow:0 8px 22px rgba(26,140,78,.32);margin-top:4px">${wEsc(w.openInstructionsButton||'הנחיות המשחק')}</button>
-          <div style="display:flex;align-items:center;margin-top:26px">${trackHtml}</div>
-        </div>
+    <div id="board-fitwrap" style="flex:1;overflow:hidden;background:#cfe2f2;display:flex;align-items:center;justify-content:center;font-family:Heebo,Arial,sans-serif;color:#15224a">
+      <div id="gameboard" style="width:1920px;height:1080px;flex:none;transform-origin:center center;position:relative;overflow:hidden;background:url('assets/cover-clean.png') center/cover no-repeat">
+        <div style="position:absolute;top:50px;right:64px;z-index:6"><img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:38px;width:auto"></div>
+        <span style="position:absolute;top:215px;left:0;right:0;z-index:5;display:block;text-align:center;font-size:34px;font-weight:700;letter-spacing:.16em;color:#1b2a52;text-shadow:0 1px 10px rgba(255,255,255,.7)">ברוכים הבאים ל־</span>
+        <img src="assets/logo-game.png" alt="מסילות ותכנונים" style="position:absolute;top:288px;left:50%;transform:translateX(-50%);z-index:5;width:630px;height:auto;filter:drop-shadow(0 14px 28px rgba(20,40,90,.35))">
+        <p style="position:absolute;top:660px;left:0;right:0;z-index:5;padding:0 410px;font-size:26px;font-weight:600;line-height:1.55;color:#1b2a52;text-align:center;text-wrap:pretty;white-space:pre-line;text-shadow:0 1px 10px rgba(255,255,255,.7)">${intro}</p>
+        <button onclick="showInstructions()" style="position:absolute;top:812px;left:50%;transform:translateX(-50%);z-index:6;padding:20px 60px;border-radius:999px;border:2px solid rgba(120,255,180,.6);cursor:pointer;font-family:inherit;font-size:27px;font-weight:900;color:#fff;background:linear-gradient(180deg,#23c95f,#127f3e);display:flex;align-items:center;gap:12px;animation:ctaNeon 2.6s ease-in-out infinite">${label}<span style="font-size:22px;font-weight:800">›</span></button>
+        <svg viewBox="0 0 1920 1080" width="1920" height="1080" style="position:absolute;inset:0;z-index:5;pointer-events:none" fill="none">
+          <path id="iconLine" d="M 1335 982 L 585 982" fill="none" stroke="none"></path>
+          <circle r="10" fill="#fff" style="filter:drop-shadow(0 0 7px #19c3ff) drop-shadow(0 0 16px #19c3ff)"><animateMotion dur="4.5s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear"><mpath href="#iconLine"></mpath></animateMotion></circle>
+        </svg>
+        <div style="position:absolute;inset:0;z-index:4;pointer-events:none">${conn}</div>
+        <div style="position:absolute;inset:0;z-index:6;pointer-events:none">${icons}</div>
       </div>
     </div>`;
   fitBoard();
@@ -1856,78 +1773,87 @@ function showInstructions() {
 }
 
 function renderWelcome(app) {
-  const w = GC.uiCopy.welcome;
-  const ACCENT = ['#221f64','#00aeff','#1abe9b','#e84d3d','#e0a200'];
-  const ICONS = ['pin','gauge','top10','wheel','trophy'];
-  const wEsc = (t) => String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  function scoreColor(line) {
-    if (/מלא|10/.test(line)) return ['#1a7a44', 800];
-    if (/חלק|5\s*נק|: 5/.test(line)) return ['#9a6a00', 800];
-    if (/שגוי|0\s*נק|: 0/.test(line)) return ['#c0392b', 800];
-    return ['#4a4636', 500];
-  }
-  const sections = w.sections || [];
-  const rules = sections.map((s, i) => {
-    const isScoring = /ניקוד|נקודות/.test(s.title);
-    const raw = String(s.body || '').split(/<br\s*\/?>/i).map(t => t.trim()).filter(Boolean);
-    const lines = raw.map(t => { const sc = isScoring ? scoreColor(t) : ['#4a4636', 500]; return [t, sc[0], sc[1]]; });
-    return { num: i+1, title: s.title, lines, color: ACCENT[i % ACCENT.length], icon: ICONS[i % ICONS.length] };
-  });
-  const splitAt = rules.length >= 5 ? 3 : Math.ceil(rules.length / 2);
-  const cardHtml = (r) => `
-    <div style="width:31%;background:#fff;border:1.5px solid #ece3cd;border-radius:20px;padding:20px 22px;display:flex;gap:16px;box-shadow:0 5px 16px rgba(34,31,100,.07)">
-      <div style="display:flex;flex-direction:column;align-items:center;gap:9px;flex-shrink:0">
-        <div style="width:58px;height:58px;border-radius:50%;background:#fff;border:5px solid ${r.color};display:flex;align-items:center;justify-content:center;color:${r.color};font-size:26px;font-weight:800">${r.num}</div>
-        <img src="assets/icons/icon-${r.icon}.svg" alt="" style="width:28px;height:28px;opacity:.85">
-      </div>
-      <div style="display:flex;flex-direction:column;gap:7px;min-width:0">
-        <span style="font-size:21px;font-weight:800;line-height:1.15;color:${r.color}">${wEsc(r.title)}</span>
-        <div style="display:flex;flex-direction:column;gap:3px">
-          ${r.lines.map(ln => `<span style="font-size:16.5px;font-weight:${ln[2]};line-height:1.5;color:${ln[1]};text-wrap:pretty">${wEsc(ln[0])}</span>`).join('')}
-        </div>
-      </div>
-    </div>`;
-  const topCards = rules.slice(0, splitAt).map(cardHtml).join('');
-  const bottomCards = rules.slice(splitAt).map(cardHtml).join('');
-  app.innerHTML = `
-    <div id="board-fitwrap" style="flex:1;overflow:hidden;background:#dfe2e8;display:flex;align-items:center;justify-content:center">
-      <div id="gameboard" style="width:1920px;height:1080px;flex:none;transform-origin:center center;position:relative;overflow:hidden;background:#eef0f4 url('assets/board-bg.png') center/cover no-repeat;font-family:Heebo,Arial,sans-serif;direction:rtl">
-        <div style="position:absolute;inset:30px;background:#f7f2e6;border-radius:30px;box-shadow:0 18px 50px rgba(34,31,100,.16);border:3px solid #e6dcc2;overflow:hidden">
-          <div style="position:absolute;inset:14px;border:2px dashed #d9cdab;border-radius:20px;pointer-events:none;z-index:0"></div>
-          <div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%;padding:30px 54px 32px">
-            <div style="flex-shrink:0;display:flex;align-items:center;gap:24px;height:104px">
-              <div style="flex:1;display:flex;justify-content:flex-start"><span style="font-size:26px;font-weight:900;color:#221f64">${wEsc(w.title)}</span></div>
-              <div style="display:flex;align-items:center;justify-content:center">
-                <img src="assets/logo-game.png" alt="מסילות ותכנונים" style="height:104px;width:auto">
-              </div>
-              <div style="flex:1;display:flex;justify-content:flex-end"><img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:32px;width:auto;opacity:.9"></div>
-            </div>
-            <div style="flex-shrink:0;display:flex;align-items:center;gap:20px;background:#221f64;border-radius:18px;padding:16px 28px;margin-top:6px">
-              <div style="width:58px;height:58px;border-radius:50%;background:#f4c40f;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                <img src="assets/icons/icon-target.svg" alt="" style="width:30px;height:30px">
-              </div>
-              <div style="display:flex;flex-direction:column;gap:2px">
-                <span style="font-size:15px;font-weight:800;letter-spacing:.05em;color:#f4c40f">מטרת המשחק</span>
-                <p style="font-size:20px;font-weight:600;line-height:1.45;color:#fff;text-wrap:pretty">${wEsc(w.intro)}</p>
-              </div>
-            </div>
-            <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:18px;margin-top:14px">
-              <div style="display:flex;justify-content:center;gap:20px">${topCards}</div>
-              <div style="display:flex;justify-content:center;gap:20px">${bottomCards}</div>
-            </div>
-            <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:14px">
-              <button onclick="enterBoard()" style="padding:17px 56px;border-radius:15px;border:none;cursor:pointer;font-family:inherit;font-size:21px;font-weight:800;color:#fff;background:#1a8c4e;box-shadow:0 6px 18px rgba(26,140,78,.28)">${wEsc(w.startButton || 'התחילו משחק')}</button>
+  const GQ=[{bg:'#00aeff',fg:'#fff'},{bg:'#1abe9b',fg:'#fff'},{bg:'#e8821e',fg:'#fff'},{bg:'#7b5fd4',fg:'#fff'}];
+  const QR_SRCS=['assets/qr1.png','assets/qr2.png','assets/qr3.png','assets/qr4.png'];
+  const INSTR_GROUPS=GC.groups||[
+    {label:'קבוצה 1',divisionName:'חטיבת נייד'},
+    {label:'קבוצה 2',divisionName:'חטיבת משאבי אנוש'},
+    {label:'קבוצה 3',divisionName:'חטיבת בטיחות, ביטחון ואיכ"ס'},
+    {label:'קבוצה 4',divisionName:'חטיבת פיתוח עסקי'}
+  ];
+  const STATIONS=[
+    {type:'qr',ic:'flag',label:'כולם לעלות',title:'כולם לעלות!'},
+    {type:'text',ic:'clipboard',label:'מתארגנים',title:'מתארגנים לנסיעה',
+     lines:['בחרו נציג או נציגה שיכריזו את התשובות בשם הקבוצה לאורך כל המשחק.','עברו יחד על מבנה תיק תכנית העבודה: רשימת המשימות ומודל התגמול.','המשחק מתקדם בסבבים קבועים - כל קבוצה בתורה, תחנה אחרי תחנה.','המטרה: לזהות טעויות בתכנית העבודה, לצבור נקודות ולהתקדם על המסילה.']},
+    {type:'text',ic:'doc',label:'מתקדמים',title:'איך מתקדמים?',
+     lines:['בכל תחנה תקבלו משימה: למצוא את הטעות המוטמנת בתיק תכנית העבודה.','בתורכם, פתחו את התיק במובייל, התייעצו והכריזו תשובה דרך נציג הקבוצה.','אחרי המענה שלכם - התור עובר לקבוצה הבאה. בזמן שאתם עונים, התיקים של שאר הקבוצות נעולים - וגם להפך.','הגעתם לתחנת בלת"מ? סובבו את הגלגל: לפעמים מחכים סבב, ולפעמים ממשיכים.']},
+    {type:'text',ic:'trophy',label:'מנצחים',title:'איך מנצחים?',
+     lines:[{text:'בכל תחנה תצברו נקודות לפי איכות התשובה:',score:[{text:'תשובה מלאה: 10 נקודות',color:'#1a8c4e',bg:'#eafaf1'},{text:'תשובה חלקית: 5 נקודות',color:'#e8821e',bg:'#fdefe0'},{text:'תשובה שגויה: 0 נקודות - עצירת ביניים בסבב הבא',color:'#d23b3b',bg:'#fdecec'}]},'המטרה - להגיע ראשונים לאישור מודל התגמול.','במקרה של שוויון על המסילה, הנקודות קובעות מי מובילים.','המסילה מוכנה, התחנה הראשונה מחכה!']},
+  ];
+  const QR_HEADING='התחלקו לארבע קבוצות, סרקו את הברקוד של הקבוצה שלכם והיכנסו לתיק תכנית העבודה שלכם. עברו על מבנה התיק: המשימות ומודל התגמול.';
+  const iEsc=(t)=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  let instrStep=0,instrQrIdx=0;
+  app.innerHTML=`<div id="instr-fitwrap" style="width:100%;height:100%;overflow:hidden;background:#cfe2f2;display:flex;align-items:center;justify-content:center;font-family:Heebo,Arial,sans-serif;color:#15224a;direction:rtl"><div id="instrboard" style="width:1920px;height:1080px;flex:none;transform-origin:center center;position:relative;overflow:hidden;background:url('assets/cover-clean.png') center/cover no-repeat"></div></div>`;
+  function instrRender(){
+    const cur=STATIONS[instrStep],N=STATIONS.length;
+    let inner='';
+    if(cur.type==='qr'){
+      const tabs=INSTR_GROUPS.map((g,i)=>`<button onclick="window._instrSelQr(${i})" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 18px rgba(20,40,90,.26)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 11px rgba(20,40,90,.16)'" style="padding:12px 30px;border-radius:999px;border:3px solid ${GQ[i].bg};cursor:pointer;font-family:inherit;font-size:24px;font-weight:800;color:${instrQrIdx===i?GQ[i].fg:GQ[i].bg};background:${instrQrIdx===i?GQ[i].bg:'linear-gradient(180deg,#fdfdfe,#e9edf3)'};box-shadow:0 4px 11px rgba(20,40,90,.16);transition:all .18s">${iEsc(g.label)}</button>`).join('');
+      inner=`<div style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;gap:12px;width:100%"><p style="font-size:30px;font-weight:600;line-height:1.4;color:#2a3658;text-align:center;max-width:960px;text-wrap:pretty;flex-shrink:0">${iEsc(QR_HEADING)}</p><div style="display:flex;gap:13px;justify-content:center;flex-shrink:0">${tabs}</div><span style="font-size:38px;font-weight:900;color:${GQ[instrQrIdx].bg};text-align:center;flex-shrink:0">${iEsc(INSTR_GROUPS[instrQrIdx].divisionName)}</span><img src="${QR_SRCS[instrQrIdx]}" alt="ברקוד הקבוצה" style="width:280px;height:280px;flex-shrink:0;object-fit:contain"></div>`;
+    }else{
+      const lines=cur.lines.map(ln=>{const o=(typeof ln==='string')?{text:ln}:ln;const score=(o.score||[]).map(s=>`<span style="align-self:flex-start;font-size:25px;font-weight:800;line-height:1.25;color:${s.color};background:${s.bg};border-radius:12px;padding:6px 18px;text-wrap:pretty">${iEsc(s.text)}</span>`).join('');const scoreBlock=score?`<div style="display:flex;flex-direction:column;gap:9px">${score}</div>`:'';return `<div style="display:flex;align-items:flex-start;gap:14px;padding:8px 6px;border-top:1px solid #eef1f7"><span style="flex-shrink:0;width:14px;height:14px;border-radius:50%;background:#1f4e9c;margin-top:11px"></span><div style="flex:1;display:flex;flex-direction:column;gap:9px"><span style="font-size:30px;font-weight:500;line-height:1.34;color:#2a3658;text-wrap:pretty">${iEsc(o.text)}</span>${scoreBlock}</div></div>`;}).join('');
+      inner=`<div style="flex-shrink:0;min-height:0;width:100%;display:flex;flex-direction:column;justify-content:flex-start;gap:4px;padding-top:8px">${lines}</div>`;
+    }
+    const btn=instrStep===N-1?'':
+      `<button onclick="window._instrGo(${instrStep+1})" title="לתחנה הבאה" style="width:88px;height:88px;border-radius:50%;border:2px solid rgba(150,190,255,.6);cursor:pointer;font-family:inherit;font-size:44px;font-weight:800;color:#fff;background:linear-gradient(180deg,#2a66c4,#143a7a);display:flex;align-items:center;justify-content:center;animation:ctaNavy 2.4s ease-in-out infinite"><span style="direction:ltr;display:inline-block">‹</span></button>`;
+    const startPill=instrStep===N-1?`<button onclick="enterBoard()" style="flex-shrink:0;margin:auto 0;padding:15px 64px;border-radius:999px;border:2px solid rgba(120,255,180,.55);cursor:pointer;font-family:inherit;font-size:28px;font-weight:900;color:#fff;background:linear-gradient(180deg,#23c95f,#127f3e);animation:ctaNavyWide 2.4s ease-in-out infinite">מתחילים לשחק!</button>`:'';
+    const backBtn=instrStep===0?'':
+      `<button onclick="window._instrGo(${instrStep-1})" title="לתחנה הקודמת" style="width:88px;height:88px;border-radius:50%;border:2px solid rgba(150,190,255,.6);cursor:pointer;font-family:inherit;font-size:44px;font-weight:800;color:#fff;background:linear-gradient(180deg,#2a66c4,#143a7a);display:flex;align-items:center;justify-content:center;animation:ctaNavy 2.4s ease-in-out infinite"><span style="direction:ltr;display:inline-block">›</span></button>`;
+    const rail=STATIONS.map((s,i)=>{const a=i===instrStep;return `<div onclick="window._instrGo(${i})" style="position:relative;z-index:${a?3:1};display:flex;flex-direction:column;align-items:center;gap:0;cursor:pointer;width:200px"><div style="width:78px;height:78px;border-radius:50%;background:${a?'#1f4e9c':'#fff'};border:5px solid #1f4e9c;display:flex;align-items:center;justify-content:center;box-shadow:${a?'0 10px 26px rgba(31,78,156,.5), 0 0 0 6px rgba(31,78,156,.14)':'0 4px 12px rgba(20,40,90,.16)'};transform:${a?'scale(1.45)':'scale(1)'};transition:all .35s cubic-bezier(.3,.7,.2,1)"><img src="assets/icons/icon-${s.ic}${a?'-white':'-nav'}.svg" alt="" style="width:38px;height:38px"></div><span style="margin-top:${a?34:16}px;font-size:${a?30:25}px;font-weight:800;color:#fff;text-shadow:0 2px 8px rgba(20,40,90,.55)">${iEsc(s.label)}</span></div>`;}).join('');
+    const board=document.getElementById('instrboard');
+    if(!board)return;
+    board.innerHTML=`
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(207,226,242,.2),rgba(255,255,255,.42) 44%,rgba(207,226,242,.28));z-index:0;pointer-events:none"></div>
+      <div style="position:absolute;top:46px;right:64px;z-index:8"><img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:34px;width:auto"></div>
+      <div style="position:absolute;top:34px;left:64px;z-index:8"><img src="assets/logo-game.png" alt="מסילות ותכנונים" style="height:104px;width:auto"></div>
+      <div style="position:absolute;top:100px;left:248px;right:248px;bottom:244px;z-index:6;overflow:visible;display:flex;justify-content:center">
+        <div style="display:flex;height:100%;width:100%;justify-content:center;padding:40px 0 0">
+          <div style="width:1180px;max-width:100%;height:100%;background:#fff;border:1px solid #d6deec;border-radius:26px;box-shadow:0 24px 60px rgba(15,28,60,.28);position:relative;display:flex;flex-direction:column;animation:cardSlide .5s cubic-bezier(.3,.7,.2,1) both">
+            <div style="position:absolute;top:0;left:50%;transform:translate(-50%,-50%);width:104px;height:104px;border-radius:50%;background:#fff;border:7px solid #1f4e9c;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(20,40,90,.18);z-index:2"><img src="assets/icons/icon-${cur.ic}-nav.svg" alt="" style="width:52px;height:52px"></div>
+            <div style="flex:1;min-height:0;padding:56px 56px 26px;display:flex;flex-direction:column;align-items:center;gap:11px;overflow:hidden">
+              <h1 style="font-size:48px;font-weight:900;line-height:1.04;color:#1f4e9c;text-align:center;flex-shrink:0">${iEsc(cur.title)}</h1>
+              ${inner}
+              ${startPill}
             </div>
           </div>
         </div>
       </div>
-    </div>`;
-  fitBoard();
+      ${instrStep===N-1?'':`<div style="position:absolute;top:430px;left:286px;z-index:8">${btn}</div>`}
+      ${instrStep===0?'':`<div style="position:absolute;top:430px;right:286px;z-index:8">${backBtn}</div>`}
+      <div style="position:absolute;bottom:56px;left:0;right:0;z-index:7;display:flex;justify-content:center"><div style="position:relative;display:flex;flex-direction:row;align-items:flex-start;justify-content:center"><div style="position:absolute;top:35px;right:70px;left:70px;height:9px;border-radius:6px;background:#ffffff;box-shadow:0 0 0 1px rgba(31,78,156,.22),0 3px 14px rgba(31,78,156,.4)"></div>${rail}</div></div>`;
+  }
+  function instrFit(){
+    const b=document.getElementById('instrboard'),w=document.getElementById('instr-fitwrap');
+    if(b&&w)b.style.transform='scale('+Math.min(w.clientWidth/1920,w.clientHeight/1080)+')';
+  }
+  window._instrGo=function(i){instrStep=Math.max(0,Math.min(STATIONS.length-1,i));instrRender();instrFit();};
+  window._instrSelQr=function(i){instrQrIdx=i;instrRender();};
+  window.addEventListener('resize',instrFit);
+  instrRender();
+  instrFit();
 }
 
 function enterBoard() {
   gameStarted = true;
   phonesActive = true;
+  GC.groups.forEach(g => {
+    const gst = gs(g.id);
+    if (gst.currentStationOrder === 0) {
+      gst.currentStationOrder = 1;
+      if (!gst.completedStationIds.includes('station_start'))
+        gst.completedStationIds.push('station_start');
+    }
+  });
   pushGameState();
   instructionsOpen = false;
   renderApp();
@@ -2874,18 +2800,27 @@ function renderStationModal() {
   let mainHtml = '';
 
   if (isWaiting && !DEV_MODE) {
-    const waitReasonText = gst.waitingReason === 'unexpected'
-      ? 'בגלל: גלגל הבלת"מ'
-      : 'בגלל: תשובה שגויה בסבב הקודם';
+    const isUnexpected = gst.waitingReason === 'unexpected';
+    const waitColor = '#e84d3d';
+    const waitMsg = isUnexpected ? 'עצירת ביניים - גלגל הבלת"מ' : copy.messages.wrongOutcome;
+    const waitIconHtml = isUnexpected
+      ? `<div style="width:86px;height:86px;border-radius:50%;background:${waitColor};display:flex;align-items:center;justify-content:center;font-size:44px">🎲</div>`
+      : `<svg xmlns="http://www.w3.org/2000/svg" width="86" height="86" viewBox="0 0 86 86"><polygon points="27,3 59,3 83,27 83,59 59,83 27,83 3,59 3,27" fill="#c01a20"/><polygon points="27,3 59,3 83,27 83,59 59,83 27,83 3,59 3,27" fill="none" stroke="white" stroke-width="4"/><polygon points="32,9 54,9 77,32 77,54 54,77 32,77 9,54 9,32" fill="none" stroke="white" stroke-width="1.5"/><rect x="24" y="46" width="42" height="24" rx="6" fill="white"/><rect x="25" y="15" width="10" height="34" rx="5" fill="white"/><rect x="37" y="11" width="10" height="38" rx="5" fill="white"/><rect x="49" y="15" width="10" height="34" rx="5" fill="white"/><rect x="61" y="23" width="8" height="26" rx="4" fill="white"/><rect x="13" y="48" width="16" height="10" rx="5" fill="white"/></svg>`;
     mainHtml = `
-      <div style="flex:1;display:flex;align-items:center;justify-content:center;margin-top:32px">
-        <div style="background:#fff;border-radius:22px;border:1px solid #e4e7f1;box-shadow:0 8px 26px rgba(34,31,100,.10);padding:48px 64px;text-align:center;max-width:720px">
-          <p style="font-size:20px;font-weight:600;color:#3a3e78;margin-bottom:10px">${copy.groupCard.waitingMessage}</p>
-          <p style="font-size:16px;color:#8a90c0;margin-bottom:36px">${waitReasonText}</p>
-          <button onclick="skipWaitingGroup('${currentGroup.id}')"
-            style="background:#221f64;color:#fff;border:none;border-radius:12px;
-              padding:16px 40px;font-size:18px;font-weight:700;cursor:pointer;font-family:inherit;
-              box-shadow:0 4px 16px rgba(34,31,100,.25)">${copy.groupCard.skipButton}</button>
+      <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding-top:4px">
+        <div style="width:860px;max-height:100%;background:${gp.tint};border-radius:30px;border:6px solid ${gp.bg};box-shadow:0 22px 55px rgba(34,31,100,.20);position:relative;display:flex;flex-direction:column;align-items:center;padding:32px 50px 36px;overflow:hidden">
+          <div style="position:absolute;inset:14px;border:2px solid ${gp.soft};border-radius:20px;pointer-events:none;z-index:0"></div>
+          <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%;gap:14px;text-align:center">
+            <span style="display:inline-flex;align-items:center;gap:9px;background:${gp.bg};border-radius:999px;padding:5px 18px 5px 7px">
+              <span style="width:28px;height:28px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;color:${gp.bg};font-size:15px;font-weight:800">${gpIdx + 1}</span>
+              <span style="font-size:16px;font-weight:800;color:${gp.fg}">${qEsc(currentGroup.label + ' · ' + currentGroup.divisionName)}</span>
+            </span>
+            ${waitIconHtml}
+            <span style="font-size:34px;font-weight:800;color:${waitColor}">0 נקודות</span>
+            <p style="font-size:22px;font-weight:700;color:#1b1c4e;line-height:1.5;max-width:480px">${qEsc(waitMsg)}</p>
+            <button onclick="skipWaitingGroup('${currentGroup.id}')"
+              style="padding:14px 34px;border-radius:13px;border:2px solid #221f64;background:#fff;cursor:pointer;font-family:inherit;font-size:18px;font-weight:800;color:#221f64">${copy.groupCard.skipButton}</button>
+          </div>
         </div>
       </div>`;
 
@@ -2996,40 +2931,52 @@ function renderStationModal() {
     const tm = GC.transitionMessages[station.transitionMessageId];
     const trGroupColor = COLOR[currentGroup.colorToken].primary;
     if (station.id === 'station_start') {
-      const activeQRGroup = window._activeQRTab || GC.groups[0].id;
-      const tabsHtml = GC.groups.map(g => {
-        const col = COLOR[g.colorToken];
-        const isActive = g.id === activeQRGroup;
-        return `<button onclick="window._activeQRTab='${g.id}';renderApp()"
-          style="padding:8px 16px;border:2px solid ${col.primary};border-radius:8px;
-            background:${isActive ? col.primary : '#fff'};color:${isActive ? '#fff' : col.primary};
-            font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s">
-          ${g.label}
+      const QR_SRCS_M = ['assets/qr1.png','assets/qr2.png','assets/qr3.png','assets/qr4.png'];
+      const activeQRIdx = window._activeQRIdx != null ? window._activeQRIdx : 0;
+      const GQ_M = [
+        {bg:'#00aeff',fg:'#fff'},{bg:'#1abe9b',fg:'#fff'},
+        {bg:'#f4c40f',fg:'#221f64'},{bg:'#7b5fd4',fg:'#fff'}
+      ];
+      const tabsHtml = GC.groups.map((g, i) => {
+        const isActive = i === activeQRIdx;
+        const c = GQ_M[i] || GQ_M[0];
+        return `<button onclick="window._activeQRIdx=${i};renderApp()"
+          onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 18px rgba(20,40,90,.26)'"
+          onmouseout="this.style.transform='';this.style.boxShadow='0 4px 11px rgba(20,40,90,.16)'"
+          style="padding:12px 30px;border-radius:999px;border:3px solid ${c.bg};cursor:pointer;
+            font-family:inherit;font-size:22px;font-weight:800;
+            color:${isActive ? c.fg : c.bg};
+            background:${isActive ? c.bg : 'linear-gradient(180deg,#fdfdfe,#e9edf3)'};
+            box-shadow:0 4px 11px rgba(20,40,90,.16);transition:all .18s">
+          ${qEsc(g.label)}
         </button>`;
       }).join('');
-      const activeGroup = GC.groups.find(g => g.id === activeQRGroup);
-      const col = COLOR[activeGroup.colorToken];
+      const activeGroup = GC.groups[activeQRIdx] || GC.groups[0];
+      const activeC = GQ_M[activeQRIdx] || GQ_M[0];
+      stationRowHtml = '';
       mainHtml = `
-        <div style="flex:1;display:flex;align-items:center;justify-content:center;margin-top:24px">
-          <div style="background:#fff;border-radius:22px;border:1px solid #e4e7f1;
-            box-shadow:0 8px 26px rgba(34,31,100,.10);padding:40px 56px;text-align:center;max-width:800px">
-            <div style="font-size:24px;font-weight:800;color:#1E1F56;margin-bottom:8px">${tm.title}</div>
-            <p style="font-size:15px;color:#3A3E78;line-height:1.7;margin-bottom:24px">${tm.body}</p>
-            <div style="display:flex;gap:8px;justify-content:center;margin-bottom:24px;flex-wrap:wrap">
-              ${tabsHtml}
+        <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:16px 0 8px">
+          <div style="width:1180px;max-width:100%;background:#fff;border:7px solid #1f4e9c;border-radius:26px;
+            box-shadow:0 24px 60px rgba(15,28,60,.28);position:relative;display:flex;flex-direction:column;align-items:center">
+            <div style="position:absolute;top:0;left:50%;transform:translate(-50%,-50%);
+              width:104px;height:104px;border-radius:50%;background:#fff;border:7px solid #1f4e9c;
+              display:flex;align-items:center;justify-content:center;
+              box-shadow:0 8px 20px rgba(20,40,90,.18);z-index:2">
+              <img src="assets/icons/icon-flag-nav.svg" alt="" style="width:52px;height:52px">
             </div>
-            <div style="background:${col.light};border:2px solid ${col.primary};border-radius:16px;
-              padding:24px 20px;display:inline-block;min-width:260px;margin-bottom:28px">
-              <div style="font-size:16px;font-weight:800;color:${col.text};margin-bottom:2px">${activeGroup.label}</div>
-              <div style="font-size:12px;color:${col.primary};margin-bottom:16px;font-weight:600">${activeGroup.divisionName}</div>
-              <img src="${QR_CODES[activeGroup.id]}" alt="QR ${activeGroup.label}"
-                style="width:200px;height:200px;border-radius:8px;display:block;margin:0 auto" />
-            </div>
-            <div>
-              <button onclick="activatePhones()"
-                style="background:#1E1F56;color:#fff;border:none;border-radius:10px;
-                  padding:12px 40px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;
-                  box-shadow:0 2px 12px rgba(30,31,86,.25)">מתחילים</button>
+            <div style="padding:64px 56px 32px;display:flex;flex-direction:column;align-items:center;gap:14px;width:100%">
+              <h1 style="font-size:46px;font-weight:900;line-height:1.05;color:#1f4e9c;text-align:center;flex-shrink:0">
+                ${qEsc(tm.title)}
+              </h1>
+              <p style="font-size:26px;font-weight:500;line-height:1.45;color:#2a3658;text-align:center;max-width:900px;text-wrap:pretty;flex-shrink:0">
+                ${qEsc(tm.body)}
+              </p>
+              <div style="display:flex;gap:13px;justify-content:center;flex-shrink:0">${tabsHtml}</div>
+              <span style="font-size:36px;font-weight:900;color:${activeC.bg};text-align:center;flex-shrink:0">
+                ${qEsc(activeGroup.divisionName)}
+              </span>
+              <img src="${QR_SRCS_M[activeQRIdx]}" alt="ברקוד הקבוצה"
+                style="width:240px;height:240px;flex-shrink:0;object-fit:contain">
             </div>
           </div>
         </div>`;
