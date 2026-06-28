@@ -2320,6 +2320,8 @@ function renderFacilitator(app) {
 
   // ── HOOK 2: גלולת "תור פעיל" ─────────────────────────────────────────────
   const bTurnText = currentGroup.label + ' · ' + currentGroup.divisionName;
+  const bCurIdx = GC.groups.indexOf(currentGroup);
+  const bGP = GP[bCurIdx] || GP[0];
 
   // ── Scoreboard: כרטיסי לוח תוצאות ────────────────────────────────────────
   const CHIP_DEF = {
@@ -2329,7 +2331,8 @@ function renderFacilitator(app) {
     notyet:  { chip:'מחכה לתורה', bg:'#eef0f5', fg:'#7a809a' },
   };
   const bScoreHtml = GC.groups.map((g, gi) => {
-    const status = statusByGroup[gi], isAct = status==='active', c = CHIP_DEF[status]||CHIP_DEF.notyet;
+    const status = statusByGroup[gi], isAct = status==='active';
+    const c = isAct ? {chip:'תור פעיל', bg:GP[gi].bg, fg:GP[gi].fg} : (CHIP_DEF[status]||CHIP_DEF.notyet);
     const cellBg = isAct ? GP[gi].tint : '#fff', cellBorder = isAct ? GP[gi].bg : '#e6e8f0';
     return `
       <div style="flex:1;border-radius:15px;overflow:hidden;background:${cellBg};border:2px solid ${cellBorder};box-shadow:0 4px 14px rgba(34,31,100,.10)">
@@ -2375,9 +2378,9 @@ function renderFacilitator(app) {
         <!-- כותרת: גלולת תור (ימין) · לוגואים (מרכז) · לוגו רכבת (שמאל) -->
         <div style="display:flex;align-items:center;gap:24px;flex-shrink:0;height:150px">
           <div style="flex:1;display:flex;justify-content:flex-start">
-            <div style="background:#221f64;border-radius:40px;padding:8px 20px 8px 14px;display:flex;align-items:center;gap:11px;box-shadow:0 5px 16px rgba(34,31,100,.22)">
-              <span style="background:#f4c40f;color:#221f64;font-weight:800;font-size:15px;border-radius:20px;padding:5px 14px">תור פעיל</span>
-              <span style="color:#fff;font-size:19px;font-weight:700">${bEsc(bTurnText)}</span>
+            <div style="background:${bGP.bg};border-radius:40px;padding:8px 20px 8px 14px;display:flex;align-items:center;gap:11px;box-shadow:0 5px 16px rgba(34,31,100,.22)">
+              <span style="background:rgba(255,255,255,.28);color:${bGP.fg};font-weight:800;font-size:15px;border-radius:20px;padding:5px 14px">תור פעיל</span>
+              <span style="color:${bGP.fg};font-size:19px;font-weight:700">${bEsc(bTurnText)}</span>
             </div>
           </div>
           <div style="display:flex;align-items:center;justify-content:center">
