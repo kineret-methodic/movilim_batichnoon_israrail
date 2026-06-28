@@ -2802,21 +2802,16 @@ function renderStationModal() {
   if (isWaiting && !DEV_MODE) {
     const isUnexpected = gst.waitingReason === 'unexpected';
     const waitColor = '#e84d3d';
-    const waitMsg = isUnexpected ? 'עצירת ביניים - גלגל הבלת"מ' : copy.messages.wrongOutcome;
-    const waitIconHtml = isUnexpected
-      ? `<div style="width:86px;height:86px;border-radius:50%;background:${waitColor};display:flex;align-items:center;justify-content:center;font-size:44px">🎲</div>`
-      : `<svg xmlns="http://www.w3.org/2000/svg" width="86" height="86" viewBox="0 0 86 86"><polygon points="27,3 59,3 83,27 83,59 59,83 27,83 3,59 3,27" fill="#c01a20"/><polygon points="27,3 59,3 83,27 83,59 59,83 27,83 3,59 3,27" fill="none" stroke="white" stroke-width="4"/><polygon points="32,9 54,9 77,32 77,54 54,77 32,77 9,54 9,32" fill="none" stroke="white" stroke-width="1.5"/><rect x="24" y="46" width="42" height="24" rx="6" fill="white"/><rect x="25" y="15" width="10" height="34" rx="5" fill="white"/><rect x="37" y="11" width="10" height="38" rx="5" fill="white"/><rect x="49" y="15" width="10" height="34" rx="5" fill="white"/><rect x="61" y="23" width="8" height="26" rx="4" fill="white"/><rect x="13" y="48" width="16" height="10" rx="5" fill="white"/></svg>`;
+    const waitIcon = isUnexpected ? '🎲' : '↩';
+    const waitPoints = '0 נקודות';
+    const waitMsg = isUnexpected ? 'עצירת ביניים בסבב הבא — גלגל הבלת"מ' : 'עצירת ביניים בסבב הבא';
     mainHtml = `
       <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding-top:4px">
         <div style="width:860px;max-height:100%;background:${gp.tint};border-radius:30px;border:6px solid ${gp.bg};box-shadow:0 22px 55px rgba(34,31,100,.20);position:relative;display:flex;flex-direction:column;align-items:center;padding:32px 50px 36px;overflow:hidden">
           <div style="position:absolute;inset:14px;border:2px solid ${gp.soft};border-radius:20px;pointer-events:none;z-index:0"></div>
-          <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%;gap:14px;text-align:center">
-            <span style="display:inline-flex;align-items:center;gap:9px;background:${gp.bg};border-radius:999px;padding:5px 18px 5px 7px">
-              <span style="width:28px;height:28px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;color:${gp.bg};font-size:15px;font-weight:800">${gpIdx + 1}</span>
-              <span style="font-size:16px;font-weight:800;color:${gp.fg}">${qEsc(currentGroup.label + ' · ' + currentGroup.divisionName)}</span>
-            </span>
-            ${waitIconHtml}
-            <span style="font-size:34px;font-weight:800;color:${waitColor}">0 נקודות</span>
+          <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%;gap:14px;text-align:center;padding:8px 0">
+            <div style="width:86px;height:86px;border-radius:50%;background:${waitColor};display:flex;align-items:center;justify-content:center;color:#fff;font-size:44px;font-weight:800">${waitIcon}</div>
+            <span style="font-size:34px;font-weight:800;color:${waitColor}">${waitPoints}</span>
             <p style="font-size:22px;font-weight:700;color:#1b1c4e;line-height:1.5;max-width:480px">${qEsc(waitMsg)}</p>
             <button onclick="skipWaitingGroup('${currentGroup.id}')"
               style="padding:14px 34px;border-radius:13px;border:2px solid #221f64;background:#fff;cursor:pointer;font-family:inherit;font-size:18px;font-weight:800;color:#221f64">${copy.groupCard.skipButton}</button>
