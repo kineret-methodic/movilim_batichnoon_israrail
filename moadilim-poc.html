@@ -1818,7 +1818,7 @@ function renderWelcome(app) {
       <div style="position:absolute;top:34px;left:64px;z-index:8"><img src="assets/logo-game.png" alt="מסילות ותכנונים" style="height:104px;width:auto"></div>
       <div style="position:absolute;top:100px;left:248px;right:248px;bottom:244px;z-index:6;overflow:visible;display:flex;justify-content:center">
         <div style="display:flex;height:100%;width:100%;justify-content:center;padding:40px 0 0">
-          <div style="width:1180px;max-width:100%;height:100%;background:#fff;border:1px solid #d6deec;border-radius:26px;box-shadow:0 24px 60px rgba(15,28,60,.28);position:relative;display:flex;flex-direction:column;animation:cardSlide .85s cubic-bezier(.3,.7,.2,1) both">
+          <div style="width:1180px;max-width:100%;height:100%;background:#fff;border:1px solid #d6deec;border-radius:26px;box-shadow:0 24px 60px rgba(15,28,60,.28);position:relative;display:flex;flex-direction:column;animation:none">
             <div style="position:absolute;top:0;left:50%;transform:translate(-50%,-64%);width:104px;height:104px;border-radius:50%;background:#fff;border:7px solid #1f4e9c;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(20,40,90,.18);z-index:2"><img src="assets/icons/icon-${cur.ic}-nav.svg" alt="" style="width:52px;height:52px"></div>
             <div style="flex:1;min-height:0;padding:56px 56px 26px;display:flex;flex-direction:column;align-items:center;gap:11px;overflow:hidden">
               <h1 style="font-size:48px;font-weight:900;line-height:1.04;color:#1f4e9c;text-align:center;flex-shrink:0">${iEsc(cur.title)}</h1>
@@ -2802,7 +2802,7 @@ function renderStationModal() {
   if (isWaiting && !DEV_MODE) {
     const isUnexpected = gst.waitingReason === 'unexpected';
     const waitColor = '#e84d3d';
-    const waitIcon = isUnexpected ? '🎲' : '↩';
+    const waitIcon = isUnexpected ? '🎲' : '✕';
     const waitPoints = '0 נקודות';
     const waitMsg = isUnexpected ? 'עצירת ביניים בסבב הבא — גלגל הבלת"מ' : 'עצירת ביניים בסבב הבא';
     mainHtml = `
