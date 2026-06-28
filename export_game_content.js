@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 const htmlPath = path.join(__dirname, 'moadilim-poc.html');
-const outPath  = path.join(__dirname, 'gameContent.json');
+const outPath  = path.join(__dirname, 'src', 'data', 'gameContent.json');
 
 const html = fs.readFileSync(htmlPath, 'utf8');
 
