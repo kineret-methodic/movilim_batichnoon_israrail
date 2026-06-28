@@ -1786,7 +1786,7 @@ function renderWelcome(app) {
     {type:'text',ic:'clipboard',label:'מתארגנים',title:'מתארגנים לנסיעה',
      lines:['בחרו נציג או נציגה שיכריזו את התשובות בשם הקבוצה לאורך כל המשחק.','עברו יחד על מבנה תיק תכנית העבודה: רשימת המשימות ומודל התגמול.','המשחק מתקדם בסבבים קבועים - כל קבוצה בתורה, תחנה אחרי תחנה.','המטרה: לזהות טעויות בתכנית העבודה, לצבור נקודות ולהתקדם על המסילה.']},
     {type:'text',ic:'doc',label:'מתקדמים',title:'איך מתקדמים?',
-     lines:['בכל תחנה תקבלו משימה: למצוא את הטעות המוטמנת בתיק תכנית העבודה.','בתורכם, פתחו את התיק במובייל, התייעצו והכריזו תשובה דרך נציג הקבוצה.','אחרי המענה שלכם - התור עובר לקבוצה הבאה. בזמן שאתם עונים, התיקים של שאר הקבוצות נעולים - וגם להפך.','הגעתם לתחנת בלת"מ? סובבו את הגלגל: לפעמים מחכים סבב, ולפעמים ממשיכים.']},
+     lines:['בכל תחנה תקבלו משימה: למצוא את הטעות המוטמנת בתיק תכנית העבודה.','בתורכם, פתחו את התיק במובייל, התייעצו והכריזו תשובה דרך נציג הקבוצה.','תשובה נכונה או חלקית — מתקדמים לתחנה הבאה. תשובה שגויה — עצירת ביניים בסבב הבא.','אחרי המענה שלכם - התור עובר לקבוצה הבאה. בזמן שאתם עונים, התיקים של שאר הקבוצות נעולים - וגם להפך.','הגעתם לתחנת בלת"מ? סובבו את הגלגל: לפעמים מחכים סבב, ולפעמים ממשיכים.']},
     {type:'text',ic:'trophy',label:'מנצחים',title:'איך מנצחים?',
      lines:[{text:'בכל תחנה תצברו נקודות לפי איכות התשובה:',score:[{text:'תשובה מלאה: 10 נקודות',color:'#1a8c4e',bg:'#eafaf1'},{text:'תשובה חלקית: 5 נקודות',color:'#e8821e',bg:'#fdefe0'},{text:'תשובה שגויה: 0 נקודות - עצירת ביניים בסבב הבא',color:'#d23b3b',bg:'#fdecec'}]},'המטרה - להגיע ראשונים לאישור מודל התגמול.','במקרה של שוויון על המסילה, הנקודות קובעות מי מובילים.','המסילה מוכנה, התחנה הראשונה מחכה!']},
   ];
@@ -1798,7 +1798,7 @@ function renderWelcome(app) {
     const cur=STATIONS[instrStep],N=STATIONS.length;
     let inner='';
     if(cur.type==='qr'){
-      const tabs=INSTR_GROUPS.map((g,i)=>`<button onclick="window._instrSelQr(${i})" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 18px rgba(20,40,90,.26)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 11px rgba(20,40,90,.16)'" style="padding:12px 30px;border-radius:999px;border:3px solid ${GQ[i].bg};cursor:pointer;font-family:inherit;font-size:24px;font-weight:800;color:${instrQrIdx===i?GQ[i].fg:GQ[i].bg};background:${instrQrIdx===i?GQ[i].bg:'linear-gradient(180deg,#fdfdfe,#e9edf3)'};box-shadow:0 4px 11px rgba(20,40,90,.16);transition:all .18s">${iEsc(g.label)}</button>`).join('');
+      const tabs=INSTR_GROUPS.map((g,i)=>`<button onclick="window._instrSelQr(${i})" style="padding:12px 30px;border-radius:999px;border:3px solid ${GQ[i].bg};cursor:pointer;font-family:inherit;font-size:24px;font-weight:800;color:${instrQrIdx===i?GQ[i].fg:GQ[i].bg};background:${instrQrIdx===i?GQ[i].bg:'linear-gradient(180deg,#fdfdfe,#e9edf3)'};box-shadow:0 4px 11px rgba(20,40,90,.16)">${iEsc(g.label)}</button>`).join('');
       inner=`<div style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;gap:12px;width:100%"><p style="font-size:30px;font-weight:600;line-height:1.4;color:#2a3658;text-align:center;max-width:960px;text-wrap:pretty;flex-shrink:0">${iEsc(QR_HEADING)}</p><div style="display:flex;gap:13px;justify-content:center;flex-shrink:0">${tabs}</div><span style="font-size:38px;font-weight:900;color:${GQ[instrQrIdx].bg};text-align:center;flex-shrink:0">${iEsc(INSTR_GROUPS[instrQrIdx].divisionName)}</span><img src="${QR_SRCS[instrQrIdx]}" alt="ברקוד הקבוצה" style="width:280px;height:280px;flex-shrink:0;object-fit:contain"></div>`;
     }else{
       const lines=cur.lines.map(ln=>{const o=(typeof ln==='string')?{text:ln}:ln;const score=(o.score||[]).map(s=>`<span style="align-self:flex-start;font-size:25px;font-weight:800;line-height:1.25;color:${s.color};background:${s.bg};border-radius:12px;padding:6px 18px;text-wrap:pretty">${iEsc(s.text)}</span>`).join('');const scoreBlock=score?`<div style="display:flex;flex-direction:column;gap:9px">${score}</div>`:'';return `<div style="display:flex;align-items:flex-start;gap:14px;padding:8px 6px;border-top:1px solid #eef1f7"><span style="flex-shrink:0;width:14px;height:14px;border-radius:50%;background:#1f4e9c;margin-top:11px"></span><div style="flex:1;display:flex;flex-direction:column;gap:9px"><span style="font-size:30px;font-weight:500;line-height:1.34;color:#2a3658;text-wrap:pretty">${iEsc(o.text)}</span>${scoreBlock}</div></div>`;}).join('');
@@ -1818,8 +1818,8 @@ function renderWelcome(app) {
       <div style="position:absolute;top:34px;left:64px;z-index:8"><img src="assets/logo-game.png" alt="מסילות ותכנונים" style="height:104px;width:auto"></div>
       <div style="position:absolute;top:100px;left:248px;right:248px;bottom:244px;z-index:6;overflow:visible;display:flex;justify-content:center">
         <div style="display:flex;height:100%;width:100%;justify-content:center;padding:40px 0 0">
-          <div style="width:1180px;max-width:100%;height:100%;background:#fff;border:1px solid #d6deec;border-radius:26px;box-shadow:0 24px 60px rgba(15,28,60,.28);position:relative;display:flex;flex-direction:column;animation:cardSlide .5s cubic-bezier(.3,.7,.2,1) both">
-            <div style="position:absolute;top:0;left:50%;transform:translate(-50%,-50%);width:104px;height:104px;border-radius:50%;background:#fff;border:7px solid #1f4e9c;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(20,40,90,.18);z-index:2"><img src="assets/icons/icon-${cur.ic}-nav.svg" alt="" style="width:52px;height:52px"></div>
+          <div style="width:1180px;max-width:100%;height:100%;background:#fff;border:1px solid #d6deec;border-radius:26px;box-shadow:0 24px 60px rgba(15,28,60,.28);position:relative;display:flex;flex-direction:column;animation:cardSlide .85s cubic-bezier(.3,.7,.2,1) both">
+            <div style="position:absolute;top:0;left:50%;transform:translate(-50%,-64%);width:104px;height:104px;border-radius:50%;background:#fff;border:7px solid #1f4e9c;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(20,40,90,.18);z-index:2"><img src="assets/icons/icon-${cur.ic}-nav.svg" alt="" style="width:52px;height:52px"></div>
             <div style="flex:1;min-height:0;padding:56px 56px 26px;display:flex;flex-direction:column;align-items:center;gap:11px;overflow:hidden">
               <h1 style="font-size:48px;font-weight:900;line-height:1.04;color:#1f4e9c;text-align:center;flex-shrink:0">${iEsc(cur.title)}</h1>
               ${inner}
@@ -1828,8 +1828,8 @@ function renderWelcome(app) {
           </div>
         </div>
       </div>
-      ${instrStep===N-1?'':`<div style="position:absolute;top:430px;left:286px;z-index:8">${btn}</div>`}
-      ${instrStep===0?'':`<div style="position:absolute;top:430px;right:286px;z-index:8">${backBtn}</div>`}
+      ${instrStep===N-1?'':`<div style="position:absolute;top:430px;left:240px;z-index:8">${btn}</div>`}
+      ${instrStep===0?'':`<div style="position:absolute;top:430px;right:240px;z-index:8">${backBtn}</div>`}
       <div style="position:absolute;bottom:56px;left:0;right:0;z-index:7;display:flex;justify-content:center"><div style="position:relative;display:flex;flex-direction:row;align-items:flex-start;justify-content:center"><div style="position:absolute;top:35px;right:70px;left:70px;height:9px;border-radius:6px;background:#ffffff;box-shadow:0 0 0 1px rgba(31,78,156,.22),0 3px 14px rgba(31,78,156,.4)"></div>${rail}</div></div>`;
   }
   function instrFit(){
@@ -2941,13 +2941,11 @@ function renderStationModal() {
         const isActive = i === activeQRIdx;
         const c = GQ_M[i] || GQ_M[0];
         return `<button onclick="window._activeQRIdx=${i};renderApp()"
-          onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 18px rgba(20,40,90,.26)'"
-          onmouseout="this.style.transform='';this.style.boxShadow='0 4px 11px rgba(20,40,90,.16)'"
           style="padding:12px 30px;border-radius:999px;border:3px solid ${c.bg};cursor:pointer;
             font-family:inherit;font-size:22px;font-weight:800;
             color:${isActive ? c.fg : c.bg};
             background:${isActive ? c.bg : 'linear-gradient(180deg,#fdfdfe,#e9edf3)'};
-            box-shadow:0 4px 11px rgba(20,40,90,.16);transition:all .18s">
+            box-shadow:0 4px 11px rgba(20,40,90,.16)">
           ${qEsc(g.label)}
         </button>`;
       }).join('');
