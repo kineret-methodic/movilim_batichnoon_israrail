@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useEffect } from 'react';
 import data from './data/gameContent.json';
 import type { GroupState, AnswerOutcome } from './data/gameContent.types';
 import { initGroupState, applyOutcome, startNewRound } from './engine';
@@ -26,11 +26,22 @@ type Action =
 
 const maxOrder = Math.max(...data.stations.map(s => s.order));
 
+function viewFromHash(): View {
+  const hash = window.location.hash.replace('#', '');
+  if (hash.startsWith('mobile/')) return `mobile_${hash.replace('mobile/', '')}` as View;
+  return 'facilitator';
+}
+
+function hashFromView(view: View): string {
+  if (view.startsWith('mobile_')) return `#mobile/${view.replace('mobile_', '')}`;
+  return '#facilitator';
+}
+
 function initState(): AppState {
   const groupStates: Record<string, GroupState> = {};
   data.groups.forEach(g => { groupStates[g.id] = initGroupState(g.id); });
   return {
-    view: 'facilitator',
+    view: viewFromHash(),
     groupStates,
     openStationId: null,
     answerRevealed: false,
@@ -90,6 +101,10 @@ export default function App() {
   const ui = data.uiCopy;
 
   const currentGroup = data.groups[state.currentTurnGroupIndex];
+
+  useEffect(() => {
+    window.location.hash = hashFromView(state.view);
+  }, [state.view]);
 
   const callbacks = {
     onOpenStation: (id: string) => dispatch({ type: 'OPEN_STATION', stationId: id }),
