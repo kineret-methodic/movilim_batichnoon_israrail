@@ -447,16 +447,6 @@ function StationPanel({ stationId, groupStates, answerRevealed, currentGroupId, 
                 </div>
               )}
 
-              {/* Principle (for facilitator, subtle) */}
-              {answerRevealed && (
-                <div style={{
-                  background: '#EFF8EE', border: '1px solid #B0D8B0',
-                  borderRadius: 8, padding: '8px 12px', marginBottom: 12,
-                  fontSize: 12, color: '#1A5A1A',
-                }}>
-                  <strong>עיקרון מקצועי: </strong>{question.professionalPrinciple}
-                </div>
-              )}
 
               {/* Group tabs */}
               <div style={{ display: 'flex', gap: 4, marginBottom: 0, borderBottom: '2px solid #E0E4F0' }}>
