@@ -4,7 +4,7 @@
   "description": "מובילים בתכנון — משחק רצפה לנאמני תכניות עבודה, רכבת ישראל",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && xcopy /Y /E /I assets dist\\assets\\ && copy moadilim-poc.html dist\\moadilim-poc.html",
+    "build": "node export_game_content.js && vite build && xcopy /Y /E /I assets dist\\assets\\ && copy moadilim-poc.html dist\\moadilim-poc.html",
     "export-content": "node export_game_content.js"
   },
   "dependencies": {
