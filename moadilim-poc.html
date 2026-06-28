@@ -775,7 +775,7 @@ const GC = {
     {
       "id": "q_weight",
       "stationId": "station_weight",
-      "questionText": "בדקו את מודל התגמול לבדיקה: האם המשקולות מסתכמות ל־100? האם ספי הביצוע ריאליים ומאתגרים? אם לא — הסבירו מה יש לתקן.",
+      "questionText": "בדקו את מודל התגמול שלפניכם: האם המשקולות מסתכמות ל־100? האם ספי הביצוע ריאליים ומאתגרים? אם לא — הסבירו מה יש לתקן.",
       "professionalPrinciple": "כל המשקולות יחד צריכות להסתכם ל־100. ספי הביצוע צריכים להגדיר עמידה מלאה, חלקית או אי־עמידה, ולהיות ריאליים ומאתגרים.",
       "timerSeconds": 60,
       "answersByGroup": {
@@ -1293,7 +1293,7 @@ const GC = {
     },
     "transition_model_approved": {
       "title": "טו-טו! מודל התגמול אושר",
-      "body": "מודל התגמול אושר. הגעתם ליעד."
+      "body": "הגעתם ליעד."
     }
   },
   "reminderDefinitions": [
@@ -2042,10 +2042,6 @@ function renderAnswerKeyView() {
         <div style="display:flex;flex-direction:column;gap:1px;flex-shrink:0"><span style="font-size:12px;font-weight:700;color:#9aa0b8">${aEsc(b.month)}</span><span style="font-size:22px;font-weight:800;line-height:1.1;color:${b.color}">${aEsc(b.name)}</span></div>
         <div style="width:1px;height:42px;background:#eef0f5;margin:0 6px"></div>
         <p style="font-size:16px;font-weight:600;line-height:1.45;color:#3a3f5c;flex:1;min-width:0">${aEsc(b.question)}</p>
-      </div>
-      <div style="padding:14px 24px;background:#faf7ef;border-bottom:1px solid #eef0f5;display:flex;gap:11px;align-items:flex-start">
-        <span style="font-size:12px;font-weight:800;color:#9a6a00;background:#f7e9c6;border-radius:7px;padding:4px 10px;white-space:nowrap;flex-shrink:0">עיקרון מקצועי</span>
-        <p style="font-size:14px;font-weight:500;line-height:1.5;color:#5a5436">${aEsc(b.principle)}</p>
       </div>
       <div style="padding:14px 16px;display:flex;flex-direction:column;gap:12px">
         ${b.answers.map(a=>`
