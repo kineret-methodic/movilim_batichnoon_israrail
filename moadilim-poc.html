@@ -1918,10 +1918,10 @@ function renderGameOverOverlay() {
   const END_GP = [
     { bg:'#00aeff', fg:'#fff', fgSoft:'rgba(255,255,255,.85)', tint:'#eaf6fd' },
     { bg:'#1abe9b', fg:'#fff', fgSoft:'rgba(255,255,255,.85)', tint:'#e8f7f2' },
-    { bg:'#f4c40f', fg:'#221f64', fgSoft:'rgba(34,31,100,.7)', tint:'#fdf7e0' },
+    { bg:'#e8821e', fg:'#fff', fgSoft:'rgba(255,255,255,.85)', tint:'#fdf0e8' },
     { bg:'#7b5fd4', fg:'#fff', fgSoft:'rgba(255,255,255,.85)', tint:'#f1ecfb' },
   ];
-  const CONF = ['#00aeff','#1abe9b','#f4c40f','#7b5fd4','#e84d3d','#221f64'];
+  const CONF = ['#00aeff','#1abe9b','#e8821e','#7b5fd4','#e84d3d','#221f64'];
   const RANK = ['🥇 מקום ראשון','🥈 מקום שני','🥉 מקום שלישי','מקום רביעי'];
   const eEsc = (t) => String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   const lefts = [5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,3,8,13,18,23,28,33,38,43,48,53,58,63,68,73,78,83,88,93,2,7,12,17];
@@ -2019,7 +2019,7 @@ function renderAnswerKeyView() {
   const AK_GP = [
     ['#00aeff','#fff','rgba(255,255,255,.82)'],
     ['#1abe9b','#fff','rgba(255,255,255,.82)'],
-    ['#f4c40f','#221f64','rgba(34,31,100,.62)'],
+    ['#e8821e','#fff','rgba(255,255,255,.82)'],
     ['#7b5fd4','#fff','rgba(255,255,255,.82)'],
   ];
   const AK_ICON = {station_start:'flag',station_company_goal:'target',station_outcome_metric:'gauge',station_top10:'top10',station_measurable:'doc',station_output_metric:'clipboard',station_milestones:'milestone',station_deputy_ceo:'lock',station_reward_metric:'wallet',station_weight:'weight',station_end:'trophy',station_reflection:'pin'};
@@ -2216,7 +2216,7 @@ function renderFacilitator(app) {
   const GP = [
     { bg:'#00aeff', fg:'#fff',    tint:'#e8f7ff' },
     { bg:'#1abe9b', fg:'#fff',    tint:'#e6f7f2' },
-    { bg:'#f4c40f', fg:'#221f64', tint:'#fdf6df' },
+    { bg:'#e8821e', fg:'#fff', tint:'#fdf0e8' },
     { bg:'#7b5fd4', fg:'#fff',    tint:'#f1ecfb' },
   ];
 
@@ -2753,7 +2753,7 @@ function renderStationModal() {
   const GP_Q = [
     { bg:'#00aeff', fg:'#fff', deep:'#0a6aa0', soft:'#a6def7', tint:'#f3fbff' },
     { bg:'#1abe9b', fg:'#fff', deep:'#11876e', soft:'#a6e3d4', tint:'#f1fcf8' },
-    { bg:'#f4c40f', fg:'#221f64', deep:'#9a7a00', soft:'#f0dd8e', tint:'#fffdf3' },
+    { bg:'#e8821e', fg:'#fff', deep:'#b55a10', soft:'#f0c4a0', tint:'#fff4ee' },
     { bg:'#7b5fd4', fg:'#fff', deep:'#5b3eb0', soft:'#c8bdef', tint:'#f3eefb' },
   ];
   const gpIdx = GC.groups.indexOf(currentGroup);
@@ -2921,7 +2921,7 @@ function renderStationModal() {
       const activeQRIdx = window._activeQRIdx != null ? window._activeQRIdx : 0;
       const GQ_M = [
         {bg:'#00aeff',fg:'#fff'},{bg:'#1abe9b',fg:'#fff'},
-        {bg:'#f4c40f',fg:'#221f64'},{bg:'#7b5fd4',fg:'#fff'}
+        {bg:'#e8821e',fg:'#fff'},{bg:'#7b5fd4',fg:'#fff'}
       ];
       const tabsHtml = GC.groups.map((g, i) => {
         const isActive = i === activeQRIdx;
@@ -3509,7 +3509,7 @@ function renderDevView(app) {
 const MOB_PAL = [
   { primary:'#00aeff', deep:'#0a6aa0', fg:'#fff',    tint:'#eaf6fd' },
   { primary:'#1abe9b', deep:'#11876e', fg:'#fff',    tint:'#e8f7f2' },
-  { primary:'#f4c40f', deep:'#9a7a00', fg:'#221f64', tint:'#fdf7e0' },
+  { primary:'#e8821e', deep:'#b55a10', fg:'#fff', tint:'#fdf0e8' },
   { primary:'#7b5fd4', deep:'#5b3eb0', fg:'#fff',    tint:'#f1ecfb' },
 ];
 let mobileSplashDone = {};
