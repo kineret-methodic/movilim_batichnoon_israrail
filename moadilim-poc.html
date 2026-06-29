@@ -1752,7 +1752,8 @@ function renderWelcomeIntro(app) {
     <div id="board-fitwrap" style="flex:1;overflow:hidden;background:#cfe2f2;display:flex;align-items:center;justify-content:center;font-family:Heebo,Arial,sans-serif;color:#15224a">
       <div id="gameboard" style="width:1920px;height:1080px;flex:none;transform-origin:center center;position:relative;overflow:hidden;background:url('assets/cover-clean.png') center/cover no-repeat">
         <div style="position:absolute;top:50px;right:64px;z-index:6"><img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:38px;width:auto"></div>
-        <span style="position:absolute;top:215px;left:0;right:0;z-index:5;display:block;text-align:center;font-size:34px;font-weight:700;letter-spacing:.16em;color:#1b2a52;text-shadow:0 1px 10px rgba(255,255,255,.7)">ברוכים הבאים ל־</span>
+        <div style="position:absolute;top:46px;left:64px;z-index:6;text-align:left;font-weight:800;font-size:28px;color:#123c86;white-space:nowrap;text-shadow:0 1px 8px rgba(255,255,255,.75)">אגף הדרכה וחטיבת משנה למנכ"ל&nbsp;&nbsp;2026</div>
+        <span style="position:absolute;top:238px;left:0;right:0;z-index:5;display:block;text-align:center;font-size:34px;font-weight:700;letter-spacing:.04em;color:#1b2a52;text-shadow:0 1px 10px rgba(255,255,255,.7)">ברוכים הבאים ל־</span>
         <img src="assets/logo-game.png" alt="מסילות ותכנונים" style="position:absolute;top:288px;left:50%;transform:translateX(-50%);z-index:5;width:630px;height:auto;filter:drop-shadow(0 14px 28px rgba(20,40,90,.35))">
         <p style="position:absolute;top:660px;left:0;right:0;z-index:5;padding:0 410px;font-size:26px;font-weight:600;line-height:1.55;color:#1b2a52;text-align:center;text-wrap:pretty;white-space:pre-line;text-shadow:0 1px 10px rgba(255,255,255,.7)">${intro}</p>
         <button onclick="showInstructions()" style="position:absolute;top:812px;left:50%;transform:translateX(-50%);z-index:6;padding:20px 60px;border-radius:999px;border:2px solid rgba(120,255,180,.6);cursor:pointer;font-family:inherit;font-size:27px;font-weight:900;color:#fff;background:linear-gradient(180deg,#23c95f,#127f3e);display:flex;align-items:center;gap:12px;animation:ctaNeon 2.6s ease-in-out infinite">${label}<span style="font-size:22px;font-weight:800">›</span></button>
@@ -1784,13 +1785,13 @@ function renderWelcome(app) {
   const STATIONS=[
     {type:'qr',ic:'flag',label:'כולם לעלות',title:'כולם לעלות!'},
     {type:'text',ic:'clipboard',label:'מתארגנים',title:'מתארגנים לנסיעה',
-     lines:['בחרו נציג או נציגה שיכריזו את התשובות בשם הקבוצה לאורך כל המשחק.','עברו יחד על מבנה תיק תכנית העבודה: רשימת המשימות ומודל התגמול.','המשחק מתקדם בסבבים קבועים - כל קבוצה בתורה, תחנה אחרי תחנה.','המטרה: לזהות טעויות בתכנית העבודה, לצבור נקודות ולהתקדם על המסילה.']},
+     lines:[{text:'בוחרים נציג או נציגה שיכריזו את התשובות בשם הקבוצה לאורך כל המשחק.',bold:true},{text:'עוברים יחד על מבנה תיק תכנית העבודה: רשימת המשימות ומודל התגמול.',bold:true},{text:'מתקדמים בסבבים קבועים - כל קבוצה בתורה, תחנה אחרי תחנה.',bold:true},{text:'המטרה: לזהות טעויות בתכנית העבודה, לצבור נקודות ולהתקדם על המסילה.',bold:true}]},
     {type:'text',ic:'doc',label:'מתקדמים',title:'איך מתקדמים?',
-     lines:['בכל תחנה מחכה לכם אתגר: לאתר את הטעות המוטמנת בתיק תכנית העבודה.','יש לכם דקה אחת להתייעצות קבוצתית.','בתורכם, נציג או נציגת הקבוצה מכריזים את התשובה.','בזמן שקבוצה אחת עונה, התיקים של שאר הקבוצות נעולים. 🔒','עניתם נכון או כמעט נכון? מתקדמים לתחנה הבאה.','טעיתם? עצירת ביניים בסבב הבא, ואז חוזרים למסילה.','אחרי המענה, התור עובר לקבוצה הבאה.','הגעתם לתחנת בלת"מ? מסובבים את הגלגל ומחזיקים אצבעות: מחכים סבב — או ממשיכים קדימה.']},
+     lines:[{text:'בכל תחנה מחכה אתגר:\nלאתר את הטעות המוטמנת בתיק תכנית העבודה – תוך דקה אחת.',em:'תוך דקה אחת'},'בכל תור נציג או נציגת הקבוצה מכריזים את תשובתה.','בזמן שקבוצה אחת עונה, התיקים של שאר הקבוצות נעולים 🔒','תשובה מלאה או חלקית? מתקדמים לתחנה הבאה.','תשובה שגויה? עצירת ביניים בסבב הבא, ואז חוזרים למסילה.','אחרי המענה, התור עובר לקבוצה הבאה.','תחנת בלת"ם? מסובבים את הגלגל ומחזיקים אצבעות: מחכים סבב - או ממשיכים קדימה.']},
     {type:'text',ic:'trophy',label:'מנצחים',title:'איך מנצחים?',
-     lines:[{text:'בכל תחנה תצברו נקודות לפי איכות התשובה:',score:[{text:'תשובה מלאה: 10 נקודות',color:'#1a8c4e',bg:'#eafaf1'},{text:'תשובה חלקית: 5 נקודות',color:'#e8821e',bg:'#fdefe0'},{text:'תשובה שגויה: 0 נקודות - עצירת ביניים בסבב הבא',color:'#d23b3b',bg:'#fdecec'}]},'המטרה - להגיע ראשונים לאישור מודל התגמול.','במקרה של שוויון על המסילה, הנקודות קובעות מי מובילים.','המסילה מוכנה, התחנה הראשונה מחכה!']},
+     lines:[{text:'בכל תחנה צוברים נקודות לפי איכות התשובה:',score:[{text:'תשובה מלאה: 10 נקודות',color:'#1a8c4e',bg:'#eafaf1'},{text:'תשובה חלקית: 5 נקודות',color:'#e8821e',bg:'#fdefe0'},{text:'תשובה שגויה: 0 נקודות ועצירת ביניים בסבב הבא',color:'#d23b3b',bg:'#fdecec'}]},{text:'המטרה: להגיע ראשונים לאישור מודל התגמול.',em:'המטרה:'},'במקרה של שוויון על המסילה, הנקודות קובעות מי המנצחים.','המסילה מוכנה, התחנה הראשונה מחכה!']},
   ];
-  const QR_HEADING='התחלקו לארבע קבוצות, סרקו את הברקוד של הקבוצה שלכם והיכנסו לתיק תכנית העבודה שלכם. עברו על מבנה התיק: המשימות ומודל התגמול.';
+  const QR_HEADING='מתחלקים לארבע קבוצות.\nכל קבוצה סורקת את הברקוד שלה ונכנסת לתיק תכנית העבודה.\nפותחים את התיק, ומוודאים שכולם מכירים את שני החלקים המרכזיים: רשימת המשימות ומודל התגמול.';
   const iEsc=(t)=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   let instrStep=0,instrQrIdx=0;
   app.innerHTML=`<div id="instr-fitwrap" style="width:100%;height:100%;overflow:hidden;background:#cfe2f2;display:flex;align-items:center;justify-content:center;font-family:Heebo,Arial,sans-serif;color:#15224a;direction:rtl"><div id="instrboard" style="width:1920px;height:1080px;flex:none;transform-origin:center center;position:relative;overflow:hidden;background:url('assets/cover-clean.png') center/cover no-repeat"></div></div>`;
@@ -1799,9 +1800,9 @@ function renderWelcome(app) {
     let inner='';
     if(cur.type==='qr'){
       const tabs=INSTR_GROUPS.map((g,i)=>`<button onclick="window._instrSelQr(${i})" style="padding:12px 30px;border-radius:999px;border:3px solid ${GQ[i].bg};cursor:pointer;font-family:inherit;font-size:24px;font-weight:800;color:${instrQrIdx===i?GQ[i].fg:GQ[i].bg};background:${instrQrIdx===i?GQ[i].bg:'linear-gradient(180deg,#fdfdfe,#e9edf3)'};box-shadow:0 4px 11px rgba(20,40,90,.16)">${iEsc(g.label)}</button>`).join('');
-      inner=`<div style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;gap:12px;width:100%"><p style="font-size:30px;font-weight:600;line-height:1.4;color:#2a3658;text-align:center;max-width:960px;text-wrap:pretty;flex-shrink:0">${iEsc(QR_HEADING)}</p><div style="display:flex;gap:13px;justify-content:center;flex-shrink:0">${tabs}</div><span style="font-size:38px;font-weight:900;color:${GQ[instrQrIdx].bg};text-align:center;flex-shrink:0">${iEsc(INSTR_GROUPS[instrQrIdx].divisionName)}</span><img src="${QR_SRCS[instrQrIdx]}" alt="ברקוד הקבוצה" style="width:280px;height:280px;flex-shrink:0;object-fit:contain"></div>`;
+      inner=`<div style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;gap:12px;width:100%"><p style="font-size:30px;font-weight:600;line-height:1.55;color:#2a3658;text-align:center;max-width:960px;text-wrap:pretty;white-space:pre-line;flex-shrink:0">${iEsc(QR_HEADING)}</p><div style="display:flex;gap:13px;justify-content:center;flex-shrink:0">${tabs}</div><span style="font-size:38px;font-weight:900;color:${GQ[instrQrIdx].bg};text-align:center;flex-shrink:0">${iEsc(INSTR_GROUPS[instrQrIdx].divisionName)}</span><img src="${QR_SRCS[instrQrIdx]}" alt="ברקוד הקבוצה" style="width:228px;height:228px;flex-shrink:0;object-fit:contain"></div>`;
     }else{
-      const lines=cur.lines.map(ln=>{const o=(typeof ln==='string')?{text:ln}:ln;const score=(o.score||[]).map(s=>`<span style="align-self:flex-start;font-size:25px;font-weight:800;line-height:1.25;color:${s.color};background:${s.bg};border-radius:12px;padding:6px 18px;text-wrap:pretty">${iEsc(s.text)}</span>`).join('');const scoreBlock=score?`<div style="display:flex;flex-direction:column;gap:9px">${score}</div>`:'';return `<div style="display:flex;align-items:flex-start;gap:14px;padding:8px 6px;border-top:1px solid #eef1f7"><span style="flex-shrink:0;width:14px;height:14px;border-radius:50%;background:#1f4e9c;margin-top:11px"></span><div style="flex:1;display:flex;flex-direction:column;gap:9px"><span style="font-size:30px;font-weight:500;line-height:1.34;color:#2a3658;text-wrap:pretty">${iEsc(o.text)}</span>${scoreBlock}</div></div>`;}).join('');
+      const lines=cur.lines.map(ln=>{const o=(typeof ln==='string')?{text:ln}:ln;let txt=iEsc(o.text);if(o.bold)txt=txt.replace(/^(\S+)/,'<strong style="font-weight:800;color:#1f4e9c">$1</strong>');if(o.em){const e=iEsc(o.em);txt=txt.split(e).join('<strong style="font-weight:800;color:#1f4e9c">'+e+'</strong>');}const score=(o.score||[]).map(s=>`<span style="align-self:flex-start;font-size:25px;font-weight:800;line-height:1.25;color:${s.color};background:${s.bg};border-radius:12px;padding:6px 18px;text-wrap:pretty">${iEsc(s.text)}</span>`).join('');const scoreBlock=score?`<div style="display:flex;flex-direction:column;gap:9px">${score}</div>`:'';return `<div style="display:flex;align-items:flex-start;gap:14px;padding:8px 6px;border-top:1px solid #eef1f7"><span style="flex-shrink:0;width:14px;height:14px;border-radius:50%;background:#1f4e9c;margin-top:11px"></span><div style="flex:1;display:flex;flex-direction:column;gap:9px"><span style="font-size:30px;font-weight:500;line-height:1.34;color:#2a3658;text-wrap:pretty;white-space:pre-line">${txt}</span>${scoreBlock}</div></div>`;}).join('');
       inner=`<div style="flex-shrink:0;min-height:0;width:100%;display:flex;flex-direction:column;justify-content:flex-start;gap:4px;padding-top:8px">${lines}</div>`;
     }
     const btn=instrStep===N-1?'':
@@ -1946,7 +1947,7 @@ function renderGameOverOverlay() {
   const sc=Math.min(window.innerWidth/1920,window.innerHeight/1080);
   return `
     <div style="position:fixed;inset:0;z-index:800;overflow:hidden;background:#dfe2e8;display:flex;align-items:center;justify-content:center;direction:rtl">
-      <div style="width:1920px;height:1080px;flex:none;transform:scale(${sc});transform-origin:center center;position:relative;overflow:hidden;background:#eef0f4 url('assets/board-bg.png') center/cover no-repeat">
+      <div style="width:1920px;height:1080px;flex:none;transform:scale(${sc});transform-origin:center center;position:relative;overflow:hidden;background:url('assets/cover-clean.png') center/cover no-repeat">
         <div style="position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none">${conf}</div>
         <div style="position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;padding:40px 80px 44px">
           <div style="flex-shrink:0;display:flex;align-items:center;height:90px">
@@ -1985,7 +1986,7 @@ function renderCommitmentOverlay() {
   const sc = Math.min(window.innerWidth/1920, window.innerHeight/1080);
   return `
     <div style="position:fixed;inset:0;z-index:900;overflow:hidden;background:#dfe2e8;display:flex;align-items:center;justify-content:center;direction:rtl">
-      <div style="width:1920px;height:1080px;flex:none;transform:scale(${sc});transform-origin:center center;position:relative;overflow:hidden;background:#eef0f4 url('assets/board-bg.png') center/cover no-repeat">
+      <div style="width:1920px;height:1080px;flex:none;transform:scale(${sc});transform-origin:center center;position:relative;overflow:hidden;background:url('assets/cover-clean.png') center/cover no-repeat">
         <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding:46px 90px 54px">
           <div style="flex-shrink:0;width:100%;display:flex;align-items:center;gap:24px;height:150px">
             <div style="flex:1;display:flex;justify-content:flex-start;margin-top:8px"><img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:34px;width:auto;opacity:.9"></div>
@@ -1995,15 +1996,14 @@ function renderCommitmentOverlay() {
             <div style="flex:1"></div>
           </div>
           <div style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%">
-            <div style="width:100%;max-width:1320px;background:#fff;border:3px solid #221f64;border-radius:30px;box-shadow:0 16px 44px rgba(34,31,100,.14);padding:58px 70px;display:flex;flex-direction:column;align-items:center;gap:26px;position:relative;overflow:hidden">
-              <div style="position:absolute;inset:14px;border:2px dashed #d9cdab;border-radius:20px;pointer-events:none"></div>
-              <div style="width:84px;height:84px;border-radius:50%;background:#fef3d0;border:5px solid #f4c40f;display:flex;align-items:center;justify-content:center;z-index:1"><img src="assets/icons/icon-pin.svg" alt="" style="width:44px;height:44px"></div>
-              <span style="font-size:18px;font-weight:800;letter-spacing:.06em;color:#9a6a00;z-index:1">השאלה לכל משתתף.ת</span>
-              <p style="font-size:40px;font-weight:800;line-height:1.4;color:#1b1c4e;text-align:center;text-wrap:pretty;z-index:1">${cEsc(es.commitmentQuestion||'')}</p>
-              <div style="display:flex;align-items:center;gap:14px;z-index:1;margin-top:2px">
-                <span style="height:2px;width:46px;background:#e6dcc2"></span>
+            <div style="width:100%;max-width:1320px;background:#fff;border:1px solid #d6deec;border-radius:26px;box-shadow:0 24px 60px rgba(15,28,60,.28);padding:74px 70px 54px;display:flex;flex-direction:column;align-items:center;gap:22px;position:relative">
+              <div style="position:absolute;top:0;left:50%;transform:translate(-50%,-58%);width:104px;height:104px;border-radius:50%;background:#fff;border:7px solid #1f4e9c;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(20,40,90,.18);z-index:2"><img src="assets/icons/icon-pin.svg" alt="" style="width:52px;height:52px"></div>
+              <span style="font-size:19px;font-weight:800;letter-spacing:.06em;color:#1f4e9c">השאלה לכל משתתף.ת</span>
+              <p style="font-size:42px;font-weight:800;line-height:1.4;color:#1b1c4e;text-align:center;text-wrap:pretty">${cEsc(es.commitmentQuestion||'')}</p>
+              <div style="display:flex;align-items:center;gap:14px;margin-top:2px">
+                <span style="height:2px;width:46px;background:#d6deec"></span>
                 <span style="font-size:19px;font-weight:700;color:#7c84a0">פעולה אחת קונקרטית · מדידה · בת-ביצוע</span>
-                <span style="height:2px;width:46px;background:#e6dcc2"></span>
+                <span style="height:2px;width:46px;background:#d6deec"></span>
               </div>
             </div>
           </div>
@@ -2281,12 +2281,12 @@ function renderFacilitator(app) {
     const lockOpacity = locked ? 0.62 : 0;
     const labelColor = locked ? '#a7abc0' : col, monthColor = locked ? '#bcc0d0' : '#9aa0b8';
     const toks = (tokensByOrder[s.order]||[]).map(gi => {
-      const isCur = gi === currentTurnGroupIndex && s.id !== 'station_start';
-      const sz = isCur ? '44px' : '30px';
-      const fs = isCur ? '18px' : '14px';
-      const tf = isCur ? 'translateY(-7px)' : 'none';
-      const sh = isCur ? '0 4px 12px rgba(0,0,0,.35)' : '0 2px 5px rgba(0,0,0,.25)';
-      const bw = isCur ? '3.5px' : '3px';
+      const isCur = gi === currentTurnGroupIndex;
+      const sz = isCur ? '56px' : '30px';
+      const fs = isCur ? '24px' : '14px';
+      const tf = isCur ? 'translateY(-10px)' : 'none';
+      const sh = isCur ? '0 6px 16px rgba(0,0,0,.4)' : '0 2px 5px rgba(0,0,0,.25)';
+      const bw = isCur ? '4px' : '3px';
       return `<div style="width:${sz};height:${sz};border-radius:50%;background:${GP[gi].bg};border:${bw} solid #fff;box-shadow:${sh};display:flex;align-items:center;justify-content:center;color:${GP[gi].fg};font-size:${fs};font-weight:800;transform:${tf};transition:all .2s;flex-shrink:0">${gi+1}</div>`;
     }).join('');
     return `
@@ -2300,8 +2300,8 @@ function renderFacilitator(app) {
           <div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);display:flex;gap:4px;z-index:4">${toks}</div>
         </div>
         <div style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;background:${(s.id==='station_measurable'||s.id==='station_reward_metric')?'rgba(255,255,255,.82)':'transparent'};border-radius:9px;padding:4px 11px">
-          <span style="font-size:13px;font-weight:700;color:${monthColor}">${bEsc(s.month||'')}</span>
-          <span style="font-size:16px;font-weight:800;line-height:1.2;color:${labelColor};max-width:190px">${bEsc(name)}</span>
+          <span style="font-size:15px;font-weight:700;color:${monthColor}">${bEsc(s.month||'')}</span>
+          <span style="font-size:21px;font-weight:800;line-height:1.18;color:${labelColor};max-width:210px">${bEsc(name)}</span>
         </div>
       </div>`;
   }).join('');
@@ -2312,7 +2312,7 @@ function renderFacilitator(app) {
         <div style="width:124px;height:124px;border-radius:50%;background:#fff;border:4px dashed #8a93a8;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 16px rgba(34,31,100,.10)">
           <img src="assets/icons/icon-gate.svg" alt="" style="width:42px;height:42px;opacity:.8">
         </div>
-        <span style="font-size:13.5px;font-weight:700;line-height:1.2;color:#5a6d77;max-width:178px;text-align:center">${bEsc(n.data.name)}</span>
+        <span style="font-size:20px;font-weight:700;line-height:1.18;color:#5a6d77;max-width:200px;text-align:center">${bEsc(n.data.name)}</span>
       </div>`).join('');
 
   // ── HOOK 2: גלולת "תור פעיל" ─────────────────────────────────────────────
@@ -2329,17 +2329,17 @@ function renderFacilitator(app) {
     const isAct = gi === currentTurnGroupIndex;
     const pts = pointsByGroup[gi];
     return `
-      <div style="flex:1;border-radius:999px;background:${GP[gi].bg};padding:12px 24px;
-        display:flex;align-items:center;gap:14px;
-        box-shadow:${isAct ? '0 8px 24px rgba(34,31,100,.30)' : 'none'};
-        opacity:${isAct ? 1 : 0.78};
-        border:${isAct ? '3px solid rgba(255,255,255,.55)' : '2px solid transparent'}">
-        <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.28);flex-shrink:0;
+      <div style="flex:${isAct ? '1.25' : '1'};border-radius:999px;background:${GP[gi].bg};padding:${isAct ? '12px 24px' : '11px 22px'};
+        display:flex;align-items:center;gap:14px;transform:${isAct ? 'scale(1.02) translateY(-8px)' : 'none'};transform-origin:center;z-index:${isAct ? 2 : 1};
+        box-shadow:${isAct ? '0 12px 28px rgba(34,31,100,.34)' : 'none'};
+        opacity:${isAct ? 1 : 0.5};
+        border:${isAct ? '3px solid rgba(255,255,255,.6)' : '2px solid transparent'}">
+        <div style="width:${isAct ? '40px' : '34px'};height:${isAct ? '40px' : '34px'};border-radius:50%;background:rgba(255,255,255,.28);flex-shrink:0;
           display:flex;align-items:center;justify-content:center;
-          font-size:17px;font-weight:900;color:${GP[gi].fg}">${gi+1}</div>
-        <span style="flex:1;font-size:18px;font-weight:800;color:${GP[gi].fg};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${bEsc(g.divisionName)}</span>
+          font-size:${isAct ? '19px' : '16px'};font-weight:900;color:${GP[gi].fg}">${gi+1}</div>
+        <span style="flex:1;font-size:${isAct ? '20px' : '17px'};font-weight:800;color:${GP[gi].fg};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${bEsc(g.divisionName)}</span>
         <div style="display:flex;align-items:baseline;gap:3px;flex-shrink:0">
-          <span style="font-size:28px;font-weight:900;color:${GP[gi].fg};font-variant-numeric:tabular-nums;line-height:1">${pts}</span>
+          <span style="font-size:${isAct ? '30px' : '26px'};font-weight:900;color:${GP[gi].fg};font-variant-numeric:tabular-nums;line-height:1">${pts}</span>
           <span style="font-size:13px;font-weight:700;color:${GP[gi].fg};opacity:.7">נק׳</span>
         </div>
         ${isAct ? `<span style="flex-shrink:0;background:rgba(255,255,255,.28);color:${GP[gi].fg};font-weight:800;font-size:13px;border-radius:20px;padding:5px 14px;white-space:nowrap">תור פעיל</span>` : ''}
@@ -2365,18 +2365,15 @@ function renderFacilitator(app) {
       <div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:30px 56px 24px;font-family:Heebo,Arial,sans-serif;color:#221f64">
 
         <!-- כותרת: גלולת תור (ימין) · לוגואים (מרכז) · לוגו רכבת (שמאל) -->
-        <div style="display:flex;align-items:center;gap:24px;flex-shrink:0;height:150px">
+        <div style="display:flex;align-items:flex-start;gap:24px;flex-shrink:0;height:150px">
           <div style="flex:1;display:flex;justify-content:flex-start">
-            <div style="background:${bGP.bg};border-radius:40px;padding:8px 20px 8px 14px;display:flex;align-items:center;gap:11px;box-shadow:0 5px 16px rgba(34,31,100,.22)">
-              <span style="background:rgba(255,255,255,.28);color:${bGP.fg};font-weight:800;font-size:15px;border-radius:20px;padding:5px 14px">תור פעיל</span>
-              <span style="color:${bGP.fg};font-size:19px;font-weight:700">${bEsc(bTurnText)}</span>
-            </div>
+            <div style="font-size:28px;font-weight:800;color:#123c86;white-space:nowrap;text-align:right;line-height:1.2">אגף הדרכה וחטיבת משנה למנכ"ל&nbsp;&nbsp;2026</div>
           </div>
           <div style="display:flex;align-items:center;justify-content:center">
             <img src="assets/logo-game.png" alt="מסילות ותכנונים" style="height:150px;width:auto">
           </div>
           <div style="flex:1;display:flex;justify-content:flex-end">
-            <img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:28px;width:auto;opacity:.9">
+            <img src="assets/logo-rail.png" alt="רכבת ישראל" style="height:34px;width:auto;opacity:.9;margin-top:4px">
           </div>
         </div>
 
@@ -2579,109 +2576,111 @@ function openDevContent() {
 
 function renderDevContentView() {
   const sorted = [...GC.stations].sort((a, b) => a.order - b.order);
+  const esc = (t) => String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const typeBadge = {
-    professional: {label: 'מקצועית', bg: '#1E1F56', color: '#fff'},
-    unexpected_event: {label: 'בלת"מ', bg: '#8a2433', color: '#fff'},
-    transition: {label: 'מעבר', bg: '#5A5EAA', color: '#fff'},
-    reflection: {label: 'רפלקציה', bg: '#8A70C0', color: '#fff'},
+    professional: { label: 'מקצועית', col: '#1E1F56' },
+    unexpected_event: { label: 'בלת"מ', col: '#8a2433' },
+    transition: { label: 'מעבר', col: '#5a6d77' },
+    reflection: { label: 'רפלקציה', col: '#e0a200' },
   };
+  function stColor(s) {
+    if (s.type === 'unexpected_event') return '#8a2433';
+    if (s.id === 'station_start') return '#1abe9b';
+    if (s.id === 'station_reflection') return '#e0a200';
+    if (s.id === 'station_end') return '#00aeff';
+    if (s.type === 'transition' || s.type === 'reflection') return '#5a6d77';
+    return '#1E1F56';
+  }
 
   const cards = sorted.map(station => {
-    const badge = typeBadge[station.type] || {label: station.type, bg: '#999', color: '#fff'};
-    const badgeHtml = `<span style="background:${badge.bg};color:${badge.color};font-size:10px;font-weight:700;
-      border-radius:4px;padding:2px 8px;white-space:nowrap">${badge.label}</span>`;
-
-    let bodyHtml = '';
+    const col = stColor(station);
+    const badge = typeBadge[station.type] || { label: station.type, col: '#5a6d77' };
+    let body = '';
 
     if (station.type === 'transition' || station.type === 'reflection') {
       const tm = station.transitionMessageId ? GC.transitionMessages[station.transitionMessageId] : null;
-      bodyHtml = `<div style="padding:12px 16px;font-size:13px;color:#5A5E88;font-style:italic">
-        ${tm ? `<strong style="color:#1E1F56">${tm.title}</strong><br>${tm.body}` : 'תחנת מעבר'}
+      body = `<div style="padding:2px 16px 18px">
+        <div style="background:${col}0d;border-right:3px solid ${col};border-radius:10px;padding:13px 15px;font-size:15px;color:#3a4060;line-height:1.6">
+          ${tm ? `<strong style="color:${col};display:block;margin-bottom:4px">${esc(tm.title)}</strong>${esc(tm.body)}` : 'תחנת מעבר'}
+        </div>
       </div>`;
 
     } else if (station.type === 'unexpected_event') {
       const ueSet = GC.unexpectedEvents[station.unexpectedEventSetId] || [];
-      const ueItems = ueSet.map(r => {
+      const items = ueSet.map(r => {
         const noDelay = r.waitRounds === 0;
-        return `<div style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;
-          border-bottom:1px solid #F5E8D0">
-          <span style="font-size:14px;font-weight:700;color:#7A3A00;flex-shrink:0;margin-top:1px">⚡</span>
-          <div style="flex:1">
-            <div style="font-size:13px;font-weight:700;color:#7A3A00;margin-bottom:4px">${r.label}</div>
-            <div style="font-size:13px;color:#5A3000;line-height:1.55">${r.description}</div>
+        return `<div style="background:#fff;border:1px solid #f0d9b8;border-right:4px solid #e8821e;border-radius:12px;padding:12px 14px;box-shadow:0 2px 6px rgba(34,31,100,.06)">
+          <div style="display:flex;align-items:flex-start;gap:8px">
+            <span style="font-size:15px;flex-shrink:0">⚡</span>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:800;color:#1b1c4e;line-height:1.35;margin-bottom:3px">${esc(r.label)}</div>
+              <div style="font-size:13.5px;color:#5a6075;line-height:1.5">${esc(r.description)}</div>
+            </div>
           </div>
-          <span style="font-size:11px;font-weight:700;white-space:nowrap;padding:4px 10px;border-radius:6px;flex-shrink:0;
-            ${noDelay
-              ? 'background:#E8F5EE;color:#1A6A3A;border:1px solid #A8D8B8'
-              : 'background:#FEE8EC;color:#A0001A;border:1px solid #F0A0B0'}">
-            ${noDelay ? '✓ אין עיכוב' : '⏸ המתנה סבב'}
-          </span>
+          <div style="margin-top:9px;display:flex;justify-content:flex-end">
+            <span style="font-size:11px;font-weight:800;white-space:nowrap;padding:4px 11px;border-radius:999px;${noDelay?'background:#eafaf1;color:#1a7a44':'background:#fdecec;color:#c0392b'}">${noDelay?'✓ אין עיכוב':'⏸ המתנה סבב'}</span>
+          </div>
         </div>`;
       }).join('');
-      bodyHtml = `<div style="background:#FFF3E0;overflow:hidden">
-        ${ueItems || '<div style="padding:12px 16px;color:#999;font-size:12px">אין פריטים</div>'}
-      </div>`;
+      body = `<div style="padding:2px 16px 16px;display:flex;flex-direction:column;gap:10px">${items || '<div style="padding:8px;color:#9aa0b8;font-size:13px">אין פריטים</div>'}</div>`;
 
     } else if (station.type === 'professional') {
-      const q = station.questionId
-        ? GC.stationQuestions.find(x => x.id === station.questionId)
-        : null;
+      const q = station.questionId ? GC.stationQuestions.find(x => x.id === station.questionId) : null;
       if (!q) {
-        bodyHtml = `<div style="padding:12px 16px;font-size:12px;color:#999">אין שאלה</div>`;
+        body = '<div style="padding:2px 16px 16px;color:#9aa0b8;font-size:13px">אין שאלה</div>';
       } else {
-        const groupCards = GC.groups.map(group => {
+        const groupCards = GC.groups.map((group, gi) => {
           const ans = q.answersByGroup[group.id];
-          const col = COLOR[group.colorToken];
           if (!ans) return '';
-          return `<div style="background:#FAFBFF;border:1px solid ${col.primary}44;border-radius:8px;
-            padding:14px;overflow:hidden;border-right:4px solid ${col.primary}">
-            <div style="font-weight:700;font-size:13px;color:${col.primary};margin-bottom:10px;
-              padding-bottom:8px;border-bottom:1px solid ${col.primary}22">
-              ${group.label} — ${group.divisionName}
+          const gp = MOB_PAL[gi] || MOB_PAL[0];
+          return `<div style="background:#fff;border:1px solid ${gp.primary}30;border-right:4px solid ${gp.primary};border-radius:12px;padding:13px 14px;box-shadow:0 2px 6px rgba(34,31,100,.06)">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:11px">
+              <span style="width:24px;height:24px;border-radius:50%;background:${gp.primary};color:${gp.fg};font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">${gi+1}</span>
+              <span style="font-size:14px;font-weight:800;color:${gp.deep};line-height:1.25">${esc(group.label)} · ${esc(group.divisionName)}</span>
             </div>
-            <div style="font-size:13px;line-height:1.7;display:flex;flex-direction:column;gap:7px">
-              <div><span style="color:#6A70B0;font-weight:700">משימה: </span><span style="color:#1A1C50">${ans.taskName}</span></div>
-              <div><span style="color:#C8102E;font-weight:700">טעות מוטמנת: </span><span style="color:#3A1A1A">${ans.whatIsWrong}</span></div>
-              <div><span style="color:#1A6A3A;font-weight:700">תיקון: </span><span style="color:#0D3A22">${ans.correctFix}</span></div>
-              ${ans.facilitatorNotes ? `<div><span style="color:#8A70C0;font-weight:700">הערת מנחה: </span><span style="color:#3A2060">${ans.facilitatorNotes}</span></div>` : ''}
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;font-weight:800;letter-spacing:.03em;color:#6A70B0">משימה</span><span style="font-size:14px;color:#1b1c4e;line-height:1.45">${esc(ans.taskName)}</span></div>
+              <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;font-weight:800;letter-spacing:.03em;color:#c0392b">טעות מוטמנת</span><span style="font-size:14px;color:#5a2320;line-height:1.45">${esc(ans.whatIsWrong)}</span></div>
+              <div style="background:#eafaf1;border-radius:9px;padding:9px 11px;display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;font-weight:800;letter-spacing:.03em;color:#1a7a44">תיקון</span><span style="font-size:14px;color:#155c34;line-height:1.5">${esc(ans.correctFix)}</span></div>
+              ${ans.facilitatorNotes ? `<div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;font-weight:800;letter-spacing:.03em;color:#8A70C0">הערת מנחה</span><span style="font-size:13.5px;color:#3A2060;line-height:1.45">${esc(ans.facilitatorNotes)}</span></div>` : ''}
             </div>
           </div>`;
         }).filter(Boolean).join('');
-
-        bodyHtml = `<div style="padding:12px 16px 4px;background:#fff;border-bottom:1px solid #E8EAF4">
-          <div style="font-size:13px;color:#3A3E78;line-height:1.6;margin-bottom:6px;
-            padding:10px 12px;background:#EEF0FF;border-right:3px solid #1E1F56;border-radius:6px">
-            <strong style="color:#1E1F56">שאלה: </strong>${q.questionText}
-          </div>
-        </div>
-        <div style="padding:10px 16px 14px;background:#F8F9FF">
-          <div style="display:flex;flex-direction:column;gap:10px">
-            ${groupCards}
-          </div>
+        body = `<div style="padding:2px 16px 16px;display:flex;flex-direction:column;gap:11px">
+          <div style="background:${col}0d;border-right:3px solid ${col};border-radius:10px;padding:12px 14px;font-size:14.5px;color:#2e3450;line-height:1.6"><strong style="color:${col}">שאלה: </strong>${esc(q.questionText)}</div>
+          ${groupCards}
         </div>`;
       }
     }
 
-    return `<details style="background:#fff;border-radius:10px;box-shadow:0 1px 6px rgba(30,31,86,.10);overflow:hidden">
-      <summary style="background:#1E1F56;color:#fff;padding:13px 16px;cursor:pointer;list-style:none;
-        display:flex;align-items:center;gap:10px;flex-wrap:wrap;user-select:none;-webkit-tap-highlight-color:transparent">
-        <span style="font-size:11px;color:#A0A8D8;min-width:20px;flex-shrink:0">${station.order}</span>
-        <span style="font-weight:700;font-size:15px;flex:1;line-height:1.3">${station.name}</span>
-        <span style="font-size:11px;color:#C8CEF0;white-space:nowrap">${station.month || ''}</span>
-        ${badgeHtml}
-        <span style="font-size:10px;color:#A0A8D8;opacity:.8;flex-shrink:0">▼</span>
-      </summary>
-      ${bodyHtml}
-    </details>`;
+    return `<div style="flex-shrink:0;background:#fff;border-radius:14px;border-right:4px solid ${col};box-shadow:0 2px 8px rgba(34,31,100,.08);overflow:hidden">
+      <div onclick="var b=this.nextElementSibling;var o=b.style.display!=='none';b.style.display=o?'none':'block';this.querySelector('.dc-chev').style.transform='rotate('+(o?0:180)+'deg)'" style="cursor:pointer;padding:15px 16px;display:flex;align-items:center;gap:10px;-webkit-tap-highlight-color:transparent;user-select:none">
+        <span style="width:27px;height:27px;border-radius:50%;background:${col}14;color:${col};font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">${station.order}</span>
+        <span style="flex:1;font-size:16px;font-weight:700;color:#1b1c4e;line-height:1.3">${esc(station.name)}</span>
+        <span style="font-size:12px;color:#9aa0b8;white-space:nowrap">${esc(station.month || '')}</span>
+        <span style="font-size:10px;font-weight:800;border-radius:999px;padding:3px 10px;background:${badge.col}14;color:${badge.col};white-space:nowrap">${badge.label}</span>
+        <span class="dc-chev" style="color:#c4c8da;font-size:12px;flex-shrink:0;transition:transform .2s">▾</span>
+      </div>
+      <div style="display:none">${body}</div>
+    </div>`;
   }).join('');
 
-  return `<div id="board-wrap" style="direction:rtl;padding:10px 12px">
-    <div style="padding:4px 2px 12px;display:flex;align-items:center;justify-content:space-between">
-      <span style="font-size:14px;font-weight:800;color:#1E1F56">סקירת תוכן — כל התחנות</span>
-      <span style="font-size:12px;color:#8A90C0;background:#EEF0FF;padding:3px 10px;border-radius:12px">${GC.stations.length} תחנות</span>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:10px;max-width:600px;margin:0 auto">
-      ${cards}
+  return `<div dir="rtl" style="width:100%;min-height:100vh;background:#e7e9ef;display:flex;justify-content:center">
+    <div style="width:100%;max-width:480px;min-height:100vh;background:#eef0f4;display:flex;flex-direction:column">
+      <div style="flex-shrink:0;background:#fff;border-bottom:3px solid #1E1F56;padding:18px 20px 14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="background:#1E1F56;color:#fff;font-size:14px;font-weight:800;border-radius:999px;padding:5px 15px">מנחה</span>
+          <span style="font-size:15px;font-weight:600;color:#5a6075">סקירת תוכן — כל התחנות</span>
+          <div style="flex:1"></div>
+          <span style="font-size:12px;font-weight:700;color:#8A90C0;background:#EEF0FF;padding:4px 11px;border-radius:999px">${GC.stations.length}</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;margin-top:14px">
+          <img src="assets/logo-game.png" alt="מסילות ותכנונים" style="height:74px;width:auto">
+        </div>
+      </div>
+      <div style="flex:1;min-height:0;overflow:auto;padding:16px 16px 40px;display:flex;flex-direction:column;gap:12px">
+        ${cards}
+      </div>
     </div>
   </div>`;
 }
@@ -2827,49 +2826,52 @@ function renderStationModal() {
     if (!revealed) {
       mid = `
         <div style="display:flex;flex-direction:column;align-items:center;gap:15px;width:100%">
-          <div style="position:relative;width:182px;height:206px;display:flex;align-items:flex-end;justify-content:center">
-            <div style="position:absolute;top:2px;left:50%;transform:translateX(-50%);width:18px;height:18px;border:4px solid ${timerColor};border-radius:50%;z-index:3"></div>
-            <div style="position:absolute;top:17px;left:50%;transform:translateX(-50%);width:28px;height:16px;border-radius:6px;background:${timerColor};z-index:3"></div>
-            <div style="position:absolute;top:42px;right:18px;width:18px;height:14px;border-radius:5px;background:${timerColor};transform:rotate(42deg)"></div>
-            <div style="position:absolute;top:42px;left:18px;width:18px;height:14px;border-radius:5px;background:${timerColor};transform:rotate(-42deg)"></div>
-            <div onclick="toggleTimer(${total})" title="הפעלה / עצירה" style="position:relative;width:172px;height:172px;cursor:pointer">
-              <svg width="172" height="172" viewBox="0 0 172 172">
-                <circle cx="86" cy="86" r="82" fill="#fff" stroke="${timerColor}" stroke-width="6"></circle>
-                <circle cx="86" cy="86" r="70" fill="none" stroke="${timerSoft}" stroke-width="5" stroke-dasharray="4 32.6" stroke-linecap="round"></circle>
-                <g style="transform:rotate(-90deg);transform-origin:center">
-                  <circle cx="86" cy="86" r="60" fill="none" stroke="#edeef5" stroke-width="12"></circle>
-                  <circle id="timer-ring-arc" cx="86" cy="86" r="60" fill="none" stroke="${timerColor}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${QCIRC}" stroke-dashoffset="${(QCIRC*(1-frac)).toFixed(1)}" style="transition:stroke-dashoffset .9s linear,stroke .3s"></circle>
-                </g>
-              </svg>
-              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
-                <span id="timer-display" style="font-size:46px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1;color:${timerColor}">${fmtSec(remaining)}</span>
-              </div>
+          <div onclick="toggleTimer(${total})" title="הפעלה / עצירה" style="position:relative;width:236px;height:236px;cursor:pointer;flex-shrink:0">
+            <img src="assets/timer.png" alt="" style="width:100%;height:100%;object-fit:contain;display:block;filter:drop-shadow(0 10px 20px rgba(34,31,100,.24))">
+            <div style="position:absolute;left:46.8%;top:54.6%;transform:translate(-50%,-50%);width:48%;display:flex;align-items:center;justify-content:center">
+              <span id="timer-display" style="font-size:52px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1;color:${timerColor}">${fmtSec(remaining)}</span>
             </div>
           </div>
-          ${timerRunning ? '' : `<button onclick="toggleTimer(${total})" style="width:100%;max-width:380px;padding:17px;border-radius:14px;border:none;cursor:pointer;font-family:inherit;font-size:20px;font-weight:800;color:#fff;background:#1a8c4e;box-shadow:0 4px 12px rgba(26,140,78,.28)">${timerBtnLabel}</button>`}
-          <button onclick="revealGroup('${currentGroup.id}')" style="width:100%;max-width:380px;padding:16px;border-radius:14px;border:2px solid ${gp.bg};cursor:pointer;font-family:inherit;font-size:19px;font-weight:800;color:${gp.deep};background:#fff">חשפו תשובה</button>
+          ${timerRunning ? '' : `<button onclick="toggleTimer(${total})" style="width:100%;max-width:400px;padding:18px;border-radius:15px;border:none;cursor:pointer;font-family:inherit;font-size:21px;font-weight:800;color:#fff;background:linear-gradient(180deg,#22a35e,#1a8c4e);box-shadow:0 6px 0 #126340,0 12px 22px -4px rgba(18,99,64,.45)">${timerBtnLabel}</button>`}
+          ${(timerRunning || remaining < total) ? `<button onclick="revealGroup('${currentGroup.id}')" style="width:100%;max-width:400px;padding:18px;border-radius:15px;border:none;cursor:pointer;font-family:inherit;font-size:21px;font-weight:800;color:#fff;background:linear-gradient(180deg,#2f8fe0,#1f6fd0);box-shadow:0 6px 0 #144f9c,0 12px 22px -4px rgba(20,79,156,.45)">חשפו תשובה</button>` : ''}
         </div>`;
     } else if (!answered) {
       mid = `
-        <div style="display:flex;flex-direction:column;gap:13px;width:100%;background:#fff;border:1.5px solid ${gp.soft};border-radius:16px;padding:20px 22px">
-          <div style="display:flex;gap:20px">
-            <div style="flex:1;display:flex;flex-direction:column;gap:3px">
-              <span style="font-size:14px;font-weight:800;color:${stColor}">משימה</span>
-              <span style="font-size:20px;font-weight:700;color:#1b1c4e;line-height:1.4">${qEsc(ans ? ans.taskName : '')}</span>
+        <div style="display:flex;flex-direction:column;gap:14px;width:100%">
+          <div style="position:relative;display:flex;flex-direction:column;gap:12px;width:100%">
+            <div style="position:absolute;right:45px;top:36px;bottom:36px;width:3px;background:#c8cfe6;border-radius:2px;z-index:0"></div>
+            <div style="position:relative;z-index:1;display:flex;align-items:center;gap:16px;background:#fff;border-radius:18px;padding:14px 18px;box-shadow:0 8px 20px -8px rgba(34,31,100,.22);border:1px solid #eaedf6">
+              <div style="width:54px;height:54px;border-radius:50%;background:#eaf2fd;border:2.5px solid #bcd6f5;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 5px 13px -4px rgba(47,111,208,.45)">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="5" y="4.5" width="14" height="16.5" rx="2.5" stroke="#2f6fd0" stroke-width="2"></rect><path d="M9 3h6v3.4H9z" fill="#2f6fd0"></path><line x1="8.5" y1="11" x2="15.5" y2="11" stroke="#2f6fd0" stroke-width="2" stroke-linecap="round"></line><line x1="8.5" y1="15" x2="13" y2="15" stroke="#2f6fd0" stroke-width="2" stroke-linecap="round"></line></svg>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+                <span style="font-size:15px;font-weight:800;letter-spacing:.05em;color:#2f6fd0">משימה</span>
+                <span style="font-size:26px;font-weight:700;color:#1b1c4e;line-height:1.3">${qEsc(ans ? ans.taskName : '')}</span>
+              </div>
             </div>
-            <div style="flex:1;display:flex;flex-direction:column;gap:3px">
-              <span style="font-size:14px;font-weight:800;color:#c0392b">טעות מוטמנת</span>
-              <span style="font-size:18px;font-weight:600;color:#3a3f5c;line-height:1.45">${qEsc(ans ? ans.whatIsWrong : '')}</span>
+            <div style="position:relative;z-index:1;display:flex;align-items:center;gap:16px;background:#fff;border-radius:18px;padding:14px 18px;box-shadow:0 8px 20px -8px rgba(192,57,43,.24);border:1px solid #f6dcd7">
+              <div style="width:54px;height:54px;border-radius:50%;background:#fdecea;border:2.5px solid #f3b6ad;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 5px 13px -4px rgba(192,57,43,.45)">
+                <svg width="27" height="27" viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.6" stroke="#c0392b" stroke-width="2.4"></circle><line x1="15.4" y1="15.4" x2="21" y2="21" stroke="#c0392b" stroke-width="2.9" stroke-linecap="round"></line></svg>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+                <span style="font-size:15px;font-weight:800;letter-spacing:.05em;color:#c0392b">טעות מוטמנת</span>
+                <span style="font-size:26px;font-weight:700;color:#5a2320;line-height:1.35">${qEsc(ans ? ans.whatIsWrong : '')}</span>
+              </div>
+            </div>
+            <div style="position:relative;z-index:1;display:flex;align-items:center;gap:16px;background:#fff;border-radius:18px;padding:14px 18px;box-shadow:0 8px 20px -8px rgba(26,122,68,.24);border:1px solid #cdebd8">
+              <div style="width:54px;height:54px;border-radius:50%;background:#e8f6ee;border:2.5px solid #aedcbf;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 5px 13px -4px rgba(26,122,68,.45)">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="#1a7a44" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+                <span style="font-size:15px;font-weight:800;letter-spacing:.05em;color:#1a7a44">תיקון</span>
+                <span style="font-size:26px;font-weight:700;color:#155c34;line-height:1.4">${qEsc(ans ? ans.correctFix : '')}</span>
+              </div>
             </div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:3px;background:#e9f7ef;border-radius:12px;padding:13px 16px;border:1px solid #bfe6cf">
-            <span style="font-size:14px;font-weight:800;color:#1a7a44">תיקון</span>
-            <span style="font-size:18px;font-weight:700;color:#185c36;line-height:1.5">${qEsc(ans ? ans.correctFix : '')}</span>
-          </div>
-          <div style="display:flex;gap:11px">
-            <button onclick="doOutcome('${currentGroup.id}','correct')" style="flex:1;padding:16px 6px;border-radius:13px;border:none;cursor:pointer;font-family:inherit;font-size:20px;font-weight:800;color:#fff;background:#1a8c4e">נכון</button>
-            <button onclick="doOutcome('${currentGroup.id}','partial')" style="flex:1;padding:16px 6px;border-radius:13px;border:none;cursor:pointer;font-family:inherit;font-size:20px;font-weight:800;color:#221f64;background:#f4c40f">חלקי</button>
-            <button onclick="doOutcome('${currentGroup.id}','wrong')" style="flex:1;padding:16px 6px;border-radius:13px;border:none;cursor:pointer;font-family:inherit;font-size:20px;font-weight:800;color:#fff;background:#e84d3d">שגוי</button>
+          <div style="display:flex;gap:13px;margin-top:3px">
+            <button onclick="doOutcome('${currentGroup.id}','correct')" style="flex:1;padding:18px 6px;border-radius:15px;border:none;cursor:pointer;font-family:inherit;font-size:22px;font-weight:800;color:#fff;background:linear-gradient(180deg,#22a35e,#1a8c4e);box-shadow:0 6px 0 #126340,0 12px 20px -4px rgba(18,99,64,.5)">נכון</button>
+            <button onclick="doOutcome('${currentGroup.id}','partial')" style="flex:1;padding:18px 6px;border-radius:15px;border:none;cursor:pointer;font-family:inherit;font-size:22px;font-weight:800;color:#221f64;background:linear-gradient(180deg,#ffd633,#f4c40f);box-shadow:0 6px 0 #c79a00,0 12px 20px -4px rgba(199,154,0,.45)">חלקי</button>
+            <button onclick="doOutcome('${currentGroup.id}','wrong')" style="flex:1;padding:18px 6px;border-radius:15px;border:none;cursor:pointer;font-family:inherit;font-size:22px;font-weight:800;color:#fff;background:linear-gradient(180deg,#f2604f,#e84d3d);box-shadow:0 6px 0 #b8392c,0 12px 20px -4px rgba(184,57,44,.5)">שגוי</button>
           </div>
         </div>`;
     } else {
@@ -2889,16 +2891,15 @@ function renderStationModal() {
 
     mainHtml = `
       <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding-top:4px">
-        <div style="width:860px;max-height:100%;background:${gp.tint};border-radius:30px;border:6px solid ${gp.bg};box-shadow:0 22px 55px rgba(34,31,100,.20);position:relative;display:flex;flex-direction:column;align-items:center;padding:32px 50px 36px;overflow:hidden">
-          <div style="position:absolute;inset:14px;border:2px solid ${gp.soft};border-radius:20px;pointer-events:none;z-index:0"></div>
-          <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%;gap:15px">
-            <div style="width:100px;height:100px;border-radius:50%;background:${stTint};border:5px solid ${stColor};display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(34,31,100,.10)">
-              <img src="${qIconUrl(station)}" alt="" style="width:52px;height:52px">
+        <div style="width:900px;max-height:100%;background:linear-gradient(168deg,#ffffff 0%,${gp.tint} 100%);border-radius:34px;border:5px solid ${gp.bg};box-shadow:0 34px 70px -20px rgba(34,31,100,.48),0 16px 32px rgba(34,31,100,.18),inset 0 3px 0 rgba(255,255,255,.9);position:relative;display:flex;flex-direction:column;align-items:center;padding:34px 54px 40px;overflow:hidden">
+          <div style="position:absolute;inset:13px;border:2px solid ${gp.soft};border-radius:24px;pointer-events:none;z-index:0"></div>
+          <div style="position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:${gp.bg};opacity:.06;pointer-events:none;z-index:0"></div>
+          <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%;gap:${revealed ? '12px' : '17px'}">
+            <div style="width:${revealed ? '76px' : '104px'};height:${revealed ? '76px' : '104px'};border-radius:50%;background:${stTint};border:5px solid ${stColor};display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 8px 20px -4px rgba(34,31,100,.28),inset 0 2px 0 rgba(255,255,255,.7);transition:all .3s">
+              <img src="${qIconUrl(station)}" alt="" style="width:${revealed ? '40px' : '54px'};height:${revealed ? '40px' : '54px'};transition:all .3s">
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:7px">
-              <span style="font-size:34px;font-weight:800;line-height:1.05;color:${stColor};text-align:center">${qEsc(station.name)}</span>
-            </div>
-            ${!answered ? `<p style="font-size:19px;font-weight:500;line-height:1.5;color:#5a6080;text-align:center;text-wrap:pretty">${qEsc(question.questionText)}</p>` : ''}
+            <span style="font-size:${revealed ? '24px' : '32px'};font-weight:800;line-height:1.05;color:${stColor};text-align:center;transition:all .3s">${qEsc(station.name)}</span>
+            ${!answered ? `<p style="font-size:${revealed ? '18px' : '38px'};font-weight:${revealed ? '600' : '800'};line-height:1.3;color:${revealed ? '#8086aa' : '#1b1c4e'};text-align:center;text-wrap:pretty;white-space:pre-line;margin:${revealed ? '0' : '6px 0 4px'};max-width:${revealed ? '720px' : '800px'};transition:all .3s">${qEsc(question.questionText).replace(/([.?!]) /, '$1\n')}</p>` : ''}
             ${mid}
           </div>
         </div>
@@ -2979,16 +2980,9 @@ function renderStationModal() {
     }
 
   } else if (station.type === 'unexpected_event') {
+    stationRowHtml = '';
     const ueGroupColor = COLOR[currentGroup.colorToken].primary;
     const ueGroupIdx = GC.groups.indexOf(currentGroup);
-    const ueGroupFg = ['#fff','#fff','#221f64','#fff'][ueGroupIdx] || '#fff';
-    const ueGroupBadge = `
-      <span style="font-size:17px;font-weight:700;color:#9c5660">${station.month||''} · בלת"מ</span>
-      <h2 style="font-size:36px;font-weight:800;line-height:1.05;color:#8a2433;margin:4px 0 10px;text-align:center">גלגל הבלת"מ</h2>
-      <span style="display:inline-flex;align-items:center;gap:9px;background:${ueGroupColor};border-radius:999px;padding:5px 18px 5px 7px;margin-bottom:16px">
-        <span style="width:28px;height:28px;border-radius:50%;background:#fff;display:inline-flex;align-items:center;justify-content:center;color:${ueGroupColor};font-size:15px;font-weight:800">${ueGroupIdx+1}</span>
-        <span style="font-size:16px;font-weight:800;color:${ueGroupFg}">${currentGroup.label} · ${currentGroup.divisionName}</span>
-      </span>`;
     let ueContent = '';
     if (activeUEResult) {
       const noDelay = activeUEResult.waitRounds === 0;
@@ -2998,25 +2992,16 @@ function renderStationModal() {
       else if (typeof wr === 'number') { wTxt = 'ממתינים ' + wr + (wr === 1 ? ' סבב' : ' סבבים'); wIc = '⏳'; wBg = '#fbeccf'; wFg = '#9a6a00'; }
       else { wTxt = 'ההשפעה תיקבע בתיאום עם המנחה'; wIc = '•'; wBg = '#eef0f5'; wFg = '#7a809a'; }
       ueContent = `
-        ${ueGroupBadge}
-        <div style="display:flex;flex-direction:column;align-items:center;gap:13px;width:100%;max-width:480px;background:#fff;border:1.5px solid #d8b3b9;border-radius:18px;padding:22px 26px">
-          <span style="font-size:25px;font-weight:800;color:#1b1c4e;text-align:center;line-height:1.2">${activeUEResult.label}</span>
-          <p style="font-size:17px;font-weight:500;color:#5a6075;line-height:1.5;text-align:center;margin:0">${activeUEResult.description}</p>
-          <span style="display:inline-flex;align-items:center;gap:9px;background:${wBg};color:${wFg};border-radius:12px;padding:11px 20px;font-size:19px;font-weight:800">${wIc} ${wTxt}</span>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:580px;background:#fff;border:2px solid #f1c7c0;border-radius:18px;padding:24px 28px;box-shadow:0 8px 22px -8px rgba(192,57,43,.25)">
+          <span style="font-size:27px;font-weight:800;color:#1b1c4e;text-align:center;line-height:1.3">${qEsc(activeUEResult.label)}</span>
         </div>
         <button onclick="doUEOutcome('${currentGroup.id}',${noDelay ? 0 : 1})"
-          style="margin-top:4px;padding:14px 34px;border-radius:13px;border:2px solid #221f64;background:#fff;cursor:pointer;font-family:inherit;font-size:17px;font-weight:800;color:#221f64">
-          הבנו, ממשיכים ←</button>`;
+          style="width:100%;max-width:360px;padding:18px;border-radius:15px;border:none;cursor:pointer;font-family:inherit;font-size:21px;font-weight:800;color:#fff;background:linear-gradient(180deg,#f2604f,#e84d3d);box-shadow:0 6px 0 #b8392c,0 12px 22px -4px rgba(184,57,44,.45)">הבנו, ממשיכים ←</button>`;
     } else if (ueAlreadyUsed) {
       ueContent = `
-        ${ueGroupBadge}
-        <div style="font-size:40px;margin-bottom:16px">⚡</div>
-        <p style="font-size:16px;color:#5A5A8A;line-height:1.6;margin-bottom:24px;max-width:360px;text-align:center">
-          ${GC.uiCopy.messages.unexpectedAlreadyUsed}</p>
+        <p style="font-size:20px;color:#5A5A8A;line-height:1.6;max-width:440px;text-align:center">${qEsc(GC.uiCopy.messages.unexpectedAlreadyUsed)}</p>
         <button onclick="doUEOutcome('${currentGroup.id}',0)"
-          style="background:#1E1F56;color:#fff;border:none;border-radius:10px;
-            padding:14px 32px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit">
-          ממשיכים קדימה ←</button>`;
+          style="width:100%;max-width:360px;padding:18px;border-radius:15px;border:none;cursor:pointer;font-family:inherit;font-size:21px;font-weight:800;color:#fff;background:linear-gradient(180deg,#f2604f,#e84d3d);box-shadow:0 6px 0 #b8392c,0 12px 22px -4px rgba(184,57,44,.45)">ממשיכים קדימה ←</button>`;
     } else {
       const devUEList = DEV_MODE && ueSet && ueSet.length
         ? `<div style="margin-top:24px;text-align:right;max-width:480px">
@@ -3036,36 +3021,31 @@ function renderStationModal() {
           </div>`
         : '';
       const isWheelSpinning = wheelSpinState && wheelSpinState.spinning;
-      const wheelSvgHtml = buildWheelSvg(ueSet);
       ueContent = `
-        ${ueGroupBadge}
-        <div style="background:#fbf2f3;border:6px solid #8a2433;border-radius:30px;padding:30px 40px 34px;display:flex;flex-direction:column;align-items:center;position:relative;width:100%;max-width:480px">
-          <div style="position:absolute;inset:14px;border:2px solid #d8b3b9;border-radius:20px;pointer-events:none;z-index:0"></div>
-          <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%;gap:14px">
-            <div style="position:relative;width:300px;height:330px;display:flex;align-items:flex-end;justify-content:center;flex-shrink:0">
-              <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:26px solid #221f64;z-index:5;filter:drop-shadow(0 3px 4px rgba(0,0,0,.25))"></div>
-              <div id="ue-wheel-svg" style="width:300px;height:300px;border-radius:50%;will-change:transform">${wheelSvgHtml}</div>
-              <div style="position:absolute;top:calc(50% + 16px);left:50%;transform:translate(-50%,-50%);width:96px;z-index:4;pointer-events:none;display:flex;align-items:center;justify-content:center">
-                <img src="assets/logo-game.png" alt="" style="width:96px;height:auto">
-              </div>
-            </div>
-            <div id="ue-wheel-action" style="width:100%;display:flex;flex-direction:column;align-items:center">
-              ${isWheelSpinning
-                ? `<div style="height:56px;display:flex;align-items:center;justify-content:center"><span style="font-size:18px;font-weight:700;color:#9c5660">הגלגל מסתובב…</span></div>`
-                : `<button onclick="spinWheel('${currentGroup.id}','${station.unexpectedEventSetId}')"
-                    style="width:100%;max-width:300px;padding:17px;border-radius:14px;border:none;cursor:pointer;font-family:inherit;font-size:20px;font-weight:800;color:#fff;background:#8a2433;box-shadow:0 5px 16px rgba(138,36,51,.32)">
-                    ${copy.buttons.spinWheel}</button>`}
-            </div>
-          </div>
+        <div style="position:relative;width:360px;height:360px;flex-shrink:0;filter:drop-shadow(0 14px 26px rgba(34,31,100,.22))">
+          <img id="ue-wheel-svg" src="assets/wheel-inner.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;will-change:transform;transform-origin:50% 50%;backface-visibility:hidden">
+          <img src="assets/wheel-frame.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none">
+        </div>
+        <div id="ue-wheel-action" style="width:100%;display:flex;flex-direction:column;align-items:center">
+          ${isWheelSpinning
+            ? `<div style="height:60px;display:flex;align-items:center;justify-content:center"><span style="font-size:20px;font-weight:700;color:#9c5660">הגלגל מסתובב…</span></div>`
+            : `<button onclick="spinWheel('${currentGroup.id}','${station.unexpectedEventSetId}')"
+                style="width:100%;max-width:360px;padding:18px;border-radius:15px;border:none;cursor:pointer;font-family:inherit;font-size:21px;font-weight:800;color:#fff;background:linear-gradient(180deg,#f2604f,#e84d3d);box-shadow:0 6px 0 #b8392c,0 12px 22px -4px rgba(184,57,44,.45)">${copy.buttons.spinWheel}</button>`}
         </div>
         ${devUEList}`;
     }
     mainHtml = `
-      <div style="flex:1;display:flex;align-items:center;justify-content:center;margin-top:24px">
-        <div style="display:flex;flex-direction:column;align-items:center;background:#fff;
-          border-radius:22px;border:1px solid #e4e7f1;box-shadow:0 8px 26px rgba(34,31,100,.10);
-          padding:40px 56px;text-align:center;max-width:720px;width:100%">
-          ${ueContent}
+      <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding-top:4px">
+        <div style="width:900px;max-height:100%;background:linear-gradient(168deg,#ffffff 0%,${stTint} 100%);border-radius:34px;border:5px solid ${stColor};box-shadow:0 34px 70px -20px rgba(34,31,100,.48),0 16px 32px rgba(34,31,100,.18),inset 0 3px 0 rgba(255,255,255,.9);position:relative;display:flex;flex-direction:column;align-items:center;padding:30px 54px 38px;overflow:hidden">
+          <div style="position:absolute;inset:13px;border:2px solid #f3c7c0;border-radius:24px;pointer-events:none;z-index:0"></div>
+          <div style="position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:${stColor};opacity:.06;pointer-events:none;z-index:0"></div>
+          <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%;gap:14px">
+            <div style="width:96px;height:96px;border-radius:50%;background:${stTint};border:5px solid ${stColor};display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 8px 20px -4px rgba(34,31,100,.28),inset 0 2px 0 rgba(255,255,255,.7)">
+              <img src="${qIconUrl(station)}" alt="" style="width:50px;height:50px">
+            </div>
+            <span style="font-size:32px;font-weight:800;line-height:1.05;color:${stColor};text-align:center">${qEsc(station.name)}</span>
+            ${ueContent}
+          </div>
         </div>
       </div>`;
 
@@ -3953,16 +3933,19 @@ function spinWheel(groupId, ueSetId) {
   const idx = Math.floor(Math.random() * N);
   const SEG = 360 / N;
   const target = idx * SEG + SEG / 2;
-  const finalDeg = 360 * 5 + (360 - target);
+  const finalDeg = 360 * 6 + (360 - target);
   wheelSpinState = { spinning: true, finalDeg, idx, result: ueSet[idx], groupId };
   renderApp();
   requestAnimationFrame(() => {
     const el = document.getElementById('ue-wheel-svg');
     if (!el) return;
+    el.style.transition = 'none';
     el.style.transform = 'rotate(0deg)';
     void el.offsetWidth;
-    el.style.transition = 'transform 3.8s cubic-bezier(.15,.62,.2,1)';
-    el.style.transform = `rotate(${finalDeg}deg)`;
+    requestAnimationFrame(() => {
+      el.style.transition = 'transform 5s cubic-bezier(.12,.57,.13,1)';
+      el.style.transform = `rotate(${finalDeg}deg)`;
+    });
   });
   setTimeout(() => {
     const res = wheelSpinState ? wheelSpinState.result : null;
@@ -3972,7 +3955,7 @@ function spinWheel(groupId, ueSetId) {
     gs(groupId).usedUnexpectedEventIds.push(res.resultId);
     wheelSpinState = null;
     renderApp();
-  }, 3950);
+  }, 5150);
 }
 
 function devSelectUEResult(groupId, ueSetId, idx) {
