@@ -2345,6 +2345,10 @@ function renderFacilitator(app) {
   const bScoreHtml = GC.groups.map((g, gi) => {
     const isAct = gi === currentTurnGroupIndex;
     const pts = pointsByGroup[gi];
+    const isPlayerLocked = gameStarted && gi !== currentTurnGroupIndex;
+    const phoneIcon = `<svg viewBox="0 0 24 24" width="${isAct?'18':'16'}" height="${isAct?'18':'16'}" fill="none"><rect x="5" y="2" width="14" height="20" rx="2" stroke="${GP[gi].fg}" stroke-width="1.8"/><line x1="9" y1="5" x2="15" y2="5" stroke="${GP[gi].fg}" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="17" r="1.5" fill="${GP[gi].fg}"/></svg>`;
+    const lockDot = isPlayerLocked ? `<span style="position:absolute;bottom:-3px;left:-3px;width:15px;height:15px;border-radius:50%;background:#e84d3d;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 10 10" width="9" height="9" fill="none"><rect x="1.5" y="4.5" width="7" height="5" rx="1" stroke="#fff" stroke-width="1.1"/><path d="M3 4.5V3.5a2 2 0 014 0v1" stroke="#fff" stroke-width="1.1" fill="none"/></svg></span>` : '';
+    const phoneBtn = `<button onclick="event.stopPropagation();openMobile('${g.id}',false)" style="flex-shrink:0;width:${isAct?'36px':'30px'};height:${isAct?'36px':'30px'};border-radius:9px;border:1.5px solid rgba(255,255,255,.4);background:rgba(255,255,255,.18);cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;padding:0" title="פתח תיקיית ${bEsc(g.label)}">${phoneIcon}${lockDot}</button>`;
     return `
       <div style="flex:${isAct ? '1.25' : '1'};border-radius:999px;background:${GP[gi].bg};padding:${isAct ? '12px 24px' : '11px 22px'};
         display:flex;align-items:center;gap:14px;transform:${isAct ? 'scale(1.02) translateY(-8px)' : 'none'};transform-origin:center;z-index:${isAct ? 2 : 1};
@@ -2360,6 +2364,7 @@ function renderFacilitator(app) {
           <span style="font-size:13px;font-weight:700;color:${GP[gi].fg};opacity:.7">נק׳</span>
         </div>
         ${isAct ? `<span style="flex-shrink:0;background:rgba(255,255,255,.28);color:${GP[gi].fg};font-weight:800;font-size:13px;border-radius:20px;padding:5px 14px;white-space:nowrap">תור פעיל</span>` : ''}
+        ${phoneBtn}
       </div>`;
   }).join('');
 
@@ -2369,7 +2374,7 @@ function renderFacilitator(app) {
       ${DEV_MODE ? `<button onclick="openDevContent()" title="תוכן פיתוח"
         style="width:48px;height:48px;border-radius:11px;border:1.5px solid #d0d4e8;background:#f0f2f8;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;color:#3a3f6c">☰</button>` : ''}
       ${GC.groups.map((g, gi) => `
-        <button onclick="openMobile('${g.id}')" title="${bEsc(g.label)} — ${bEsc(g.divisionName)}"
+        <button onclick="openMobile('${g.id}',true)" title="${bEsc(g.label)} — ${bEsc(g.divisionName)}"
           style="width:48px;height:72px;border-radius:11px;border:2px solid #fff;background:${GP[gi].bg};cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:0 3px 10px rgba(34,31,100,.22)">
           <span style="width:15px;height:2px;border-radius:2px;background:${GP[gi].fg};opacity:.65"></span>
           <span style="font-size:22px;font-weight:800;color:${GP[gi].fg};line-height:1">${gi+1}</span>
@@ -2567,11 +2572,13 @@ function toggleBoardPhones() {
 }
 
 // HOOK 3: פתיחת תצוגת מובייל של קבוצה מתוך הלוח
-function openMobile(groupId) {
+// asPreview=true → מנחה רואה פתוח תמיד (זכוכית מגדלת)
+// asPreview=false → מנחה רואה מה שהשחקן רואה (צ'יפ תחתי)
+function openMobile(groupId, asPreview = false) {
   currentView = 'mobile';
   currentGroup = groupId;
   cameFromBoard = true;
-  facilitatorPreview = false;
+  facilitatorPreview = asPreview;
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   const idx = GC.groups.findIndex(g => g.id === groupId);
   if (idx >= 0) {
