@@ -2899,7 +2899,7 @@ function renderStationModal() {
               <img src="${qIconUrl(station)}" alt="" style="width:${revealed ? '40px' : '54px'};height:${revealed ? '40px' : '54px'};transition:all .3s">
             </div>
             <span style="font-size:${revealed ? '24px' : '32px'};font-weight:800;line-height:1.05;color:${stColor};text-align:center;transition:all .3s">${qEsc(station.name)}</span>
-            ${!answered ? `<p style="font-size:${revealed ? '18px' : '38px'};font-weight:${revealed ? '600' : '800'};line-height:1.3;color:${revealed ? '#8086aa' : '#1b1c4e'};text-align:center;text-wrap:pretty;white-space:pre-line;margin:${revealed ? '0' : '6px 0 4px'};max-width:${revealed ? '720px' : '800px'};transition:all .3s">${qEsc(question.questionText).replace(/([.?!]) /, '$1\n')}</p>` : ''}
+            ${!answered ? `<p style="font-size:${revealed ? '18px' : '28px'};font-weight:${revealed ? '600' : '800'};line-height:1.3;color:${revealed ? '#8086aa' : '#1b1c4e'};text-align:center;text-wrap:pretty;white-space:pre-line;margin:${revealed ? '0' : '6px 0 4px'};max-width:${revealed ? '720px' : '860px'};transition:all .3s">${qEsc(question.questionText).replace(/([.?!]) /, '$1\n')}</p>` : ''}
             ${mid}
           </div>
         </div>
