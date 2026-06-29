@@ -767,7 +767,7 @@ const GC = {
           "groupId": "group_4",
           "taskName": "הגדלת הכנסות מסחר",
           "whatIsWrong": "המדד 'שיפור הכנסות מסחריות' עמום, והנוסחה 'הכנסות בפועל' חלקית — לא ברור מה נמדד ובאיזה יחס.",
-          "correctFix": "מדד = 'שיעור עמידה ביעד הכנסות מסחר ונדל\"ן'; נוסחה = 'מס' הגגות שעליהן מותקנים PV'.",
+          "correctFix": "מדד = 'שיעור עמידה ביעד הכנסות מסחר ונדל\"ן'; נוסחה = 'מספר הגגות שעליהן מותקנים PV'.",
           "facilitatorNotes": null
         }
       }
@@ -804,7 +804,7 @@ const GC = {
           "groupId": "group_4",
           "taskName": "הגדלת הכנסות מסחר",
           "whatIsWrong": "ספי הביצוע אינם רלוונטיים למדד ההכנסות — '100% = קבלת אישור התקנה | 70% = מוכנות להתקנה' מתאימים למתקנים פוטווולטאיים, לא להכנסות מסחר.",
-          "correctFix": "ספים נכונים (לפי מס' גגות עם PV): 100% = 7 גגות | 70% = 5 גגות | 0% = מתחת ל-5.",
+          "correctFix": "ספים נכונים (לפי מספר גגות עם PV): 100% = 7 גגות | 70% = 5 גגות | 0% = מתחת ל-5.",
           "facilitatorNotes": null
         }
       }
@@ -1149,7 +1149,7 @@ const GC = {
       "dataSource": "מערכת הכנסות, דוחות פיננסיים רבעוניים",
       "notes": "ספי הביצוע אינם מתייחסים להכנסות — יש להתאים למדד הנכון",
       "devErrors": ["rewardMetric", "formula", "performanceThresholds"],
-      "devHint": "טעויות מוטמנות: (1) מדד תגמול עמום — 'שיפור הכנסות מסחריות' לא מגדיר מה נמדד; נכון: 'שיעור עמידה ביעד הכנסות מסחר ונדל\"ן'. (2) נוסחה חלקית — 'הכנסות בפועל' לא מגדירה ביחס למה; נכון: 'מס' הגגות שעליהן מותקנים PV'. (3) ספי ביצוע שגויים — נכון: 100% = 7 גגות | 70% = 5 גגות | 0% = מתחת ל-5."
+      "devHint": "טעויות מוטמנות: (1) מדד תגמול עמום — 'שיפור הכנסות מסחריות' לא מגדיר מה נמדד; נכון: 'שיעור עמידה ביעד הכנסות מסחר ונדל\"ן'. (2) נוסחה חלקית — 'הכנסות בפועל' לא מגדירה ביחס למה; נכון: 'מספר הגגות שעליהן מותקנים PV'. (3) ספי ביצוע שגויים — נכון: 100% = 7 גגות | 70% = 5 גגות | 0% = מתחת ל-5."
     }
   },
   "unexpectedEvents": {
@@ -1778,7 +1778,7 @@ function renderWelcome(app) {
   const INSTR_GROUPS=GC.groups||[
     {label:'קבוצה 1',divisionName:'חטיבת נייד'},
     {label:'קבוצה 2',divisionName:'חטיבת משאבי אנוש'},
-    {label:'קבוצה 3',divisionName:'חטיבת בטיחות, ביטחון ואיכ"ס'},
+    {label:'קבוצה 3',divisionName:'חטיבת בטיחות, ביטחון ואיכות הסביבה'},
     {label:'קבוצה 4',divisionName:'חטיבת פיתוח עסקי'}
   ];
   const STATIONS=[
@@ -1786,7 +1786,7 @@ function renderWelcome(app) {
     {type:'text',ic:'clipboard',label:'מתארגנים',title:'מתארגנים לנסיעה',
      lines:['בחרו נציג או נציגה שיכריזו את התשובות בשם הקבוצה לאורך כל המשחק.','עברו יחד על מבנה תיק תכנית העבודה: רשימת המשימות ומודל התגמול.','המשחק מתקדם בסבבים קבועים - כל קבוצה בתורה, תחנה אחרי תחנה.','המטרה: לזהות טעויות בתכנית העבודה, לצבור נקודות ולהתקדם על המסילה.']},
     {type:'text',ic:'doc',label:'מתקדמים',title:'איך מתקדמים?',
-     lines:['בכל תחנה תקבלו משימה: למצוא את הטעות המוטמנת בתיק תכנית העבודה.','בתורכם, פתחו את התיק במובייל — יש לכם דקה להתייעצות — והכריזו תשובה דרך נציג הקבוצה.','תשובה נכונה או חלקית — מתקדמים לתחנה הבאה. תשובה שגויה — עצירת ביניים בסבב הבא.','אחרי המענה שלכם - התור עובר לקבוצה הבאה. בזמן שאתם עונים, התיקים של שאר הקבוצות נעולים - וגם להפך.','הגעתם לתחנת בלת"מ? סובבו את הגלגל: לפעמים מחכים סבב, ולפעמים ממשיכים.']},
+     lines:['בכל תחנה מחכה לכם אתגר: לאתר את הטעות המוטמנת בתיק תכנית העבודה.','יש לכם דקה אחת להתייעצות קבוצתית.','בתורכם, נציג או נציגת הקבוצה מכריזים את התשובה.','בזמן שקבוצה אחת עונה, התיקים של שאר הקבוצות נעולים. 🔒','עניתם נכון או כמעט נכון? מתקדמים לתחנה הבאה.','טעיתם? עצירת ביניים בסבב הבא, ואז חוזרים למסילה.','אחרי המענה, התור עובר לקבוצה הבאה.','הגעתם לתחנת בלת"מ? מסובבים את הגלגל ומחזיקים אצבעות: מחכים סבב — או ממשיכים קדימה.']},
     {type:'text',ic:'trophy',label:'מנצחים',title:'איך מנצחים?',
      lines:[{text:'בכל תחנה תצברו נקודות לפי איכות התשובה:',score:[{text:'תשובה מלאה: 10 נקודות',color:'#1a8c4e',bg:'#eafaf1'},{text:'תשובה חלקית: 5 נקודות',color:'#e8821e',bg:'#fdefe0'},{text:'תשובה שגויה: 0 נקודות - עצירת ביניים בסבב הבא',color:'#d23b3b',bg:'#fdecec'}]},'המטרה - להגיע ראשונים לאישור מודל התגמול.','במקרה של שוויון על המסילה, הנקודות קובעות מי מובילים.','המסילה מוכנה, התחנה הראשונה מחכה!']},
   ];
@@ -2319,37 +2319,29 @@ function renderFacilitator(app) {
   const bCurIdx = GC.groups.indexOf(currentGroup);
   const bGP = GP[bCurIdx] || GP[0];
 
-  // ── Scoreboard: כרטיסי לוח תוצאות ────────────────────────────────────────
-  const CHIP_DEF = {
-    active:  { chip:'תור פעיל',   bg:'#f4c40f', fg:'#221f64' },
-    played:  { chip:'✓ שיחקה',    bg:'#dff0e6', fg:'#1a7a44' },
-    waiting: { chip:'⏳ ממתינה',  bg:'#fbeccf', fg:'#9a6a00' },
-    notyet:  { chip:'מחכה לתורה', bg:'#eef0f5', fg:'#7a809a' },
-  };
+  // ── Scoreboard: צ'יפי קבוצות תחתיים ────────────────────────────────────────
+  const bRoundHtml = `<div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:rgba(255,255,255,.22);border-radius:20px;padding:10px 22px;min-width:90px">
+    <span style="font-size:13px;font-weight:600;color:rgba(27,28,78,.55);letter-spacing:.04em">סבב</span>
+    <span style="font-size:34px;font-weight:900;color:#1b1c4e;line-height:1;font-variant-numeric:tabular-nums">${roundNumber}</span>
+  </div>`;
   const bScoreHtml = GC.groups.map((g, gi) => {
-    const status = statusByGroup[gi], isAct = status==='active';
-    const c = isAct ? {chip:'תור פעיל', bg:GP[gi].bg, fg:GP[gi].fg} : (CHIP_DEF[status]||CHIP_DEF.notyet);
-    const cellBg = isAct ? GP[gi].tint : '#fff', cellBorder = isAct ? GP[gi].bg : '#e6e8f0';
+    const isAct = gi === currentTurnGroupIndex;
+    const pts = pointsByGroup[gi];
     return `
-      <div style="flex:1;border-radius:15px;overflow:hidden;background:${cellBg};border:2px solid ${cellBorder};box-shadow:0 4px 14px rgba(34,31,100,.10)">
-        <div style="height:6px;background:${GP[gi].bg}"></div>
-        <div style="padding:12px 16px 13px;display:flex;flex-direction:column;gap:9px">
-          <div style="display:flex;align-items:center;gap:11px">
-            <div style="width:38px;height:38px;border-radius:50%;background:${GP[gi].bg};border:3px solid #fff;box-shadow:0 2px 6px rgba(34,31,100,.22);display:flex;align-items:center;justify-content:center;color:${GP[gi].fg};font-size:17px;font-weight:800;flex-shrink:0">${gi+1}</div>
-            <div style="flex:1;min-width:0">
-              <div style="font-size:17px;font-weight:800;color:#1b1c4e">${bEsc(g.label)}</div>
-              <div style="font-size:13px;font-weight:500;color:#6a70a0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${bEsc(g.divisionName)}</div>
-            </div>
-            <span style="font-size:12px;font-weight:800;border-radius:999px;padding:5px 13px;background:${c.bg};color:${c.fg};white-space:nowrap;flex-shrink:0">${c.chip}</span>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid #edeef5;padding-top:9px">
-            <div style="font-size:13px;font-weight:600;color:#5a6075;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">📍 ${bEsc(nameByOrder[groupOrders[gi]]||'—')}</div>
-            <div style="display:flex;align-items:baseline;gap:4px;flex-shrink:0">
-              <span style="font-size:27px;font-weight:800;color:#1b1c4e;font-variant-numeric:tabular-nums">${pointsByGroup[gi]}</span>
-              <span style="font-size:12.5px;font-weight:700;color:#9aa0b8">נק׳</span>
-            </div>
-          </div>
+      <div style="flex:1;border-radius:999px;background:${GP[gi].bg};padding:12px 24px;
+        display:flex;align-items:center;gap:14px;
+        box-shadow:${isAct ? '0 8px 24px rgba(34,31,100,.30)' : 'none'};
+        opacity:${isAct ? 1 : 0.78};
+        border:${isAct ? '3px solid rgba(255,255,255,.55)' : '2px solid transparent'}">
+        <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.28);flex-shrink:0;
+          display:flex;align-items:center;justify-content:center;
+          font-size:17px;font-weight:900;color:${GP[gi].fg}">${gi+1}</div>
+        <span style="flex:1;font-size:18px;font-weight:800;color:${GP[gi].fg};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${bEsc(g.divisionName)}</span>
+        <div style="display:flex;align-items:baseline;gap:3px;flex-shrink:0">
+          <span style="font-size:28px;font-weight:900;color:${GP[gi].fg};font-variant-numeric:tabular-nums;line-height:1">${pts}</span>
+          <span style="font-size:13px;font-weight:700;color:${GP[gi].fg};opacity:.7">נק׳</span>
         </div>
+        ${isAct ? `<span style="flex-shrink:0;background:rgba(255,255,255,.28);color:${GP[gi].fg};font-weight:800;font-size:13px;border-radius:20px;padding:5px 14px;white-space:nowrap">תור פעיל</span>` : ''}
       </div>`;
   }).join('');
 
@@ -2399,7 +2391,7 @@ function renderFacilitator(app) {
         </div>
 
         <!-- לוח תוצאות -->
-        <div style="flex-shrink:0;display:flex;gap:16px">${bScoreHtml}</div>
+        <div style="flex-shrink:0;display:flex;align-items:center;gap:14px">${bRoundHtml}${bScoreHtml}</div>
 
       </div>
 
