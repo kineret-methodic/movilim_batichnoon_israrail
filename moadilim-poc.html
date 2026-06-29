@@ -3021,6 +3021,7 @@ function renderStationModal() {
       ueContent = `
         <div style="display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:580px;background:#fff;border:2px solid #f1c7c0;border-radius:18px;padding:24px 28px;box-shadow:0 8px 22px -8px rgba(192,57,43,.25)">
           <span style="font-size:27px;font-weight:800;color:#1b1c4e;text-align:center;line-height:1.3">${qEsc(activeUEResult.label)}</span>
+          <span style="font-size:19px;font-weight:800;color:${wFg};background:${wBg};border-radius:10px;padding:8px 20px;text-align:center">${wIc} ${wTxt}</span>
         </div>
         <button onclick="doUEOutcome('${currentGroup.id}',${noDelay ? 0 : 1})"
           style="width:100%;max-width:360px;padding:18px;border-radius:15px;border:none;cursor:pointer;font-family:inherit;font-size:21px;font-weight:800;color:#fff;background:linear-gradient(180deg,#f2604f,#e84d3d);box-shadow:0 6px 0 #b8392c,0 12px 22px -4px rgba(184,57,44,.45)">הבנו, ממשיכים ←</button>`;
