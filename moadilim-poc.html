@@ -1622,7 +1622,22 @@ const QR_CODES = {
 };
 
 // ── Sound effects — disabled, pending new sounds ────
-const SFX = { wheelSpin(){}, wheelGood(){}, wheelBad(){}, correct(){}, partial(){}, wrong(){}, whoosh(){}, tick(){}, timerWarning(){}, victory(){}, locked(){} };
+function _sfx(file, volume = 1) {
+  try { const a = new Audio('assets/sfx/' + file); a.volume = volume; a.play().catch(()=>{}); } catch(e) {}
+}
+const SFX = {
+  correct()      { _sfx('correct.mp3'); },
+  partial()      { _sfx('partial.mp3'); },
+  wrong()        { _sfx('wrong.mp3'); },
+  tick()         { _sfx('tick.mp3', 0.5); },
+  timerWarning() { _sfx('timerWarning.mp3'); },
+  wheelSpin()    { _sfx('wheelSpin.mp3'); },
+  wheelGood()    { _sfx('wheelGood.mp3'); },
+  wheelBad()     { _sfx('wheelBad.mp3'); },
+  whoosh()       {},
+  victory()      { _sfx('correct.mp3'); },
+  locked()       {},
+};
 let _lockedSoundKey = null;
 
 // ── Game state ──────────────────────────────────────────
