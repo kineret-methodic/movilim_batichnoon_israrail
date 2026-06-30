@@ -1645,6 +1645,7 @@ const SFX = {
   wheelBad()     { _sfx('wheelBad.mp3'); },
   whoosh()       {},
   victory()      { _sfx('correct.mp3'); },
+  applause()     { _sfx('applause.mp3'); },
   locked()       {},
 };
 let _lockedSoundKey = null;
@@ -2570,6 +2571,7 @@ function renderFacilitator(app) {
     gameOverConfettiLaunched = true;
     setTimeout(launchConfetti, 80);
     setTimeout(() => SFX.victory(), 80);
+    setTimeout(() => SFX.applause(), 300);
   }
   // Scale the projected gameboard to fill available space
   fitBoard();
