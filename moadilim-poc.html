@@ -3330,8 +3330,10 @@ function goBackToMap() {
 }
 
 function revealGroup(groupId) {
+  stopTimer();
   const gst = gs(groupId);
   const st = stationById(activeStationId);
+  if (!gst || !st) { renderApp(); return; }
   const atStation = gst.currentStationOrder >= st.order;
   const completed = gst.completedStationIds.includes(activeStationId);
   if (!atStation && !completed) {
@@ -3339,7 +3341,6 @@ function revealGroup(groupId) {
     renderApp();
     return;
   }
-  stopTimer();
   revealedGroups.add(groupId);
   renderApp();
 }
