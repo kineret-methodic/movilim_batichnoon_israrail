@@ -2845,14 +2845,15 @@ function renderStationModal() {
     const waitMsg = isUnexpected ? 'עצירת ביניים בסבב הבא — גלגל הבלת"מ' : 'עצירת ביניים בסבב הבא';
     mainHtml = `
       <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding-top:4px">
-        <div style="width:860px;max-height:100%;background:${gp.tint};border-radius:30px;border:6px solid ${gp.bg};box-shadow:0 22px 55px rgba(34,31,100,.20);position:relative;display:flex;flex-direction:column;align-items:center;padding:32px 50px 36px;overflow:hidden">
-          <div style="position:absolute;inset:14px;border:2px solid ${gp.soft};border-radius:20px;pointer-events:none;z-index:0"></div>
+        <div style="width:900px;max-height:100%;background:linear-gradient(168deg,#ffffff 0%,${gp.tint} 100%);border-radius:34px;border:5px solid ${gp.bg};box-shadow:0 34px 70px -20px rgba(34,31,100,.48),0 16px 32px rgba(34,31,100,.18),inset 0 3px 0 rgba(255,255,255,.9);position:relative;display:flex;flex-direction:column;align-items:center;padding:34px 54px 40px;overflow:hidden">
+          <div style="position:absolute;inset:13px;border:2px solid ${gp.soft};border-radius:24px;pointer-events:none;z-index:0"></div>
+          <div style="position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:${gp.bg};opacity:.06;pointer-events:none;z-index:0"></div>
           <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%;gap:14px;text-align:center;padding:8px 0">
             <div style="width:86px;height:86px;border-radius:50%;background:${waitColor};display:flex;align-items:center;justify-content:center;color:#fff;font-size:44px;font-weight:800">${waitIcon}</div>
             <span style="font-size:34px;font-weight:800;color:${waitColor}">${waitPoints}</span>
             <p style="font-size:22px;font-weight:700;color:#1b1c4e;line-height:1.5;max-width:480px">${qEsc(waitMsg)}</p>
             <button onclick="skipWaitingGroup('${currentGroup.id}')"
-              style="padding:14px 34px;border-radius:13px;border:2px solid #221f64;background:#fff;cursor:pointer;font-family:inherit;font-size:18px;font-weight:800;color:#221f64">${copy.groupCard.skipButton}</button>
+              style="margin-top:4px;padding:16px 46px;border-radius:14px;border:none;cursor:pointer;font-family:inherit;font-size:20px;font-weight:800;color:#fff;background:linear-gradient(180deg,#2e2c74,#221f64);box-shadow:0 5px 0 #17143a,0 12px 22px -4px rgba(34,31,100,.4)">${copy.groupCard.skipButton}</button>
           </div>
         </div>
       </div>`;
