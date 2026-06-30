@@ -1632,7 +1632,7 @@ const SFX = {
   wrong()        { _sfx('wrong.mp3'); },
   tick()         {
     if (_tickAudio) { try { _tickAudio.pause(); _tickAudio.currentTime = 0; } catch(e) {} }
-    _tickAudio = _sfx('tick.mp3', 0.5);
+    _tickAudio = _sfx('tick.mp3', 1.0);
   },
   stopTick()     {
     if (_tickAudio) { try { _tickAudio.pause(); _tickAudio.currentTime = 0; } catch(e) {} _tickAudio = null; }
