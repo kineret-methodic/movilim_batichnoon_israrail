@@ -3079,10 +3079,13 @@ function renderStationModal() {
           ${(() => {
             const N = ueSet.length || 1;
             const SEG = 360 / N;
-            const warm = ['#EFA63A','#E5574F','#E8743B','#D94F8F'];
-            let wi = 0;
-            const colors = ueSet.map(r => r.waitRounds === 0 ? '#34A85A' : warm[(wi++) % warm.length]);
-            const conic = 'conic-gradient(from 0deg,' + ueSet.map((r,i) => `${colors[i]} ${i*SEG}deg ${(i+1)*SEG}deg`).join(',') + ')';
+            const hasGradientWait = N === 3 && ueSet[0].waitRounds === 0 && ueSet[1].waitRounds > 0 && ueSet[2].waitRounds > 0;
+            const conic = hasGradientWait
+              ? 'conic-gradient(from 0deg, #34A85A 0deg 120deg, #F5A623 120deg, #C4580D 360deg)'
+              : 'conic-gradient(from 0deg,' + ueSet.map((r,i) => {
+                  const c = r.waitRounds === 0 ? '#34A85A' : '#EFA63A';
+                  return `${c} ${i*SEG}deg ${(i+1)*SEG}deg`;
+                }).join(',') + ')';
             const discR = 158, iconR = 92, dotR = 169, Ndots = 12;
             const dividers = ueSet.map((r,i) => `<div style="position:absolute;left:50%;top:50%;width:0;height:0;transform:rotate(${i*SEG}deg)"><div style="position:absolute;left:-1.5px;top:-${discR}px;width:3px;height:${discR}px;background:rgba(255,255,255,.85)"></div></div>`).join('');
             const icons = '';
