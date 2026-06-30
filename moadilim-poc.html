@@ -1626,16 +1626,19 @@ function _sfx(file, volume = 1) {
   try { const a = new Audio('assets/sfx/' + file); a.volume = volume; a.play().catch(()=>{}); } catch(e) {}
 }
 const _tickEl = (() => { try { const a = new Audio('assets/sfx/tick.mp3'); a.volume = 1.0; return a; } catch(e) { return null; } })();
+let _tickStopped = false;
 const SFX = {
   correct()      { _sfx('correct.mp3'); },
   partial()      { _sfx('partial.mp3'); },
   wrong()        { _sfx('wrong.mp3'); },
   tick()         {
     if (!_tickEl) return;
+    _tickStopped = false;
     _tickEl.pause(); _tickEl.currentTime = 0;
-    _tickEl.play().catch(()=>{});
+    _tickEl.play().then(() => { if (_tickStopped) _tickEl.pause(); }).catch(()=>{});
   },
   stopTick()     {
+    _tickStopped = true;
     if (!_tickEl) return;
     _tickEl.pause(); _tickEl.currentTime = 0;
   },
