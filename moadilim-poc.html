@@ -1623,19 +1623,21 @@ const QR_CODES = {
 
 // ── Sound effects ────────────────────────────────────────
 function _sfx(file, volume = 1) {
-  try { const a = new Audio('assets/sfx/' + file); a.volume = volume; a.play().catch(()=>{}); return a; } catch(e) { return null; }
+  try { const a = new Audio('assets/sfx/' + file); a.volume = volume; a.play().catch(()=>{}); } catch(e) {}
 }
-let _tickAudio = null;
+const _tickEl = (() => { try { const a = new Audio('assets/sfx/tick.mp3'); a.volume = 1.0; return a; } catch(e) { return null; } })();
 const SFX = {
   correct()      { _sfx('correct.mp3'); },
   partial()      { _sfx('partial.mp3'); },
   wrong()        { _sfx('wrong.mp3'); },
   tick()         {
-    if (_tickAudio) { try { _tickAudio.pause(); _tickAudio.currentTime = 0; } catch(e) {} }
-    _tickAudio = _sfx('tick.mp3', 1.0);
+    if (!_tickEl) return;
+    _tickEl.pause(); _tickEl.currentTime = 0;
+    _tickEl.play().catch(()=>{});
   },
   stopTick()     {
-    if (_tickAudio) { try { _tickAudio.pause(); _tickAudio.currentTime = 0; } catch(e) {} _tickAudio = null; }
+    if (!_tickEl) return;
+    _tickEl.pause(); _tickEl.currentTime = 0;
   },
   timerWarning() { _sfx('timerWarning.mp3'); },
   wheelSpin()    { _sfx('wheelSpin.mp3'); },
