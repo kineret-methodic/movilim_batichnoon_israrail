@@ -3653,12 +3653,12 @@ function renderMobile(app, groupId) {
     return;
   }
 
-  if (!mobileSplashDone[groupId]) {
-    renderSplash(wrap, group, pal);
-  } else if (refOpen) {
+  if (refOpen) {
     const goals = GC.companyGoals || [];
     const glossary = GC.planningGlossary || [];
     renderReferenceScreen(wrap, pal, goals, glossary);
+  } else if (!mobileSplashDone[groupId]) {
+    renderSplash(wrap, group, pal);
   } else {
     renderFolder(wrap, group, pal);
   }
