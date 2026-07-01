@@ -3648,7 +3648,7 @@ function renderMobile(app, groupId) {
   const currentGroup = GC.groups[currentTurnGroupIndex];
   const isLocked = !DEV_MODE && !facilitatorPreview && gameStarted && group.id !== currentGroup.id;
 
-  if (isLocked) {
+  if (isLocked && !refOpen) {
     renderFolderLocked(wrap, group, pal, currentGroup);
     return;
   }
@@ -3701,6 +3701,10 @@ function renderFolderLocked(wrap, group, pal, currentGroup) {
         <div style="flex-shrink:0;padding:0 24px 30px;display:flex;flex-direction:column;align-items:center;gap:10px">
           <div style="display:flex;gap:7px">${dots}</div>
           <span style="font-size:12px;font-weight:600;color:#9aa0b8">התיק ייפתח אוטומטית כשיגיע תורכם</span>
+          <p style="font-size:13px;font-weight:500;color:#7c84a0;text-align:center;line-height:1.5">ניתן לגשת לחומרי העזר בלחיצה על הכפתור מטה</p>
+          <button onclick="openRef()" style="width:100%;padding:16px;border-radius:14px;border:none;cursor:pointer;font-family:inherit;font-size:17px;font-weight:800;color:${pal.fg};background:${pal.primary};box-shadow:0 5px 16px rgba(34,31,100,.22);display:flex;align-items:center;justify-content:center;gap:10px">
+            <span style="font-size:20px">📖</span>חומרי עזר · צריכים תזכורת?
+          </button>
         </div>
       </div>
     </div>`;
